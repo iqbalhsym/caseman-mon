@@ -38,6 +38,10 @@ Route::post('logout', function () {
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (){
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
+Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import');
+    Route::get('obat/export', [ObatController::class, 'export'])->name('obat.export');
+    Route::get('obat-search', [ObatController::class, 'searchObat'])->name('obat.search');
+
     Route::resources([
         'lokasi' => LokasiController::class,
         'shift' => ShiftController::class,
@@ -56,10 +60,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (){
             'role' => RoleController::class,
         ]);
     });
-
-    Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import');
-    Route::get('obat/export', [ObatController::class, 'export'])->name('obat.export');
-    Route::get('obat-search', [ObatController::class, 'searchObat'])->name('obat.search');
 
     // Search permintaan by name or no_rm (AJAX) - for list/viewer
     Route::get('permintaan-search', [PermintaanController::class, 'search'])->name('permintaan.search');

@@ -13,7 +13,7 @@ class ObatExport implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return Obat::select('f_nf', 'nama_generik', 'kode_item', 'nama_item')->get();
+        return Obat::select('f_nf', 'nama_generik', 'kode_item', 'nama_item', 'warna')->get();
     }
 
     public function headings(): array
@@ -22,7 +22,8 @@ class ObatExport implements FromCollection, WithHeadings
             'F/NF',
             'NAMA GENERIK',
             'KODE ITEM',
-            'NAMA ITEM'
+            'NAMA ITEM',
+            'KATEGORI'
         ];
     }
 }

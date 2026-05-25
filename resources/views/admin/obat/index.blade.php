@@ -17,6 +17,12 @@
             border-left: none !important;
             padding-left: 0 !important;
         }
+        .col-nama-item {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        }
     </style>
 
     <div class="row">
@@ -77,7 +83,15 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="table-responsive">
-                                            <table class="table table-hover select-table table-condensed">
+                                            <table class="table table-hover select-table table-condensed" style="table-layout: fixed; width: 100%;">
+                                                <colgroup>
+        <col style="width: 6%">   {{-- F/NF --}}
+        <col style="width: 20%">  {{-- Nama Generik --}}
+        <col style="width: 12%">  {{-- Kode Item --}}
+        <col style="width: 32%">  {{-- Nama Item --}}
+        <col style="width: 12%">  {{-- Kategori --}}
+        <col style="width: 10%">  {{-- Aksi --}}
+    </colgroup>
                                                 <thead>
                                                     <tr>
                                                         <th>F/NF</th>
@@ -89,32 +103,32 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody id="obat-table-body">
-                                                    @forelse ($data as $item)
-                                                        <tr class="obat-row" data-id="{{ $item->id }}">
-                                                            <td>{{ $item->f_nf }}</td>
-                                                            <td>{{ $item->nama_generik }}</td>
-                                                            <td><span class="badge badge-info">{{ $item->kode_item }}</span></td>
-                                                            <td><h6 class="mb-0">{{ $item->nama_item }}</h6></td>
-                                                            <td>
-                                                                @if($item->warna == 'hijau')
-                                                                    <span class="badge bg-success">Hijau</span>
-                                                                @elseif($item->warna == 'kuning')
-                                                                    <span class="badge bg-warning text-dark">Kuning</span>
-                                                                @elseif($item->warna == 'merah')
-                                                                    <span class="badge bg-danger">Merah</span>
-                                                                @else
-                                                                    <span class="badge bg-secondary">-</span>
-                                                                @endif
-                                                            </td>
-                                                            <td>
-                                                                <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="{{ $item->id }}" title="Edit"><i class="mdi mdi-pencil"></i></button>
-                                                                <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="{{ $item->id }}" title="Hapus"><i class="mdi mdi-delete"></i></button>
-                                                            </td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr><td colspan="6" class="text-center py-4">Belum ada data obat</td></tr>
-                                                    @endforelse
-                                                </tbody>
+    @forelse ($data as $item)
+        <tr class="obat-row" data-id="{{ $item->id }}">
+            <td class="col-nama-item">{{ $item->f_nf }}</td>
+            <td class="col-nama-item" title="{{ $item->nama_generik }}">{{ $item->nama_generik }}</td>
+            <td><span class="badge badge-info">{{ $item->kode_item }}</span></td>
+            <td><h6 class="mb-0 col-nama-item" title="{{ $item->nama_item }}">{{ $item->nama_item }}</h6></td>
+            <td>
+                @if($item->warna == 'hijau')
+                    <span class="badge bg-success">Hijau</span>
+                @elseif($item->warna == 'kuning')
+                    <span class="badge bg-warning text-dark">Kuning</span>
+                @elseif($item->warna == 'merah')
+                    <span class="badge bg-danger">Merah</span>
+                @else
+                    <span class="badge bg-secondary">-</span>
+                @endif
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="{{ $item->id }}" title="Edit"><i class="mdi mdi-pencil"></i></button>
+                <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="{{ $item->id }}" title="Hapus"><i class="mdi mdi-delete"></i></button>
+            </td>
+        </tr>
+    @empty
+        <tr><td colspan="6" class="text-center py-4">Belum ada data obat</td></tr>
+    @endforelse
+</tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -326,18 +340,19 @@
                             if (element.warna === 'merah') badgeWarna = '<span class="badge bg-danger">Merah</span>';
 
                             const rowHTML = `
-                                <tr class="obat-row" data-id="${element.id}">
-                                    <td>${element.f_nf || '-'}</td>
-                                    <td>${element.nama_generik || '-'}</td>
-                                    <td><span class="badge badge-info">${element.kode_item || '-'}</span></td>
-                                    <td><h6 class="mb-0">${element.nama_item || '-'}</h6></td>
-                                    <td>${badgeWarna}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="${element.id}" title="Edit"><i class="mdi mdi-pencil"></i></button>
-                                        <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="${element.id}" title="Hapus"><i class="mdi mdi-delete"></i></button>
-                                    </td>
-                                </tr>
-                            `;
+                                const rowHTML = `
+    <tr class="obat-row" data-id="${element.id}">
+        <td class="col-nama-item">${element.f_nf || '-'}</td>
+        <td class="col-nama-item" title="${element.nama_generik || '-'}">${element.nama_generik || '-'}</td>
+        <td><span class="badge badge-info">${element.kode_item || '-'}</span></td>
+        <td><h6 class="mb-0 col-nama-item" title="${element.nama_item || '-'}">${element.nama_item || '-'}</h6></td>
+        <td>${badgeWarna}</td>
+        <td>
+            <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="${element.id}" title="Edit"><i class="mdi mdi-pencil"></i></button>
+            <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="${element.id}" title="Hapus"><i class="mdi mdi-delete"></i></button>
+        </td>
+    </tr>
+`;
                             $('#obat-table-body').append(rowHTML);
                         })
                     },

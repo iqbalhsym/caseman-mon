@@ -143,8 +143,9 @@
                 <div class="form-group">
                   <label for="captcha">Captcha</label>
                   <div class="d-flex align-items-center" style="gap: 5px;">
-                    <div class="captcha-container d-flex align-items-center justify-content-between flex-grow-1">
-                      <img src="{{ $captcha_image ?? '' }}" id="captchaImage" class="captcha-img" alt="Captcha">
+                    <div class="captcha-container d-flex align-items-center justify-content-between" style="flex: 1;">
+                      <img src="{{ $captcha_image ?? '' }}" id="captchaImage" class="captcha-img" alt="Captcha"
+                          style="width: 100%; height: 60px; object-fit: contain;">
                       <button type="button" id="refreshCaptcha" class="btn btn-sm p-1">
                           <i class="mdi mdi-refresh text-primary"></i>
                       </button>
