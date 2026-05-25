@@ -104,7 +104,7 @@
                                                 </thead>
                                                 <tbody id="obat-table-body">
     @forelse ($data as $item)
-        <tr class="obat-row" data-id="{{ $item->id }}">
+        <tr class="obat-row" data-id="{{ $item->id }}" data-warna="{{ $item->warna ?? '-' }}">
             <td class="col-nama-item">{{ $item->f_nf }}</td>
             <td class="col-nama-item" title="{{ $item->nama_generik }}">{{ $item->nama_generik }}</td>
             <td><span class="badge badge-info">{{ $item->kode_item }}</span></td>
@@ -339,19 +339,18 @@
                             if (element.warna === 'kuning') badgeWarna = '<span class="badge bg-warning text-dark">Kuning</span>';
                             if (element.warna === 'merah') badgeWarna = '<span class="badge bg-danger">Merah</span>';
 
-                            const rowHTML = `
-                                const rowHTML = `
-    <tr class="obat-row" data-id="${element.id}">
-        <td class="col-nama-item">${element.f_nf || '-'}</td>
-        <td class="col-nama-item" title="${element.nama_generik || '-'}">${element.nama_generik || '-'}</td>
-        <td><span class="badge badge-info">${element.kode_item || '-'}</span></td>
-        <td><h6 class="mb-0 col-nama-item" title="${element.nama_item || '-'}">${element.nama_item || '-'}</h6></td>
-        <td>${badgeWarna}</td>
-        <td>
-            <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="${element.id}" title="Edit"><i class="mdi mdi-pencil"></i></button>
-            <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="${element.id}" title="Hapus"><i class="mdi mdi-delete"></i></button>
-        </td>
-    </tr>
+                        const rowHTML = `
+                        <tr class="obat-row" data-id="${element.id}" data-warna="${element.warna || '-'}">
+                            <td class="col-nama-item">${element.f_nf || '-'}</td>
+                            <td class="col-nama-item" title="${element.nama_generik || '-'}">${element.nama_generik || '-'}</td>
+                            <td><span class="badge badge-info">${element.kode_item || '-'}</span></td>
+                            <td><h6 class="mb-0 col-nama-item" title="${element.nama_item || '-'}">${element.nama_item || '-'}</h6></td>
+                            <td>${badgeWarna}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="${element.id}" title="Edit"><i class="mdi mdi-pencil"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="${element.id}" title="Hapus"><i class="mdi mdi-delete"></i></button>
+                        </td>
+                        </tr>
 `;
                             $('#obat-table-body').append(rowHTML);
                         })
@@ -424,22 +423,17 @@
                 const color = $('#obat-color-filter').val().toLowerCase();
 
                 $('.obat-row').each(function(){
-                    const $tr = $(this);
-                    const generik = $tr.find('td').eq(1).text().toLowerCase();
-                    const kode = $tr.find('td').eq(2).text().toLowerCase();
-                    const nama = $tr.find('td').eq(3).text().toLowerCase();
-                    const warnaCell = $tr.find('td').eq(4).text().toLowerCase().trim();
+        const $tr = $(this);
+        const generik = $tr.find('td').eq(1).text().toLowerCase();
+        const kode = $tr.find('td').eq(2).text().toLowerCase();
+        const nama = $tr.find('td').eq(3).text().toLowerCase();
+        const warnaData = $tr.data('warna').toString().toLowerCase(); // ← baca data-warna
 
-                    let matches = true;
-                    if (q && !(kode.includes(q) || nama.includes(q) || generik.includes(q))) matches = false;
-                    
-                    if (color && color !== "") {
-                        if (warnaCell !== color) {
-                            matches = false;
-                        }
-                    }
+        let matches = true;
+        if (q && !(kode.includes(q) || nama.includes(q) || generik.includes(q))) matches = false;
+        if (color && warnaData !== color) matches = false; // ← pakai warnaData
 
-                    $tr.toggle(matches);
+        $tr.toggle(matches);
                 });
             }
 
