@@ -47,6 +47,7 @@ class PermintaanController extends Controller
                 'diagnosis' => $item->diagnosis,
                 'kategori' => ucfirst($item->kategori),
                 'keterangan' => $item->keterangan,
+                'detail_obat' => $item->detail_obat,
                 'status' => $item->status,
                 'jam' => date('H:i', strtotime($item->created_at)),
                 'tanggal' => $item->created_at,
@@ -118,6 +119,7 @@ class PermintaanController extends Controller
                         $detail_paket[] = [
                             'kategori' => $kategori,
                             'keterangan' => $request->keterangan[$index] ?? '',
+                            'detail_obat' => $request->detail_obat[$index] ?? '',
                             'indikasi' => $request->indikasi[$index] ?? ''
                         ];
                     }
@@ -140,6 +142,7 @@ class PermintaanController extends Controller
                 'diagnosis' => $request->diagnosis,
                 'kategori' => $request->kategori[0] ?? null, // keep first for backward compatibility if needed
                 'keterangan' => $request->keterangan[0] ?? null,
+                'detail_obat' => $request->detail_obat[0] ?? null,
                 'indikasi' => $request->indikasi[0] ?? null,
                 'detail_paket' => $detail_paket,
                 'status' => 'menunggu',
@@ -214,11 +217,17 @@ class PermintaanController extends Controller
                     foreach ($data->detail_paket as $idx => $paket) {
                         $message .= "<b>Paket " . ($idx + 1) . "</b>\n";
                         $message .= "Kategori : " . htmlspecialchars($paket['kategori']) . "\n";
+                        if ($paket['kategori'] == 'obat') {
+                            $message .= "Detail Obat : " . htmlspecialchars(strip_tags($paket['detail_obat'] ?? '')) . "\n";
+                        }
                         $message .= "Keterangan : " . htmlspecialchars($paket['keterangan']) . "\n";
                         $message .= "Indikasi : " . htmlspecialchars($paket['indikasi']) . "\n\n";
                     }
                 } else {
                     $message .= "Kategori : " . htmlspecialchars($data->kategori) . "\n";
+                    if ($data->kategori == 'obat') {
+                        $message .= "Detail Obat : " . htmlspecialchars(strip_tags($data->detail_obat ?? '')) . "\n";
+                    }
                     $message .= "Keterangan : " . htmlspecialchars($data->keterangan) . "\n";
                     $message .= "Indikasi : " . htmlspecialchars($data->indikasi) . "\n\n";
                 }
@@ -329,6 +338,7 @@ class PermintaanController extends Controller
                     'diagnosis' => $item->diagnosis,
                     'kategori' => ucfirst($item->kategori),
                     'keterangan' => $item->keterangan,
+                    'detail_obat' => $item->detail_obat,
                     'status' => $item->status,
                     'jam' => date('H:i', strtotime($item->created_at)),
                     'tanggal' => $item->created_at,
@@ -424,6 +434,7 @@ class PermintaanController extends Controller
                     'kategori'   => ucfirst($item->kategori),
                     'tanggal'    => Carbon::parse($item->tanggal)->translatedFormat('d F Y'),
                     'keterangan' => $item->keterangan,
+                    'detail_obat'=> $item->detail_obat,
                     'indikasi'   => $item->indikasi,
                 ];
             });
@@ -511,11 +522,17 @@ class PermintaanController extends Controller
                     foreach ($data->detail_paket as $idx => $paket) {
                         $message .= "<b>Paket " . ($idx + 1) . "</b>\n";
                         $message .= "Kategori : " . htmlspecialchars($paket['kategori']) . "\n";
+                        if ($paket['kategori'] == 'obat') {
+                            $message .= "Detail Obat : " . htmlspecialchars(strip_tags($paket['detail_obat'] ?? '')) . "\n";
+                        }
                         $message .= "Keterangan : " . htmlspecialchars($paket['keterangan']) . "\n";
                         $message .= "Indikasi : " . htmlspecialchars($paket['indikasi']) . "\n\n";
                     }
                 } else {
                     $message .= "Kategori : " . htmlspecialchars($data->kategori) . "\n";
+                    if ($data->kategori == 'obat') {
+                        $message .= "Detail Obat : " . htmlspecialchars(strip_tags($data->detail_obat ?? '')) . "\n";
+                    }
                     $message .= "Keterangan : " . htmlspecialchars($data->keterangan) . "\n";
                     $message .= "Indikasi : " . htmlspecialchars($data->indikasi) . "\n\n";
                 }
@@ -561,6 +578,7 @@ class PermintaanController extends Controller
                 'diagnosis' => $request->diagnosis,
                 'kategori' => $request->kategori,
                 'keterangan' => $request->keterangan,
+                'detail_obat' => $request->detail_obat,
                 'indikasi' => $request->indikasi,
             ]);
 

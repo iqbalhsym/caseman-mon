@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\Laporan\LaporanController;
 use App\Http\Controllers\Admin\Lokasi\LokasiController;
+use App\Http\Controllers\Admin\Obat\ObatController;
 use App\Http\Controllers\Admin\Password\GantiPasswordController;
 use App\Http\Controllers\Admin\Penjamin\PenjaminController;
 use App\Http\Controllers\Admin\Permintaan\ListPermintaanController;
@@ -47,6 +48,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (){
         'viewer' => ViewerController::class,
         'penjamin' => PenjaminController::class,
         'user' => UserController::class,
+        'obat' => ObatController::class,
     ]);
 
     Route::middleware('role:administrator')->group(function () {
@@ -54,6 +56,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (){
             'role' => RoleController::class,
         ]);
     });
+
+    Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import');
+    Route::get('obat/export', [ObatController::class, 'export'])->name('obat.export');
+    Route::get('obat-search', [ObatController::class, 'searchObat'])->name('obat.search');
 
     // Search permintaan by name or no_rm (AJAX) - for list/viewer
     Route::get('permintaan-search', [PermintaanController::class, 'search'])->name('permintaan.search');

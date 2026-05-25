@@ -87,6 +87,14 @@
                 color: #333;
                 font-weight: 500;
                 flex-grow: 1;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                min-width: 0;
+            }
+            .info-row .value .badge {
+                white-space: normal;
+                text-align: left;
+                line-height: 1.4;
             }
             .card-footer {
                 background: #fcfcfc;
@@ -540,6 +548,12 @@
                                                 <span class="label" style="min-width:80px">Keterangan:</span>
                                                 <span class="value">${displayHTML(paket.keterangan)}</span>
                                             </div>
+                                            ${paket.detail_obat ? `
+                                            <div class="info-row">
+                                                <span class="label" style="min-width:80px">Detail Obat:</span>
+                                                <span class="value">${paket.detail_obat}</span>
+                                            </div>
+                                            ` : ''}
                                             <div class="info-row">
                                                 <span class="label" style="min-width:80px">Indikasi:</span>
                                                 <span class="value">${displayHTML(paket.indikasi)}</span>
@@ -556,6 +570,12 @@
                                             <span class="label">Keterangan:</span>
                                             <span class="value">${displayHTML(item.keterangan)}</span>
                                         </div>
+                                        ${item.detail_obat ? `
+                                        <div class="info-row">
+                                            <span class="label">Detail Obat:</span>
+                                            <span class="value">${item.detail_obat}</span>
+                                        </div>
+                                        ` : ''}
                                         <div class="info-row">
                                             <span class="label">Indikasi:</span>
                                             <span class="value">${displayHTML(item.indikasi)}</span>

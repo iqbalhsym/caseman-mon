@@ -26,6 +26,9 @@
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.min.css">
 
+  <!-- Tribute.js -->
+  <link rel="stylesheet" href="https://unpkg.com/tributejs/dist/tribute.css">
+
   <style>
     /* Custom modifications for Caseman-mon */
     .sidebar .nav .nav-item.active > .nav-link {
@@ -36,6 +39,18 @@
     }
     .btn-primary {
         color: #fff !important;
+    }
+
+    /* Caseman-mon tweaks */
+    .content-wrapper {
+        padding: 1.5rem 1.5rem;
+    }
+
+    [contenteditable="true"]:empty:before {
+        content: attr(data-placeholder);
+        color: #adb5bd;
+        pointer-events: none;
+        display: block; /* For Firefox */
     }
 
     /* Condensed Table Styles */
@@ -218,6 +233,13 @@
               <i class="menu-icon mdi mdi-shield-check"></i>
               <span class="menu-title">Penjamin</span>
             </a>
+          </li>
+          <li class="nav-item {{ Request::is('admin/obat*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.obat.index') }}">
+              <i class="menu-icon mdi mdi-pill"></i>
+              <span class="menu-title">Data Obat</span>
+            </a>
+          </li>
           @endif
 
           @if(Auth::user()->role_id != 4 && Auth::user()->role_id != 2)
@@ -302,6 +324,9 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.all.min.js"></script>
   
+  <!-- Tribute.js -->
+  <script src="https://unpkg.com/tributejs/dist/tribute.min.js"></script>
+
   <script>
     function showToast(message, type = 'success') {
         const Toast = Swal.mixin({

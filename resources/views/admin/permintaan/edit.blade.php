@@ -106,6 +106,14 @@
                                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3">{{ $data->keterangan }}</textarea>
                                     </div>
                                 </div>
+
+                                <div class="form-group row {{ $data->kategori == 'obat' ? '' : 'd-none' }}" id="detail-obat-group">
+                                    <label class="col-sm-4 col-form-label text-success" for="detail_obat">Detail Obat</label>
+                                    <div class="col-sm-8">
+                                        <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow: auto; resize: vertical;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">{!! $data->detail_obat !!}</div>
+                                        <textarea class="form-control d-none" id="detail_obat" name="detail_obat" rows="3">{{ $data->detail_obat }}</textarea>
+                                    </div>
+                                </div>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="indikasi">Indikasi</label>
@@ -172,8 +180,10 @@
             var indikasi = document.getElementById("indikasi").value;
             var tanggal_masuk = document.getElementById("tanggal_masuk").value;
 
-            // Validasi jaminan dihapus agar tidak memblokir ID tertentu secara kaku
-
+            // Jika kategori bukan obat, detail obat dikosongkan untuk validasi
+            if (kategori !== 'obat') {
+                document.getElementById("detail_obat").value = '';
+            }
 
             if (no_rm === "" || nama === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || keterangan === "" || indikasi === "") {
                 showToast('Semua field harus diisi, kecuali file pendukung', 'error');
@@ -272,7 +282,7 @@
                     if (resp.data.length > 0) {
                         $('#riwayat-group').removeClass('d-none');
                         $.each(resp.data, function(key, value) {
-                            $('#riwayat').append('<option value="'+ value.keterangan + ' | ' + value.indikasi +'">' + value.kategori + ' | ' + value.tanggal + ' | '+ value.keterangan + '</option>');
+                            $('#riwayat').append('<option data-obat="'+ (value.detail_obat || '') +'" value="'+ value.keterangan + ' | ' + value.indikasi +'">' + value.kategori + ' | ' + value.tanggal + ' | '+ value.keterangan + '</option>');
                         });
                     }else{
                         $('#riwayat-group').addClass('d-none');
@@ -285,13 +295,74 @@
             });
         }, 1000);
 
-        $('#kategori').on('change', handleRiwayat);
+        $('#kategori').on('change', function () {
+            handleRiwayat();
+            if ($(this).val() === 'obat') {
+                $('#detail-obat-group').removeClass('d-none');
+            } else {
+                $('#detail-obat-group').addClass('d-none');
+            }
+        });
 
         $('#riwayat').on('change', function () {
             var keterangan = $('#riwayat').val().split(' | ')[0];
             var indikasi = $('#riwayat').val().split(' | ')[1];
+            var detailObat = $(this).find(':selected').data('obat') || '';
             $('#keterangan').val(keterangan);
             $('#indikasi').val(indikasi);
+            if ($('#kategori').val() === 'obat') {
+                $('#detail_obat').val(detailObat);
+                $('.obat-input-div').html(detailObat);
+            }
+        });
+
+        // --- Tribute.js Logic ---
+        var tribute = new Tribute({
+            trigger: '@',
+            values: function (text, cb) {
+                if(text.length < 2) return cb([]);
+                $.ajax({
+                    url: "{{ route('admin.obat.search') }}",
+                    data: { q: text },
+                    dataType: 'json',
+                    success: function (data) {
+                        var mapped = data.map(function (item) {
+                            var generic = item.nama_generik ? ' - ' + item.nama_generik : '';
+                            return {
+                                key: item.nama_item + ' (' + item.kode_item + ')' + generic,
+                                value: item.nama_item,
+                                warna: item.warna
+                            };
+                        });
+                        cb(mapped);
+                    }
+                });
+            },
+            selectTemplate: function (item) {
+                if (typeof item === 'undefined') return null;
+                var badgeClass = 'bg-secondary';
+                if (item.original.warna === 'hijau') badgeClass = 'bg-success';
+                else if (item.original.warna === 'kuning') badgeClass = 'bg-warning text-dark';
+                else if (item.original.warna === 'merah') badgeClass = 'bg-danger';
+
+                return '<span contenteditable="false" class="badge ' + badgeClass + '">' + item.original.value + '</span> ';
+            },
+            menuItemTemplate: function (item) {
+                return item.string;
+            },
+            replaceTextSuffix: ''
+        });
+
+        tribute.attach(document.querySelectorAll('.obat-input-div'));
+
+        // Sync contenteditable to hidden textarea
+        $(document).on('input', '.obat-input-div', function() {
+            var content = $(this).html();
+            $('#detail_obat').val(content);
+        });
+
+        $(document).on('focus', '.obat-input-div', function() {
+            if ($(this).html().trim() === '<br>') $(this).html('');
         });
 
     </script>

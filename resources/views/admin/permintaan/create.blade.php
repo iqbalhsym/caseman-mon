@@ -110,6 +110,14 @@
                                             </div>
                                         </div>
                                         
+                                        <div class="form-group row d-none detail-obat-group">
+                                            <label class="col-sm-4 col-form-label text-success">Detail Obat</label>
+                                            <div class="col-sm-8">
+                                                <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow-y: auto;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa..."></div>
+                                                <textarea class="obat-input d-none" name="detail_obat[]"></textarea>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">Indikasi</label>
                                             <div class="col-sm-8">
@@ -274,6 +282,14 @@
             const cat = $(this).val().trim();
             const riwayatGroup = container.find('.riwayat-group');
             const riwayatInput = container.find('.riwayat-input');
+            const detailObatGroup = container.find('.detail-obat-group');
+
+            if (cat === 'obat') {
+                detailObatGroup.removeClass('d-none');
+                container.find('.obat-input-div').focus();
+            } else {
+                detailObatGroup.addClass('d-none');
+            }
 
             if (rm.length === 0 || cat.length === 0) {
                 return;
@@ -287,7 +303,7 @@
                     if (resp.data.length > 0) {
                         riwayatGroup.removeClass('d-none');
                         $.each(resp.data, function(key, value) {
-                            riwayatInput.append('<option value="'+ value.keterangan + ' | ' + value.indikasi +'">' + value.kategori + ' | ' + value.tanggal + ' | '+ value.keterangan + '</option>');
+                            riwayatInput.append('<option data-obat="'+ (value.detail_obat || '') +'" value="'+ value.keterangan + ' | ' + value.indikasi +'">' + value.kategori + ' | ' + value.tanggal + ' | '+ value.keterangan + '</option>');
                         });
                     }else{
                         riwayatGroup.addClass('d-none');
@@ -305,8 +321,13 @@
             if ($(this).val()) {
                 var keterangan = $(this).val().split(' | ')[0];
                 var indikasi = $(this).val().split(' | ')[1];
+                var detailObat = $(this).find(':selected').data('obat') || '';
                 container.find('.keterangan-input').val(keterangan);
                 container.find('.indikasi-input').val(indikasi);
+                if (container.find('.kategori-input').val() === 'obat') {
+                    container.find('.obat-input').val(detailObat);
+                    container.find('.obat-input-div').html(detailObat);
+                }
             }
         });
 
@@ -357,6 +378,14 @@
                         </div>
                     </div>
                     
+                    <div class="form-group row d-none detail-obat-group">
+                        <label class="col-sm-4 col-form-label text-success">Detail Obat</label>
+                        <div class="col-sm-8">
+                            <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; resize: vertical; overflow: auto;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa..."></div>
+                            <textarea class="obat-input d-none" name="detail_obat[]"></textarea>
+                        </div>
+                    </div>
+                    
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Indikasi</label>
                         <div class="col-sm-8">
@@ -368,6 +397,7 @@
             
             $('#paket-container').append(newPaket);
             updatePaketLabels();
+            attachTribute(); // Attach tribute to the new dynamically added div
             
             if (paketCount >= maxPaket) {
                 $(this).hide();
@@ -389,6 +419,64 @@
                 $(this).find('h6').text('Paket Detail ' + (index + 1));
             });
         }
+
+        // --- Tribute.js Logic ---
+        var tribute = new Tribute({
+            trigger: '@',
+            values: function (text, cb) {
+                if(text.length < 2) return cb([]);
+                $.ajax({
+                    url: "{{ route('admin.obat.search') }}",
+                    data: { q: text },
+                    dataType: 'json',
+                    success: function (data) {
+                        var mapped = data.map(function (item) {
+                            var generic = item.nama_generik ? ' - ' + item.nama_generik : '';
+                            return {
+                                key: item.nama_item + ' (' + item.kode_item + ')' + generic,
+                                value: item.nama_item,
+                                warna: item.warna
+                            };
+                        });
+                        cb(mapped);
+                    }
+                });
+            },
+            selectTemplate: function (item) {
+                if (typeof item === 'undefined') return null;
+                var badgeClass = 'bg-secondary';
+                if (item.original.warna === 'hijau') badgeClass = 'bg-success';
+                else if (item.original.warna === 'kuning') badgeClass = 'bg-warning text-dark';
+                else if (item.original.warna === 'merah') badgeClass = 'bg-danger';
+
+                return '<span contenteditable="false" class="badge ' + badgeClass + '">' + item.original.value + '</span> ';
+            },
+            menuItemTemplate: function (item) {
+                return item.string;
+            },
+            replaceTextSuffix: ''
+        });
+
+        function attachTribute() {
+            tribute.attach(document.querySelectorAll('.obat-input-div'));
+        }
+
+        // Sync contenteditable to hidden textarea
+        $(document).on('input', '.obat-input-div', function() {
+            var content = $(this).html();
+            $(this).siblings('.obat-input').val(content);
+        });
+
+        // Initialize Tribute on page load
+        attachTribute();
+
+        // Re-attach Tribute and fix placeholder behavior
+        $(document).on('focus', '.obat-input-div', function() {
+            if ($(this).html().trim() === '<br>') $(this).html('');
+        });
+
+        // Hapus kode sync saat riwayat dipilih di sini karena sudah dipindahkan ke atas
+
 
     </script>
 @endpush
