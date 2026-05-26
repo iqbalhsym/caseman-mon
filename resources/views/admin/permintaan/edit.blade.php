@@ -185,7 +185,7 @@
                 document.getElementById("detail_obat").value = '';
             }
 
-            if (no_rm === "" || nama === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || keterangan === "" || indikasi === "") {
+            if (no_rm === "" || nama === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || indikasi === "") {
                 showToast('Semua field harus diisi, kecuali file pendukung', 'error');
                 return false;
             }
