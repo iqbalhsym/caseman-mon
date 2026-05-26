@@ -177,7 +177,7 @@
             var diagnosis = document.getElementById("diagnosis").value;
             
             var valid = true;
-            $('.kategori-input, .keterangan-input, .indikasi-input').each(function() {
+            $('.kategori-input, .indikasi-input').each(function() {
                 if ($(this).val().trim() === '') {
                     valid = false;
                 }
@@ -374,7 +374,7 @@
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Keterangan</label>
                         <div class="col-sm-8">
-                            <textarea class="form-control keterangan-input" name="keterangan[]" rows="3" placeholder="Jelaskan detail permintaan Anda..." required></textarea>
+                            <textarea class="form-control keterangan-input" name="keterangan[]" rows="3" placeholder="Jelaskan detail permintaan Anda..."></textarea>
                         </div>
                     </div>
                     
