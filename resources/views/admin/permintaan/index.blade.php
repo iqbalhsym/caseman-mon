@@ -378,14 +378,14 @@
                 filteredSubmissions.forEach(item => {
                     const statusInfo = statusMap[item.status] || { text: item.status, badge: 'light' };
 
+                    console.log('Ireng: ', item);
+
                     let tgLink = item.phone ? `https://t.me/+${item.phone}` : '#';
                     let tgTarget = item.phone ? '_blank' : '_self';
                     let tgOnclick = item.phone ? '' : 'onclick="alert(\'Nomor Telegram belum disetel di profil pengguna ini!\')"';
 
                     let cardFooter = '';
                     if (item.status === 'menunggu') {
-                        console.log('User role: ', currentUserRole);
-                        console.log(typeof currentUserRole);
                         cardFooter = `
                             <div class="card-footer">
                                 <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
@@ -425,9 +425,9 @@
                                 <div class="text-muted" style="font-size: 0.7rem;">
                                     <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
                                 </div>
-                                <button class="btn btn-xs btn-outline-warning edit" data-id="${item.id}">
+                                <a href="{{ route('admin.permintaan.edit', '') }}/${item.id}" class="btn btn-xs btn-outline-warning edit">
                                     <i class="mdi mdi-pencil"></i> Edit
-                                </button>
+                                </a>
                             </div>
                         `;
                     } else {
