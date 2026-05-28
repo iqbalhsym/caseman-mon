@@ -84,7 +84,7 @@ class PermintaanController extends Controller
      */
     private function canEdit(Permintaan $item): bool
     {
-        $role = auth()->user()->role->name;
+        $role = Auth::user()->role?->name;
 
         // if ($role === 'viewer') return false;
         if ($role === 'administrator') return true;
@@ -99,7 +99,7 @@ class PermintaanController extends Controller
      */
     private function canDelete(Permintaan $item): bool
     {
-        $role = auth()->user()->role->name;
+        $role = Auth::user()->role?->name;
 
         if ($role === 'administrator') return true;
         if ($role === 'tenagamedis' && $item->status === 'menunggu') return true;
