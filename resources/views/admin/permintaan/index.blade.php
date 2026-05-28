@@ -425,7 +425,7 @@
                                 <div class="text-muted" style="font-size: 0.7rem;">
                                     <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
                                 </div>
-                                <a href="{{ route('admin.permintaan.edit', '') }}/${item.id}" class="btn btn-xs btn-outline-warning edit">
+                                <a href="{{ route('admin.permintaan.edit', ${item.id}) }}" class="btn btn-xs btn-outline-warning edit">
                                     <i class="mdi mdi-pencil"></i> Edit
                                 </a>
                             </div>
