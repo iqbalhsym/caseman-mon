@@ -390,8 +390,10 @@
                                 ${!(item.detail_paket && item.detail_paket.length > 0) ? `
                                 <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
                                 <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
-                                <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="">Konfirmasi</button>
-                                <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                ${currentUserRole !== 3 ? `
+                                    <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="">Konfirmasi</button>
+                                    <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                    ` : ''}
                                 ` : ''}
                             </div>
                         `;
