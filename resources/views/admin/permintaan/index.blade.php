@@ -385,6 +385,7 @@
                     let cardFooter = '';
                     if (item.status === 'menunggu') {
                         console.log('User role: ', currentUserRole);
+                        console.log(typeof currentUserRole);
                         cardFooter = `
                             <div class="card-footer">
                                 <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
