@@ -15,86 +15,105 @@
                         <input type="hidden" id="user" name="user" value="{{ Auth::user()->id }}">
                         <input type="hidden" id="dataId" name="id" value="{{ $data->id }}">
                         
+                        {{-- VARIABEL PENGAMAN ROLE --}}
+                        @php
+                            $isTenagaMedis = auth()->user()->role->name === 'tenagamedis';
+                            $isCaseManager = in_array(auth()->user()->role->name, ['casemanager', 'administrator']);
+                        @endphp
+
                         <div class="row">
-                            <!-- Bagian Data Pasien -->
                             <div class="col-md-6 border-end pe-4">
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Data Pasien & Lokasi</h5>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="tanggal_masuk">Tanggal Masuk</label>
                                     <div class="col-sm-8">
-                                        <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d', strtotime($data->tanggal)) }}">
+                                        <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d', strtotime($data->tanggal)) }}" {{ $isCaseManager ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="no_rm">No. Rekam Medis</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="no_rm" name="no_rm" value="{{ $data->no_rm }}">
+                                        <input type="text" class="form-control" id="no_rm" name="no_rm" value="{{ $data->no_rm }}" {{ $isCaseManager ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="nama">Nama Pasien</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}">
+                                        <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}" {{ $isCaseManager ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan</label>
                                     <div class="col-sm-8">
-                                        <select class="form-select" id="jaminan" name="jaminan">
-                                            <option value="umum">Pasien Umum</option>
-                                            <option value="bpjs">Pasien BPJS Kesehatan</option>
-                                            <option value="uhc">Pasien UHC</option>
-                                            <option value="bpjs_jasaraharja">Jasa Raharja - BPJS Kesehatan</option>
-                                        </select>
+                                        @if($isCaseManager)
+                                            <input type="text" class="form-control" value="{{ strtoupper($data->ruangan) }}" readonly>
+                                            <input type="hidden" id="jaminan" name="jaminan" value="{{ $data->ruangan }}">
+                                        @else
+                                            <select class="form-select" id="jaminan" name="jaminan">
+                                                <option value="umum">Pasien Umum</option>
+                                                <option value="bpjs">Pasien BPJS Kesehatan</option>
+                                                <option value="uhc">Pasien UHC</option>
+                                                <option value="bpjs_jasaraharja">Jasa Raharja - BPJS Kesehatan</option>
+                                            </select>
+                                        @endif
                                     </div>
                                 </div>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="lokasi">Lokasi Ruangan</label>
                                     <div class="col-sm-8">
-                                        <select class="form-select" id="lokasi" name="lokasi">
-                                            <option value="">Pilih Lokasi...</option>
-                                            @foreach ($lokasi as $item)
-                                                <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
-                                            @endforeach
-                                        </select>
+                                        @if($isCaseManager)
+                                            <input type="text" class="form-control" value="{{ $data->lokasi?->nama }} Lt. {{ $data->lokasi?->lantai }}" readonly>
+                                            <input type="hidden" id="lokasi" name="lokasi" value="{{ $data->lokasi_id }}">
+                                        @else
+                                            <select class="form-select" id="lokasi" name="lokasi">
+                                                <option value="">Pilih Lokasi...</option>
+                                                @foreach ($lokasi as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
+                                                @endforeach
+                                            </select>
+                                        @endif
                                     </div>
                                 </div>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="diagnosis">Diagnosis</label>
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="4">{{ $data->diagnosis }}</textarea>
+                                        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="4" {{ $isCaseManager ? 'readonly' : '' }}>{{ $data->diagnosis }}</textarea>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Bagian Detail Permintaan -->
                             <div class="col-md-6 ps-4">
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Detail Permintaan & Berkas</h5>
                                 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="kategori">Kategori</label>
                                     <div class="col-sm-8">
-                                        <select class="form-select" id="kategori" name="kategori">
-                                            <option value="">Pilih Kategori...</option>
-                                            <option value="obat">Obat</option>
-                                            <option value="lab">Laboratorium</option>
-                                            <option value="rad">Radiologi</option>
-                                            <option value="bmhp">BMHP</option>
-                                            <option value="darah">Produk Darah</option>
-                                        </select>
+                                        @if($isCaseManager)
+                                            <input type="text" class="form-control" value="{{ strtoupper($data->kategori) }}" readonly>
+                                            <input type="hidden" id="kategori" name="kategori" value="{{ $data->kategori }}">
+                                        @else
+                                            <select class="form-select" id="kategori" name="kategori">
+                                                <option value="">Pilih Kategori...</option>
+                                                <option value="obat">Obat</option>
+                                                <option value="lab">Laboratorium</option>
+                                                <option value="rad">Radiologi</option>
+                                                <option value="bmhp">BMHP</option>
+                                                <option value="darah">Produk Darah</option>
+                                            </select>
+                                        @endif
                                     </div>
                                 </div>
                                 
                                 <div class="form-group row d-none" id="riwayat-group">
                                     <label class="col-sm-4 col-form-label" for="riwayat">Riwayat Permintaan</label>
                                     <div class="col-sm-8">
-                                        <select class="form-select" id="riwayat" name="riwayat">
+                                        <select class="form-select" id="riwayat" name="riwayat" {{ $isCaseManager ? 'disabled' : '' }}>
                                             <option value="">Pilih Riwayat...</option>
                                         </select>
                                     </div>
@@ -103,14 +122,14 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="keterangan">Keterangan</label>
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3">{{ $data->keterangan }}</textarea>
+                                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" {{ $isCaseManager ? 'readonly' : '' }}>{{ $data->keterangan }}</textarea>
                                     </div>
                                 </div>
 
                                 <div class="form-group row {{ $data->kategori == 'obat' ? '' : 'd-none' }}" id="detail-obat-group">
                                     <label class="col-sm-4 col-form-label text-success" for="detail_obat">Detail Obat</label>
                                     <div class="col-sm-8">
-                                        <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow: auto; resize: vertical;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">{!! $data->detail_obat !!}</div>
+                                        <div class="form-control obat-input-div" contenteditable="{{ $isTenagaMedis ? 'true' : 'false' }}" style="min-height: 80px; overflow: auto; resize: vertical; background-eq: {{ $isCaseManager ? '#e9ecef' : '#fff' }}" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">{!! $data->detail_obat !!}</div>
                                         <textarea class="form-control d-none" id="detail_obat" name="detail_obat" rows="3">{{ $data->detail_obat }}</textarea>
                                     </div>
                                 </div>
@@ -118,7 +137,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="indikasi">Indikasi</label>
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="indikasi" name="indikasi" rows="3">{{ $data->indikasi }}</textarea>
+                                        <textarea class="form-control" id="indikasi" name="indikasi" rows="3" {{ $isCaseManager ? 'readonly' : '' }}>{{ $data->indikasi }}</textarea>
                                     </div>
                                 </div>
                                 
@@ -127,7 +146,7 @@
                                         {!! $data->file ? '<br><a href="' . asset($data->file) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file" name="file">
+                                        <input type="file" class="form-control" id="file" name="file" {{ $isCaseManager ? 'disabled' : '' }}>
                                     </div>
                                 </div>
                                 
@@ -136,7 +155,7 @@
                                         {!! $data->file2 ? '<br><a href="' . asset($data->file2) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file2" name="file2">
+                                        <input type="file" class="form-control" id="file2" name="file2" {{ $isCaseManager ? 'disabled' : '' }}>
                                     </div>
                                 </div>
                                 
@@ -145,16 +164,47 @@
                                         {!! $data->file3 ? '<br><a href="' . asset($data->file3) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file3" name="file3">
+                                        <input type="file" class="form-control" id="file3" name="file3" {{ $isCaseManager ? 'disabled' : '' }}>
                                     </div>
                                 </div>
+
+                                {{-- ========================================================================= --}}
+                                {{-- MENU RESPONS ACC / TOLAK (HANYA MUNCUL UNTUK CASE MANAGER & ADMINISTRATOR) --}}
+                                {{-- ========================================================================= --}}
+                                @if($isCaseManager)
+                                    <div class="mt-4 pt-3 border-top border-warning">
+                                        <h5 class="text-warning mb-3"><i class="mdi mdi-gavel"></i> Keputusan Case Manager</h5>
+                                        
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label" for="status">Respon Status</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-select border-warning" id="status" name="status">
+                                                    <option value="menunggu" {{ $data->status == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                                                    <option value="disetujui" {{ $data->status == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
+                                                    <option value="ditolak" {{ $data->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label" for="catatan_diterima">Catatan / Alasan</label>
+                                            <div class="col-sm-8">
+                                                <textarea class="form-control border-warning" id="catatan_diterima" name="catatan_diterima" rows="3" placeholder="Masukkan catatan persetujuan atau alasan penolakan di sini...">{{ $data->catatan_diterima }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                {{-- ========================================================================= --}}
+
                             </div>
                         </div>
                         
                         <div class="row mt-4 pt-4 border-top">
                             <div class="col-12 d-flex justify-content-end">
                                 <a href="{{ route('admin.permintaan.index') }}" class="btn btn-light me-2">Batal</a>
-                                <button type="submit" id="btnSubmit" class="btn btn-primary text-white">Update Pengajuan</button>
+                                <button type="submit" id="btnSubmit" class="btn btn-primary text-white">
+                                    {{ $isCaseManager ? 'Simpan Keputusan' : 'Update Pengajuan' }}
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -165,22 +215,32 @@
 
 @push('script')
     <script>
-        $('#jaminan').val("{{ $data->ruangan }}");
-        $('#lokasi').val("{{ $data->lokasi_id }}");
-        $('#kategori').val("{{ $data->kategori }}");
+        // Set awal data select
+        @if(!$isCaseManager)
+            $('#jaminan').val("{{ $data->ruangan }}");
+            $('#lokasi').val("{{ $data->lokasi_id }}");
+            $('#kategori').val("{{ $data->kategori }}");
+        @endif
 
         function validasiForm() {
+            // Jika login sebagai Case Manager, tidak perlu validasi input data medis
+            if(document.getElementById("status")) {
+                var status = document.getElementById("status").value;
+                if(status === "menunggu") {
+                    showToast('Silahkan pilih status Disetujui atau Ditolak', 'error');
+                    return false;
+                }
+                return true;
+            }
+
             var no_rm = document.getElementById("no_rm").value;
             var nama = document.getElementById("nama").value;
             var jaminan = document.getElementById("jaminan").value;
             var lokasi = document.getElementById("lokasi").value;
             var diagnosis = document.getElementById("diagnosis").value;
             var kategori = document.getElementById("kategori").value;
-            var keterangan = document.getElementById("keterangan").value;
             var indikasi = document.getElementById("indikasi").value;
-            var tanggal_masuk = document.getElementById("tanggal_masuk").value;
 
-            // Jika kategori bukan obat, detail obat dikosongkan untuk validasi
             if (kategori !== 'obat') {
                 document.getElementById("detail_obat").value = '';
             }
@@ -217,7 +277,6 @@
                         }
 
                         showToast(data.message)
-
                         window.location.href = "{{ route('admin.permintaan.index') }}";
                     },
                     error: function (data) {
@@ -225,7 +284,7 @@
                     },
                     complete: function() {
                         $('#btnSubmit').prop('disabled', false);
-                        $('#btnSubmit').html('Update Pengajuan');
+                        $('#btnSubmit').html("{{ $isCaseManager ? 'Simpan Keputusan' : 'Update Pengajuan' }}");
                     }
                 });
             }
@@ -240,15 +299,14 @@
             };
         }
 
+        @if(!$isCaseManager)
         function fetchSearch(q) {
             return $.getJSON("{{ route('admin.permintaan.search.rm') }}", { q: q });
         }
 
         const handleSearch = debounce(function () {
             const q = $('#no_rm').val().trim();
-            if (q.length === 0) {
-                return;
-            }
+            if (q.length === 0) return;
 
             fetchSearch(q).done(function (resp) {
                 if (resp.status === 'success') {
@@ -270,9 +328,7 @@
         const handleRiwayat = debounce(function () {
             const rm = $('#no_rm').val().trim();
             const cat = $('#kategori').val().trim();
-            if (rm.length === 0 || cat.length === 0) {
-                return;
-            }
+            if (rm.length === 0 || cat.length === 0) return;
 
             fetchRiwayat(rm, cat).done(function (resp) {
                 if (resp.status === 'success') {
@@ -355,7 +411,6 @@
 
         tribute.attach(document.querySelectorAll('.obat-input-div'));
 
-        // Sync contenteditable to hidden textarea
         $(document).on('input', '.obat-input-div', function() {
             var content = $(this).html();
             $('#detail_obat').val(content);
@@ -364,7 +419,7 @@
         $(document).on('focus', '.obat-input-div', function() {
             if ($(this).html().trim() === '<br>') $(this).html('');
         });
-
+        @endif
     </script>
 @endpush
 
