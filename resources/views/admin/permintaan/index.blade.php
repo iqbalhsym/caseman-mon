@@ -503,14 +503,14 @@
                                         if (paketStatus === 'menunggu') {
                                             paketActions = `
                                                 <div class="mt-2 pt-2 border-top">
-                                                    <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
-                                                    <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
                                                     ${item.can_edit ? `
                                                         <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
                                                             <i class="mdi mdi-pencil"></i> Edit
                                                         </a>
                                                     ` : ''}
                                                     ${currentUserRole !== 3 ? `
+                                                        <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
+                                                        <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
                                                         <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="${idx}">Konfirmasi</button>
                                                         <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="${idx}">Terima</button>
                                                     ` : ''}
