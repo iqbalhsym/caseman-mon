@@ -318,6 +318,7 @@
     @push('script')
         <script>
             const currentUserRole = {{ Auth::user()->role_id }};
+            console.log('User role: ', currentUserRole);
             const initialSubmissions = @json($datas);
             let submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
 
