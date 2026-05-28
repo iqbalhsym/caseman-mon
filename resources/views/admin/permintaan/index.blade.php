@@ -425,9 +425,11 @@
                                 <div class="text-muted" style="font-size: 0.7rem;">
                                     <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
                                 </div>
-                                <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
-                                    <i class="mdi mdi-pencil"></i> Edit
-                                </a>
+                                ${item.can_edit ? `
+                                    <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
+                                        <i class="mdi mdi-pencil"></i> Edit
+                                    </a>
+                                ` : ''}
                             </div>
                         `;
                     } else {
