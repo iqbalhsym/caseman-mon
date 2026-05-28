@@ -318,7 +318,6 @@
     @push('script')
         <script>
             const currentUserRole = {{ Auth::user()->role_id }};
-            console.log('User role: ', currentUserRole);
             const initialSubmissions = @json($datas);
             let submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
 
@@ -385,6 +384,7 @@
 
                     let cardFooter = '';
                     if (item.status === 'menunggu') {
+                        console.log('User role: ', currentUserRole);
                         cardFooter = `
                             <div class="card-footer">
                                 <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
