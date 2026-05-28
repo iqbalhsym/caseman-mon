@@ -45,8 +45,11 @@ Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import
     Route::resources([
         'lokasi' => LokasiController::class,
         'shift' => ShiftController::class,
+        'permintaan' => PermintaanController::class,
         'ganti-password' => GantiPasswordController::class,
         'laporan' => LaporanController::class,
+        'list-permintaan' => ListPermintaanController::class,
+        'viewer' => ViewerController::class,
         'penjamin' => PenjaminController::class,
         'user' => UserController::class,
         'obat' => ObatController::class,
@@ -55,23 +58,6 @@ Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import
     Route::middleware('role:administrator')->group(function () {
         Route::resources([
             'role' => RoleController::class,
-        ]);
-    });
-
-    Route::middleware('role:tenagamedis')->group(function () {
-        Route::resources([
-            'permintaan' => PermintaanController::class,
-        ]);
-    });
-
-    Route::middleware('role:viewer')->group(function () {
-    Route::resource('viewer', ViewerController::class)->only(['index', 'show']);
-    Route::resource('list-permintaan', ListPermintaanController::class)->only(['index', 'show']);
-    });
-
-    Route::middleware('role:casemanager')->group(function () {
-    Route::resources([
-        'list-permintaan' => ListPermintaanController::class,
         ]);
     });
 

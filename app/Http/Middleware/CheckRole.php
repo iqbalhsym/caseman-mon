@@ -20,10 +20,6 @@ class CheckRole
 
         $userRole = auth()->user()->role->name ?? null;
 
-         if ($userRole === 'administrator') {
-            return $next($request);
-         }
-
         if (!in_array($userRole, $roles)) {
             abort(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
         }
