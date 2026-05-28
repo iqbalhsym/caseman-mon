@@ -390,10 +390,8 @@
                             <div class="card-footer">
                                 <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
                                 ${!(item.detail_paket && item.detail_paket.length > 0) ? `
-                                <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
-                                <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
-                                ${currentUserRole !== '3' ? `
-                                    ` : ''}
+                                    <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
+                                    <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
                                 ` : ''}
                             </div>
                         `;
