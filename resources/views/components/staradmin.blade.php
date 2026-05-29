@@ -255,14 +255,15 @@
           @if(Auth::user()->role_id != 4)
           @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
           <li class="nav-item nav-category">Monitoring</li>
-          @endif ${currentUserRole !== 3 ? `
+          @endif $
           <li class="nav-item {{ Request::is('admin/list-permintaan*') ? 'active' : '' }}">
+            ${currentUserRole !== 3 ? `
             <a class="nav-link" href="{{ route('admin.list-permintaan.index') }}">
               <i class="menu-icon mdi mdi-format-list-checks"></i>
               <span class="menu-title">List Permintaan</span>
             </a>
+            ` : ''}
           </li>
-          ` : ''}
           @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
           <li class="nav-item {{ Request::is('admin/laporan*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.laporan.index') }}">
