@@ -130,7 +130,7 @@
                 background-color: #000000 !important;
                 color: #fff !important;
             }
-            
+
             @media (max-width: 768px) {
                 .filter-nav {
                     flex-wrap: nowrap;
@@ -206,8 +206,8 @@
                 </div>
 
                 <div class="tab-content tab-content-basic">
-                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
-                        
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+
                         {{-- Card Pencarian (Toolbar) --}}
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
@@ -262,17 +262,17 @@
                     <div class="modal-body">
                         <input type="hidden" id="product_id" name="product_id">
                         <input type="hidden" id="paket_index" name="paket_index">
-                        
+
                         <div class="form-group">
                             <label for="catatan">Catatan</label>
                             <textarea class="form-control" id="catatan" name="catatan" rows="3" placeholder="Masukkan catatan..."></textarea>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="hari">Jumlah Hari (Expired)</label>
                             <input type="text" class="form-control" id="hari" name="hari" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="tanggal">Tanggal Mulai (Expired)</label>
                             <input type="date" class="form-control" id="tanggal" name="tanggal" value="{{ date('Y-m-d') }}">
@@ -396,10 +396,10 @@
                                     </a>
                                 ` : ''}
                                     ${currentUserRole !== 3 ? `
-                                    <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
-                                    <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
-                                    <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="">Konfirmasi</button>
-                                    <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                    // <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
+                                    // <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
+                                    // <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="">Konfirmasi</button>
+                                    // <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
                                     ` : ''}
                                 ` : ''}
                             </div>
@@ -421,7 +421,7 @@
                                 <div class="text-muted" style="font-size: 0.7rem;">
                                     <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
                                 </div>
-         
+
                             </div>
                         `;
                     } else if (item.status == 'ditolak' || item.status == 'batal') {
@@ -498,7 +498,7 @@
                                     ${(item.detail_paket && item.detail_paket.length > 0) ? item.detail_paket.map((paket, idx) => {
                                         let paketStatus = paket.status || item.status;
                                         let paketStatusInfo = statusMap[paketStatus] || { text: paketStatus, badge: 'light' };
-                                        
+
                                         let paketActions = '';
                                         if (paketStatus === 'menunggu') {
                                             paketActions = `
@@ -509,10 +509,10 @@
                                                         </a>
                                                     ` : ''}
                                                     ${currentUserRole !== 3 ? `
-                                                        <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
-                                                        <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
-                                                        <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="${idx}">Konfirmasi</button>
-                                                        <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="${idx}">Terima</button>
+                                                        // <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
+                                                        // <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
+                                                        // <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="${idx}">Konfirmasi</button>
+                                                        // <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="${idx}">Terima</button>
                                                     ` : ''}
                                                 </div>
                                             `;
@@ -601,7 +601,7 @@
                                         <span class="value">${displayHTML(item.catatan_diterima)}</span>
                                     </div>
                                     ` : ''}
-                                    
+
                                     ${fileLinks ? `
                                     <div class="info-row mt-2">
                                         <span class="label">File:</span>
@@ -726,7 +726,7 @@
                 $('#headerBatal').html('Alasan Pembatalan');
                 cancelModal.show();
             });
-            
+
             $('body').on('click', '.btn-confirm-action', function () {
                 var id = $(this).data("id");
                 $('#formInputBatal')[0].reset();
