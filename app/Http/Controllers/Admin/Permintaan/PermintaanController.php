@@ -450,6 +450,7 @@ class PermintaanController extends Controller
         }
 
         $lokasi = Lokasi::all();
+        $penjamin = Penjamin::where('status', 'ya')->get();
         return view('admin.permintaan.edit', compact('data', 'lokasi'));
     }
 

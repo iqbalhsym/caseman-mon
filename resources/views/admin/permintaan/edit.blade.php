@@ -62,13 +62,13 @@
                                         @endif --}}
                                         @else
                                                 <select class="form-select" id="jaminan" name="jaminan">
-                                                    @forelse ($jaminans as $jaminan)
-                                                        <option value="{{ $jaminan->nama }}"
+                                                    @forelse ($penjamin as $item)
+                                                        <option value="{{ $item->nama }}"
                                                             {{ old('jaminan', $data->jaminan) == $jaminan->nama ? 'selected' : '' }}>
-                                                            {{ $jaminan->nama }}
+                                                            {{ $item->nama }}
                                                         </option>
                                                     @empty
-                                                        <option value="">Tidak ada data jaminan</option>
+                                                        <option value="">Tidak ada data penjaminan</option>
                                                     @endforelse
                                                 </select>
                                         @endif
