@@ -64,7 +64,7 @@
                                                 <select class="form-select" id="jaminan" name="jaminan">
                                                     @forelse ($penjamin as $item)
                                                         <option value="{{ $item->nama }}"
-                                                            {{ old('jaminan', $data->jaminan) == $jaminan->nama ? 'selected' : '' }}>
+                                                            {{ old('jaminan', $data->jaminan) == $item->nama ? 'selected' : '' }}>
                                                             {{ $item->nama }}
                                                         </option>
                                                     @empty
