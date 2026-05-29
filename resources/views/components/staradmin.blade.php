@@ -14,15 +14,15 @@
   <link rel="stylesheet" href="{{ asset('assets/vendors/typicons/typicons.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/vendors/simple-line-icons/css/simple-line-icons.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/vendors/css/vendor.bundle.base.css') }}">
-  
+
   <!-- inject:css -->
   <link rel="stylesheet" href="{{ asset('assets/css/vertical-layout-light/style.css') }}">
   <!-- endinject -->
   <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" />
-  
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.min.css">
 
@@ -145,7 +145,7 @@
 
 </div>
       </div>
-      <div class="navbar-menu-wrapper d-flex align-items-top"> 
+      <div class="navbar-menu-wrapper d-flex align-items-top">
         <ul class="navbar-nav">
           <li class="nav-item font-weight-semibold ms-0">
             <h1 class="welcome-text">Selamat Datang, <span class="text-black fw-bold">{{ Auth::user()->name ?? 'User' }}</span></h1>
@@ -193,7 +193,7 @@
       </div>
     </nav>
     <!-- partial -->
-    
+
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -206,7 +206,7 @@
             </a>
           </li>
           @endif
-          
+
           @if(Auth::user()->role_id == 1)
           <li class="nav-item nav-category">Master Data</li>
           <li class="nav-item {{ Request::is('admin/user*') ? 'active' : '' }}">
@@ -255,13 +255,14 @@
           @if(Auth::user()->role_id != 4)
           @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
           <li class="nav-item nav-category">Monitoring</li>
-          @endif
+          @endif ${currentUserRole !== 3 ? `
           <li class="nav-item {{ Request::is('admin/list-permintaan*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.list-permintaan.index') }}">
               <i class="menu-icon mdi mdi-format-list-checks"></i>
               <span class="menu-title">List Permintaan</span>
             </a>
           </li>
+          ` : ''}
           @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
           <li class="nav-item {{ Request::is('admin/laporan*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.laporan.index') }}">
@@ -278,7 +279,7 @@
               <span class="menu-title">Viewer Status</span>
             </a>
           </li>
-          
+
           <li class="nav-item nav-category">Sistem</li>
           <li class="nav-item">
             <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -289,13 +290,13 @@
         </ul>
       </nav>
       <!-- partial -->
-      
+
       <div class="main-panel">
         <div class="content-wrapper">
           {{ $slot }}
         </div>
         <!-- content-wrapper ends -->
-        
+
         <!-- partial:partials/_footer.html -->
         <footer class="footer">
           <div class="d-sm-flex justify-content-center justify-content-sm-between">
@@ -313,17 +314,17 @@
 
   <!-- plugins:js -->
   <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
-  
+
   <!-- inject:js -->
   <script src="{{ asset('assets/js/off-canvas.js') }}"></script>
   <script src="{{ asset('assets/js/hoverable-collapse.js') }}"></script>
   <script src="{{ asset('assets/js/template.js') }}"></script>
   <script src="{{ asset('assets/js/settings.js') }}"></script>
-  
+
   <!-- Custom Scripts -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.all.min.js"></script>
-  
+
   <!-- Tribute.js -->
   <script src="https://unpkg.com/tributejs/dist/tribute.min.js"></script>
 
