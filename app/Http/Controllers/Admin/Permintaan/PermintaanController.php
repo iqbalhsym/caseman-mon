@@ -78,7 +78,7 @@ class PermintaanController extends Controller
 
         return false; // 'viewer' dan 'casemanager' tidak bisa membuat baru
     }
-    
+
     /**
      * Cek apakah user boleh edit permintaan ini
      */
@@ -575,8 +575,10 @@ class PermintaanController extends Controller
                 ]);
             }
 
+            $role = Auth::user()->role?->name;
+
             if (in_array($role, ['casemanager', 'administrator'])) {
-                
+
                 // Set angka status berdasarkan pilihan untuk keperluan sorting di index
                 $statusAngka = 1; // menunggu
                 if ($request->status === 'disetujui') $statusAngka = 2;
@@ -586,11 +588,11 @@ class PermintaanController extends Controller
                     'status'           => $request->status,
                     'status_angka'     => $statusAngka,
                     'catatan_diterima' => $request->catatan_diterima,
-                    'manager_id'       => auth()->user()->id, // Menyimpan siapa CM yang melakukan ACC
+                    'manager_id'       => Auth::user()->id, // Menyimpan siapa CM yang melakukan ACC
                     'tanggal_jam_respon'=> Carbon::now(),     // Track waktu respon untuk kolom jam_respon
                 ]);
 
-                // Opsional: Anda bisa menambahkan trigger kirim notifikasi whatsapp/telegram 
+                // Opsional: Anda bisa menambahkan trigger kirim notifikasi whatsapp/telegram
                 // ke Tenaga Medis di sini jika statusnya di-acc atau ditolak.
 
             // KONDISI B: Jika yang login adalah Tenaga Medis (Hanya perbaikan data pengajuan)
