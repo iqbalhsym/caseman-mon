@@ -10,11 +10,11 @@
                     <p class="card-description text-danger">
                         <i class="mdi mdi-alert-circle"></i> Perhatian: Persetujuan casemanager hanya diajukan untuk pasien BPJS Kesehatan/UHC. Serta pastikan tidak ada di list auto acc.
                     </p>
-                    
+
                     <form id="pengajuan-form" class="form-sample mt-4">
                         <input type="hidden" id="user" name="user" value="{{ Auth::user()->id }}">
                         <input type="hidden" id="dataId" name="id" value="{{ $data->id }}">
-                        
+
                         {{-- VARIABEL PENGAMAN ROLE --}}
                         @php
                             $isTenagaMedis = auth()->user()->role->name === 'tenagamedis';
@@ -24,45 +24,57 @@
                         <div class="row">
                             <div class="col-md-6 border-end pe-4">
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Data Pasien & Lokasi</h5>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="tanggal_masuk">Tanggal Masuk</label>
                                     <div class="col-sm-8">
                                         <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d', strtotime($data->tanggal)) }}" {{ $isCaseManager ? 'readonly' : '' }}>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="no_rm">No. Rekam Medis</label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="no_rm" name="no_rm" value="{{ $data->no_rm }}" {{ $isCaseManager ? 'readonly' : '' }}>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="nama">Nama Pasien</label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}" {{ $isCaseManager ? 'readonly' : '' }}>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan</label>
                                     <div class="col-sm-8">
                                         @if($isCaseManager)
                                             <input type="text" class="form-control" value="{{ strtoupper($data->ruangan) }}" readonly>
                                             <input type="hidden" id="jaminan" name="jaminan" value="{{ $data->ruangan }}">
-                                        @else
+                                        {{-- @else
                                             <select class="form-select" id="jaminan" name="jaminan">
                                                 <option value="umum">Pasien Umum</option>
                                                 <option value="bpjs">Pasien BPJS Kesehatan</option>
                                                 <option value="uhc">Pasien UHC</option>
                                                 <option value="bpjs_jasaraharja">Jasa Raharja - BPJS Kesehatan</option>
                                             </select>
+                                        @endif --}}
+                                        @else
+                                                <select class="form-select" id="jaminan" name="jaminan">
+                                                    @forelse ($jaminans as $jaminan)
+                                                        <option value="{{ $jaminan->nama }}"
+                                                            {{ old('jaminan', $data->jaminan) == $jaminan->nama ? 'selected' : '' }}>
+                                                            {{ $jaminan->nama }}
+                                                        </option>
+                                                    @empty
+                                                        <option value="">Tidak ada data jaminan</option>
+                                                    @endforelse
+                                                </select>
                                         @endif
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="lokasi">Lokasi Ruangan</label>
                                     <div class="col-sm-8">
@@ -79,7 +91,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="diagnosis">Diagnosis</label>
                                     <div class="col-sm-8">
@@ -90,7 +102,7 @@
 
                             <div class="col-md-6 ps-4">
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Detail Permintaan & Berkas</h5>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="kategori">Kategori</label>
                                     <div class="col-sm-8">
@@ -109,7 +121,7 @@
                                         @endif
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row d-none" id="riwayat-group">
                                     <label class="col-sm-4 col-form-label" for="riwayat">Riwayat Permintaan</label>
                                     <div class="col-sm-8">
@@ -118,7 +130,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="keterangan">Keterangan</label>
                                     <div class="col-sm-8">
@@ -133,23 +145,23 @@
                                         <textarea class="form-control d-none" id="detail_obat" name="detail_obat" rows="3">{{ $data->detail_obat }}</textarea>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="indikasi">Indikasi</label>
                                     <div class="col-sm-8">
                                         <textarea class="form-control" id="indikasi" name="indikasi" rows="3" {{ $isCaseManager ? 'readonly' : '' }}>{{ $data->indikasi }}</textarea>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="file">File Pendukung 1 
+                                    <label class="col-sm-4 col-form-label" for="file">File Pendukung 1
                                         {!! $data->file ? '<br><a href="' . asset($data->file) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
                                     </label>
                                     <div class="col-sm-8">
                                         <input type="file" class="form-control" id="file" name="file" {{ $isCaseManager ? 'disabled' : '' }}>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file2">File Pendukung 2
                                         {!! $data->file2 ? '<br><a href="' . asset($data->file2) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
@@ -158,7 +170,7 @@
                                         <input type="file" class="form-control" id="file2" name="file2" {{ $isCaseManager ? 'disabled' : '' }}>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file3">File Pendukung 3
                                         {!! $data->file3 ? '<br><a href="' . asset($data->file3) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
@@ -174,7 +186,7 @@
                                 @if($isCaseManager)
                                     <div class="mt-4 pt-3 border-top border-warning">
                                         <h5 class="text-warning mb-3"><i class="mdi mdi-gavel"></i> Keputusan Case Manager</h5>
-                                        
+
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label" for="status">Respon Status</label>
                                             <div class="col-sm-8">
@@ -198,7 +210,7 @@
 
                             </div>
                         </div>
-                        
+
                         <div class="row mt-4 pt-4 border-top">
                             <div class="col-12 d-flex justify-content-end">
                                 <a href="{{ route('admin.permintaan.index') }}" class="btn btn-light me-2">Batal</a>
