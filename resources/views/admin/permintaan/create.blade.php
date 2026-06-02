@@ -10,38 +10,39 @@
                     <p class="card-description text-danger">
                         <i class="mdi mdi-alert-circle"></i> Perhatian: Persetujuan casemanager hanya diajukan untuk pasien BPJS Kesehatan/UHC. Serta pastikan tidak ada di list auto acc.
                     </p>
-                    
+                    <p class="text-muted small">Tanda (<span class="text-danger">*</span>) Kolom Wajib Diisi.</p>
+
                     <form id="pengajuan-form" class="form-sample mt-4">
                         <input type="hidden" id="user" name="user" value="{{ Auth::user()->id }}">
-                        
+
                         <div class="row">
                             <!-- Bagian Data Pasien -->
                             <div class="col-md-6 border-end pe-4">
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Data Pasien & Lokasi</h5>
-                                
+
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="tanggal_masuk">Tanggal Masuk</label>
+                                    <label class="col-sm-4 col-form-label" for="tanggal_masuk">Tanggal Masuk <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
                                         <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d') }}">
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="no_rm">No. Rekam Medis</label>
+                                    <label class="col-sm-4 col-form-label" for="no_rm">No. Rekam Medis <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="no_rm" name="no_rm" placeholder="Masukkan No. RM...">
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="nama">Nama Pasien</label>
+                                    <label class="col-sm-4 col-form-label" for="nama">Nama Pasien <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama pasien...">
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan</label>
+                                    <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
                                         <select class="form-select" id="jaminan" name="jaminan">
                                             <option value="">Pilih Jaminan...</option>
@@ -51,9 +52,9 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="lokasi">Lokasi Ruangan</label>
+                                    <label class="col-sm-4 col-form-label" for="lokasi">Lokasi Ruangan <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
                                         <select class="form-select" id="lokasi" name="lokasi">
                                             <option value="">Pilih Lokasi...</option>
@@ -63,9 +64,9 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="diagnosis">Diagnosis</label>
+                                    <label class="col-sm-4 col-form-label" for="diagnosis">Diagnosis <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
                                         <textarea class="form-control" id="diagnosis" name="diagnosis" rows="4" placeholder="Masukkan diagnosis pasien..."></textarea>
                                     </div>
@@ -75,12 +76,12 @@
                             <!-- Bagian Detail Permintaan -->
                             <div class="col-md-6 ps-4">
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Detail Permintaan & Berkas</h5>
-                                
+
                                 <div id="paket-container">
                                     <div class="paket-item border rounded p-3 mb-3 bg-light position-relative">
                                         <h6 class="text-secondary mb-3">Paket Detail 1</h6>
                                         <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Kategori</label>
+                                            <label class="col-sm-4 col-form-label">Kategori <span class="text-danger">*</span></label>
                                             <div class="col-sm-8">
                                                 <select class="form-select kategori-input" name="kategori[]" required>
                                                     <option value="">Pilih Kategori...</option>
@@ -93,7 +94,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="form-group row d-none riwayat-group">
                                             <label class="col-sm-4 col-form-label">Riwayat Permintaan</label>
                                             <div class="col-sm-8">
@@ -102,24 +103,24 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">Keterangan</label>
                                             <div class="col-sm-8">
                                                 <textarea class="form-control keterangan-input" name="keterangan[]" rows="3" placeholder="Jelaskan detail permintaan Anda..."></textarea>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="form-group row d-none detail-obat-group">
-                                            <label class="col-sm-4 col-form-label text-success">Detail Obat</label>
+                                            <label class="col-sm-4 col-form-label text-success">Detail Obat <span class="text-danger">*</span></label>
                                             <div class="col-sm-8">
                                                 <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow-y: auto;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa..."></div>
-                                                <textarea class="obat-input d-none" name="detail_obat[]"></textarea>
+                                                <textarea class="obat-input d-none" name="detail_obat[]" required></textarea>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Indikasi</label>
+                                            <label class="col-sm-4 col-form-label">Indikasi <span class="text-danger">*</span></label>
                                             <div class="col-sm-8">
                                                 <textarea class="form-control indikasi-input" name="indikasi[]" rows="3" placeholder="Jelaskan indikasi medis..." required></textarea>
                                             </div>
@@ -129,21 +130,21 @@
                                 <div class="mb-4">
                                     <button type="button" id="btn-tambah-paket" class="btn btn-sm btn-outline-primary"><i class="mdi mdi-plus"></i> Tambah Detail Paket</button>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file">File Pendukung 1</label>
                                     <div class="col-sm-8">
                                         <input type="file" class="form-control" id="file" name="file">
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file2">File Pendukung 2</label>
                                     <div class="col-sm-8">
                                         <input type="file" class="form-control" id="file2" name="file2">
                                     </div>
                                 </div>
-                                
+
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file3">File Pendukung 3</label>
                                     <div class="col-sm-8">
@@ -152,7 +153,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row mt-4 pt-4 border-top">
                             <div class="col-12 d-flex justify-content-end">
                                 <a href="{{ route('admin.permintaan.index') }}" class="btn btn-light me-2">Batal</a>
@@ -175,7 +176,7 @@
             var jaminan = document.getElementById("jaminan").value;
             var lokasi = document.getElementById("lokasi").value;
             var diagnosis = document.getElementById("diagnosis").value;
-            
+
             var valid = true;
             $('.kategori-input, .indikasi-input').each(function() {
                 if ($(this).val().trim() === '') {
@@ -254,12 +255,12 @@
                 if (resp.status === 'success') {
                     // Always update name if found
                     $('#nama').val(resp.data.nama);
-                    
+
                     // Only fill others if empty to avoid overwriting manual input
                     if (!$('#jaminan').val()) $('#jaminan').val(resp.data.jaminan_id);
                     if (!$('#lokasi').val()) $('#lokasi').val(resp.data.lokasi_id);
                     if (!$('#diagnosis').val()) $('#diagnosis').val(resp.data.diagnosis);
-                    
+
                     showToast('Data pasien ditemukan', 'success');
                 } else {
                     $('#nama').attr('placeholder', 'Masukkan nama pasien...');
@@ -342,13 +343,13 @@
             }
 
             paketCount++;
-            
+
             const newPaket = `
                 <div class="paket-item border rounded p-3 mb-3 bg-light position-relative mt-3">
                     <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 btn-hapus-paket"><i class="mdi mdi-close"></i> Hapus</button>
                     <h6 class="text-secondary mb-3">Paket Detail ${paketCount}</h6>
                     <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">Kategori</label>
+                        <label class="col-sm-4 col-form-label">Kategori <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
                             <select class="form-select kategori-input" name="kategori[]" required>
                                 <option value="">Pilih Kategori...</option>
@@ -361,7 +362,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="form-group row d-none riwayat-group">
                         <label class="col-sm-4 col-form-label">Riwayat Permintaan</label>
                         <div class="col-sm-8">
@@ -370,35 +371,35 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Keterangan</label>
                         <div class="col-sm-8">
                             <textarea class="form-control keterangan-input" name="keterangan[]" rows="3" placeholder="Jelaskan detail permintaan Anda..."></textarea>
                         </div>
                     </div>
-                    
+
                     <div class="form-group row d-none detail-obat-group">
-                        <label class="col-sm-4 col-form-label text-success">Detail Obat</label>
+                        <label class="col-sm-4 col-form-label text-success">Detail Obat <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
                             <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; resize: vertical; overflow: auto;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa..."></div>
                             <textarea class="obat-input d-none" name="detail_obat[]"></textarea>
                         </div>
                     </div>
-                    
+
                     <div class="form-group row">
-                        <label class="col-sm-4 col-form-label">Indikasi</label>
+                        <label class="col-sm-4 col-form-label">Indikasi <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
                             <textarea class="form-control indikasi-input" name="indikasi[]" rows="3" placeholder="Jelaskan indikasi medis..." required></textarea>
                         </div>
                     </div>
                 </div>
             `;
-            
+
             $('#paket-container').append(newPaket);
             updatePaketLabels();
             attachTribute(); // Attach tribute to the new dynamically added div
-            
+
             if (paketCount >= maxPaket) {
                 $(this).hide();
             }
@@ -408,7 +409,7 @@
             $(this).closest('.paket-item').remove();
             paketCount--;
             updatePaketLabels();
-            
+
             if (paketCount < maxPaket) {
                 $('#btn-tambah-paket').show();
             }
