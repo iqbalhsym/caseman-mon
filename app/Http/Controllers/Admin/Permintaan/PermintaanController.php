@@ -55,6 +55,7 @@ class PermintaanController extends Controller
                 'file2'                   => $item->file2 ? asset($item->file2) : null,
                 'file3'                   => $item->file3 ? asset($item->file3) : null,
                 'user'                    => $item->user_id,
+                'pengaju'                 => $item->user?->name ?? '-',
                 'user_login'              => Auth::user()->id,
                 'phone'                   => ($item->user && $item->user->phone) ? '62' . ltrim($item->user->phone, '0') : '',
                 'jaminan'                 => $item->penjamin?->nama ?? (\App\Models\Penjamin::find($item->lantai)?->nama ?? '-'),
@@ -143,12 +144,22 @@ class PermintaanController extends Controller
 
             // Cari shift yang aktif hari ini pada jam sekarang DAN di lantai yang sama
             $nowTime = date('H:i');
-            $manager = Shift::where('tanggal', date('Y-m-d'))
+            $managerQuery = Shift::where('tanggal', date('Y-m-d'))
                 ->where('jam_mulai', '<=', $nowTime)
-                ->where('jam_selesai', '>=', $nowTime)
-                ->where('lantai', $lantaiPasien)
-                ->with('user')
-                ->first();
+                ->where('jam_selesai', '>=', $nowTime);
+
+            if ($lantaiPasien !== null && $lantaiPasien !== '') {
+                $managerQuery->where(function ($query) use ($lantaiPasien) {
+                    $query->where('lantai', $lantaiPasien)
+                        ->orWhere('lantai', 'like', $lantaiPasien . ',%')
+                        ->orWhere('lantai', 'like', '%,' . $lantaiPasien)
+                        ->orWhere('lantai', 'like', '%,' . $lantaiPasien . ',%');
+                });
+            } else {
+                $managerQuery->whereNull('lantai');
+            }
+
+            $manager = $managerQuery->with('user')->first();
 
             if (!$manager) {
                 return response()->json([
@@ -342,6 +353,7 @@ class PermintaanController extends Controller
                     'file2'                   => $item->file2 ? asset($item->file2) : null,
                     'file3'                   => $item->file3 ? asset($item->file3) : null,
                     'user_id'                 => $item->user_id,
+                    'pengaju'                 => $item->user?->name ?? '-',
                     'user_login'              => Auth::user()->id,
                     'phone'                   => ($item->user && $item->user->phone) ? '62' . ltrim($item->user->phone, '0') : '',
                     'can_edit'                => $this->canEdit($item),

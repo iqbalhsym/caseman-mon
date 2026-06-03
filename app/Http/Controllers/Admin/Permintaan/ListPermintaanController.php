@@ -50,6 +50,7 @@ class ListPermintaanController extends Controller
                 'tanggal_mulai_expired' => Carbon::parse($item->tanggal_mulai_expired)->translatedFormat('d F Y'),
                 'tanggal_berakhir_expired' => Carbon::parse($item->tanggal_berakhir_expired)->translatedFormat('d F Y'),
                 'manager_id' => $item->manager_id,
+                'pengaju' => $item->user?->name ?? '-',
                 'user_login' => Auth::user()->id,
                 'jaminan' => $item->penjamin?->nama ?? (\App\Models\Penjamin::find($item->lantai)?->nama ?? '-'),
                 'jam_respon' => $item->tanggal_jam_respon ? date('d-m-Y H:i', strtotime($item->tanggal_jam_respon)) : '-',

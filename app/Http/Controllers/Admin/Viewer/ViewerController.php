@@ -37,6 +37,7 @@ class ViewerController extends Controller
                 'indikasi' => $item->indikasi,
                 'catatan' => $item->catatan_diterima,
                 'manager' => $item->manager?->name,
+                'pengaju' => $item->user?->name ?? '-',
                 'status2' => ucfirst($item->status),
                 'catatan_diterima' => $item->catatan_diterima,
                 'jumlah_hari' => $item->jumlah_hari,
