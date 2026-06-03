@@ -72,7 +72,18 @@ Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import
     Route::get('permintaan-riwayat-rm', [PermintaanController::class, 'riwayat'])->name('permintaan.riwayat.rm');
 
     Route::post('update-permintaan', [PermintaanController::class, 'ubah'])->name('update-permintaan');
+
+    Route::get('/storage/permintaan/{filename}', function ($filename) {
+        $path = storage_path('app/public/permintaan/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path);
+    })->name('storage.permintaan');
 });
+
 
 Route::get('hapus-data', function () {
     $data = Permintaan::where('created_at', '<=', '2025-09-24')->get();

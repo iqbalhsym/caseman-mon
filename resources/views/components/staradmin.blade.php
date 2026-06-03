@@ -198,7 +198,7 @@
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
-          @if(Auth::user()->role_id == 1)
+          @if(Auth::check() && Auth::user()->role_id == 1)
           <li class="nav-item {{ Request::is('admin/dashboard*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.dashboard.index') }}">
               <i class="mdi mdi-grid-large menu-icon"></i>
@@ -207,7 +207,7 @@
           </li>
           @endif
 
-          @if(Auth::user()->role_id == 1)
+          @if(Auth::check() && Auth::user()->role_id == 1)
           <li class="nav-item nav-category">Master Data</li>
           <li class="nav-item {{ Request::is('admin/user*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.user.index') }}">
@@ -242,7 +242,7 @@
           </li>
           @endif
 
-          @if(Auth::user()->role_id != 4)
+          @if(Auth::check() && Auth::user()->role_id != 4)
           <li class="nav-item nav-category">Transaksi & Laporan</li>
           <li class="nav-item {{ Request::is('admin/permintaan/create') || Request::is('admin/permintaan/*/edit') || Request::is('admin/permintaan') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.permintaan.index') }}">
@@ -253,7 +253,7 @@
           @endif
 
           @if(Auth::user()->role_id != 4)
-          @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
+          @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 2))
           <li class="nav-item nav-category">Monitoring</li>
           @endif
           <li class="nav-item {{ Request::is('admin/list-permintaan*') ? 'active' : '' }}">
@@ -262,7 +262,7 @@
               <span class="menu-title">List Permintaan</span>
             </a> --}}
             </li>
-          @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
+          @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 2))
           <li class="nav-item {{ Request::is('admin/laporan*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.laporan.index') }}">
               <i class="menu-icon mdi mdi-chart-bar"></i>
