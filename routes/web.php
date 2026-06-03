@@ -73,7 +73,7 @@ Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import
 
     Route::post('update-permintaan', [PermintaanController::class, 'ubah'])->name('update-permintaan');
 
-    Route::get('/storage/permintaan/{filename}', function ($filename) {
+    Route::get('permintaan/file/{filename}', function ($filename) {
         $path = storage_path('app/public/permintaan/' . $filename);
 
         if (!file_exists($path)) {
@@ -81,7 +81,7 @@ Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import
         }
 
         return response()->file($path);
-    })->name('storage.permintaan');
+    })->name('permintaan.file');
 });
 
 

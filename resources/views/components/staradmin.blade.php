@@ -253,9 +253,9 @@
           @endif
 
           @if(Auth::check() && Auth::user()->role_id != 4)
-@if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 2))
-<li class="nav-item nav-category">Monitoring</li>
-@endif
+          @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 2))
+          <li class="nav-item nav-category">Monitoring</li>
+          @endif
           <li class="nav-item {{ Request::is('admin/list-permintaan*') ? 'active' : '' }}">
             {{-- <a class="nav-link" href="{{ route('admin.list-permintaan.index') }}">
               <i class="menu-icon mdi mdi-format-list-checks"></i>
