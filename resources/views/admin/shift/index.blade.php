@@ -441,11 +441,12 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    let errorMessage = errorData.message || 'Gagal menyimpan data.';
-                    if (errorData.errors) {
-                        errorMessage += '\n' + Object.values(errorData.errors).join('\n');
+                const result = await response.json();
+
+                if (!response.ok || result.status === 'error') {
+                    let errorMessage = result.message || 'Gagal menyimpan data.';
+                    if (result.errors) {
+                        errorMessage += '\n' + Object.values(result.errors).join('\n');
                     }
                     Swal.fire("Gagal", errorMessage, "error");
                 } else {
