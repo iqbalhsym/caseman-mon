@@ -310,7 +310,11 @@ class PermintaanController extends Controller
     {
         try {
             $q     = trim($request->get('q', ''));
-            $query = Permintaan::with('user', 'lokasi')->orderBy('created_at', 'desc');
+            $query = Permintaan::with('user', 'lokasi', 'penjamin')->orderBy('created_at', 'desc');
+
+            if ($request->has('status')) {
+                $query->where('status', $request->get('status'));
+            }
 
             if ($q !== '') {
                 $query->where(function ($sub) use ($q) {
@@ -349,6 +353,7 @@ class PermintaanController extends Controller
                     'jumlah_hari'             => $item->jumlah_hari,
                     'tanggal_mulai_expired'   => $item->tanggal_mulai_expired ? Carbon::parse($item->tanggal_mulai_expired)->translatedFormat('d F Y') : null,
                     'tanggal_berakhir_expired'=> $item->tanggal_berakhir_expired ? Carbon::parse($item->tanggal_berakhir_expired)->translatedFormat('d F Y') : null,
+                    'detail_paket'            => $item->detail_paket,
                     'file'                    => $item->file ? asset($item->file) : null,
                     'file2'                   => $item->file2 ? asset($item->file2) : null,
                     'file3'                   => $item->file3 ? asset($item->file3) : null,
@@ -356,6 +361,8 @@ class PermintaanController extends Controller
                     'pengaju'                 => $item->user?->name ?? '-',
                     'user_login'              => Auth::user()->id,
                     'phone'                   => ($item->user && $item->user->phone) ? '62' . ltrim($item->user->phone, '0') : '',
+                    'jaminan'                 => $item->penjamin?->nama ?? (\App\Models\Penjamin::find($item->lantai)?->nama ?? '-'),
+                    'jam_respon'              => $item->tanggal_jam_respon ? date('d-m-Y H:i', strtotime($item->tanggal_jam_respon)) : '-',
                     'can_edit'                => $this->canEdit($item),
                     'can_delete'              => $this->canDelete($item),
                 ];

@@ -409,9 +409,11 @@
                             <div class="card-footer">
                                 <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
                                 ${!(item.detail_paket && item.detail_paket.length > 0) ? `
-                                <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
-                                <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
-                                <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                    ${currentUserRole !== 3 ? `
+                                    <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
+                                    <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
+                                    <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                    ` : ''}
                                 ` : ''}
                             </div>
                         `;
@@ -497,60 +499,67 @@
                                     </div>
                                     <hr>
                                     <h6 class="text-primary mb-2 mt-3">Detail Paket</h6>
-                                    ${(item.detail_paket && item.detail_paket.length > 0) ? item.detail_paket.map((paket, idx) => {
-                                        let paketStatus = paket.status || item.status;
-                                        let paketStatusInfo = statusMap[paketStatus] || { text: paketStatus, badge: 'light' };
-
-                                        let paketActions = '';
-                                        if (paketStatus === 'menunggu') {
-                                            paketActions = `
-                                                <div class="mt-2 pt-2 border-top">
-                                                    ${item.can_edit ? `
-                                                        <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
-                                                            <i class="mdi mdi-pencil"></i> Edit
-                                                        </a>
-                                                    ` : ''}
-                                                    ${currentUserRole !== 3 ? `
-                                                        <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
-                                                        <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
-                                                        <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="${idx}">Konfirmasi</button>
-                                                        <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="${idx}">Terima</button>
-                                                    ` : ''}
-                                                </div>
-                                            `;
-                                        } else if (paketStatus === 'konfirmasi') {
-                                            paketActions = `
-                                                <div class="mt-2 pt-2 border-top">
-                                                    <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
-                                                    <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
-                                                    <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="${idx}">Terima</button>
-                                                </div>
-                                            `;
-                                        } else {
-                                            let pCatatan = '';
-                                            if (paket.catatan) {
-                                                pCatatan = `
-                                                <div class="info-row mt-1 text-muted" style="font-size: 0.8rem;">
-                                                    <span class="label" style="min-width:80px">Catatan:</span>
-                                                    <span class="value">${displayHTML(paket.catatan)}</span>
-                                                </div>`;
-                                            }
-                                            let pExpired = '';
-                                            if (paketStatus === 'disetujui' && paket.jumlah_hari) {
-                                                pExpired = `
-                                                <div class="info-row mt-1 text-info" style="font-size: 0.8rem;">
-                                                    <span class="label" style="min-width:80px">Persetujuan:</span>
-                                                    <span class="value">${paket.jumlah_hari} Hari (${paket.tanggal_mulai_expired} s/d ${paket.tanggal_berakhir_expired})</span>
-                                                </div>`;
-                                            }
-                                            paketActions = `
-                                                <div class="mt-2 pt-2 border-top">
-                                                    <span class="badge bg-${paketStatusInfo.badge} me-2">${paketStatusInfo.text}</span>
-                                                    ${pCatatan}
-                                                    ${pExpired}
-                                                </div>
-                                            `;
-                                        }
+                                     ${(item.detail_paket && item.detail_paket.length > 0) ? item.detail_paket.map((paket, idx) => {
+                                         let paketStatus = paket.status || item.status;
+                                         let paketStatusInfo = statusMap[paketStatus] || { text: paketStatus, badge: 'light' };
+ 
+                                         let pCatatan = '';
+                                         if (paket.catatan) {
+                                             pCatatan = `
+                                             <div class="info-row mt-1 text-muted" style="font-size: 0.8rem;">
+                                                 <span class="label" style="min-width:80px">Catatan:</span>
+                                                 <span class="value">${displayHTML(paket.catatan)}</span>
+                                             </div>`;
+                                         }
+ 
+                                         let paketActions = '';
+                                         if (paketStatus === 'menunggu') {
+                                             paketActions = `
+                                                 <div class="mt-2 pt-2 border-top">
+                                                     ${item.can_edit ? `
+                                                         <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
+                                                             <i class="mdi mdi-pencil"></i> Edit
+                                                         </a>
+                                                     ` : ''}
+                                                     ${currentUserRole !== 3 ? `
+                                                         <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
+                                                         <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
+                                                         <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="${idx}">Konfirmasi</button>
+                                                         <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="${idx}">Terima</button>
+                                                     ` : ''}
+                                                 </div>
+                                             `;
+                                         } else if (paketStatus === 'konfirmasi') {
+                                             paketActions = `
+                                                 <div class="mt-2 pt-2 border-top">
+                                                     <span class="badge bg-${paketStatusInfo.badge} me-2">${paketStatusInfo.text}</span>
+                                                     ${pCatatan}
+                                                     ${currentUserRole !== 3 ? `
+                                                     <div class="mt-2">
+                                                         <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="${idx}">Tolak</button>
+                                                         <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="${idx}">Batal</button>
+                                                         <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="${idx}">Terima</button>
+                                                     </div>
+                                                     ` : ''}
+                                                 </div>
+                                             `;
+                                         } else {
+                                             let pExpired = '';
+                                             if (paketStatus === 'disetujui' && paket.jumlah_hari) {
+                                                 pExpired = `
+                                                 <div class="info-row mt-1 text-info" style="font-size: 0.8rem;">
+                                                     <span class="label" style="min-width:80px">Persetujuan:</span>
+                                                     <span class="value">${paket.jumlah_hari} Hari (${paket.tanggal_mulai_expired} s/d ${paket.tanggal_berakhir_expired})</span>
+                                                 </div>`;
+                                             }
+                                             paketActions = `
+                                                 <div class="mt-2 pt-2 border-top">
+                                                     <span class="badge bg-${paketStatusInfo.badge} me-2">${paketStatusInfo.text}</span>
+                                                     ${pCatatan}
+                                                     ${pExpired}
+                                                 </div>
+                                             `;
+                                         }
 
                                         return `
                                         <div class="p-2 mb-2 bg-light border rounded">
