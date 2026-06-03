@@ -233,7 +233,7 @@
             }
 
             function fetchSearch(q) {
-                return $.getJSON("{{ route('admin.permintaan.search') }}", { q: q });
+                return $.getJSON("{{ route('admin.permintaan.search') }}", { q: q, status: 'disetujui' });
             }
 
             function displayHTML(text) {
@@ -324,7 +324,28 @@
                                     </div>
                                     <hr>
                                     <h6 class="text-primary mb-2 mt-3">Detail Paket</h6>
-                                    ${(item.detail_paket && item.detail_paket.length > 0) ? item.detail_paket.map((paket, idx) => `
+                                    ${(item.detail_paket && item.detail_paket.length > 0) ? item.detail_paket.map((paket, idx) => {
+                                        let paketStatus = paket.status || item.status;
+                                        let paketStatusInfo = statusMap[paketStatus] || { text: paketStatus, badge: 'light' };
+
+                                        let pCatatan = '';
+                                        if (paket.catatan) {
+                                            pCatatan = `
+                                            <div class="info-row mt-1 text-muted" style="font-size: 0.8rem;">
+                                                <span class="label" style="min-width:80px">Catatan:</span>
+                                                <span class="value">${displayHTML(paket.catatan)}</span>
+                                            </div>`;
+                                        }
+                                        let pExpired = '';
+                                        if (paketStatus === 'disetujui' && paket.jumlah_hari) {
+                                            pExpired = `
+                                            <div class="info-row mt-1 text-info" style="font-size: 0.8rem;">
+                                                <span class="label" style="min-width:80px">Persetujuan:</span>
+                                                <span class="value">${paket.jumlah_hari} Hari (${paket.tanggal_mulai_expired} s/d ${paket.tanggal_berakhir_expired})</span>
+                                            </div>`;
+                                        }
+
+                                        return `
                                         <div class="p-2 mb-2 bg-light border rounded">
                                             <strong>Paket ${idx + 1}</strong>
                                             <div class="info-row mt-1">
@@ -345,8 +366,14 @@
                                                 <span class="label" style="min-width:80px">Indikasi:</span>
                                                 <span class="value">${displayHTML(paket.indikasi)}</span>
                                             </div>
+                                            <div class="mt-2 pt-2 border-top">
+                                                <span class="badge bg-${paketStatusInfo.badge} me-2">${paketStatusInfo.text}</span>
+                                                ${pCatatan}
+                                                ${pExpired}
+                                            </div>
                                         </div>
-                                    `).join('') : `
+                                        `;
+                                    }).join('') : `
                                         <div class="info-row">
                                             <span class="label">Kategori:</span>
                                             <span class="value text-primary font-weight-bold">${item.kategori ? item.kategori.replace(/_/g, ' ') : '-'}</span>
@@ -367,11 +394,13 @@
                                         </div>
                                     `}
                                     <hr>
+                                    ${!(item.detail_paket && item.detail_paket.length > 0) ? `
                                     <div class="info-row mt-3">
                                         <span class="label">Catatan:</span>
                                         <span class="value">${displayHTML(item.catatan_diterima)}</span>
                                     </div>
                                     ${noteHTML}
+                                    ` : ''}
                                     ${fileLinks ? `<div class="info-row mt-2"><span class="label">Lampiran:</span><span class="value">${fileLinks}</span></div>` : ''}
                                 </div>
                                 <div class="card-footer justify-content-between align-items-center">
