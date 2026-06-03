@@ -495,6 +495,15 @@
                                         let paketStatus = paket.status || item.status;
                                         let paketStatusInfo = statusMap[paketStatus] || { text: paketStatus, badge: 'light' };
                                         
+                                        let pCatatan = '';
+                                        if (paket.catatan) {
+                                            pCatatan = `
+                                            <div class="info-row mt-1 text-muted" style="font-size: 0.8rem;">
+                                                <span class="label" style="min-width:80px">Catatan:</span>
+                                                <span class="value">${displayHTML(paket.catatan)}</span>
+                                            </div>`;
+                                        }
+                                        
                                         let paketActions = '';
                                         if (paketStatus === 'menunggu') {
                                             paketActions = `
@@ -508,20 +517,16 @@
                                         } else if (paketStatus === 'konfirmasi') {
                                             paketActions = `
                                                 <div class="mt-2 pt-2 border-top">
-                                                    <button class="btn btn-xs btn-danger text-white btn-reject" data-id="${item.id}" data-paket="${idx}">Tolak</button>
-                                                    <button class="btn btn-xs btn-dark text-white btn-batal" data-id="${item.id}" data-paket="${idx}">Batal</button>
-                                                    <button class="btn btn-xs btn-success text-white btn-approve" data-id="${item.id}" data-paket="${idx}">Terima</button>
+                                                    <span class="badge bg-${paketStatusInfo.badge} me-2">${paketStatusInfo.text}</span>
+                                                    ${pCatatan}
+                                                    <div class="mt-2">
+                                                        <button class="btn btn-xs btn-danger text-white btn-reject" data-id="${item.id}" data-paket="${idx}">Tolak</button>
+                                                        <button class="btn btn-xs btn-dark text-white btn-batal" data-id="${item.id}" data-paket="${idx}">Batal</button>
+                                                        <button class="btn btn-xs btn-success text-white btn-approve" data-id="${item.id}" data-paket="${idx}">Terima</button>
+                                                    </div>
                                                 </div>
                                             `;
                                         } else {
-                                            let pCatatan = '';
-                                            if (paket.catatan) {
-                                                pCatatan = `
-                                                <div class="info-row mt-1 text-muted" style="font-size: 0.8rem;">
-                                                    <span class="label" style="min-width:80px">Catatan:</span>
-                                                    <span class="value">${displayHTML(paket.catatan)}</span>
-                                                </div>`;
-                                            }
                                             let pExpired = '';
                                             if (paketStatus === 'disetujui' && paket.jumlah_hari) {
                                                 pExpired = `
