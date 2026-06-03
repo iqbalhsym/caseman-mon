@@ -74,6 +74,7 @@ class PermintaanController extends Controller
 
         // Hanya administrator dan tenagamedis yang bisa membuat permintaan
         if ($role === 'administrator') return true;
+        if ($role === 'casemanager') return true;
         if ($role === 'tenagamedis') return true;
 
         return false; // 'viewer' dan 'casemanager' tidak bisa membuat baru
@@ -102,6 +103,7 @@ class PermintaanController extends Controller
         $role = Auth::user()->role?->name;
 
         if ($role === 'administrator') return true;
+        if ($role === 'casemanager') return true;
         if ($role === 'tenagamedis' && $item->status === 'menunggu') return true;
 
         return false;

@@ -242,7 +242,7 @@
           </li>
           @endif
 
-          @if(Auth::user()->role_id != 4 && Auth::user()->role_id != 2)
+          @if(Auth::user()->role_id != 4)
           <li class="nav-item nav-category">Transaksi & Laporan</li>
           <li class="nav-item {{ Request::is('admin/permintaan/create') || Request::is('admin/permintaan/*/edit') || Request::is('admin/permintaan') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.permintaan.index') }}">
