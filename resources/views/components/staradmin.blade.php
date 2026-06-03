@@ -165,7 +165,7 @@
               <a class="dropdown-item" href="{{ route('admin.user.index') }}">
                   <i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>Profil
               </a>
-              @if(!Auth::user()->telegram_chat_id)
+              @if(Auth::check() && !Auth::user()->telegram_chat_id)
                   @php $encodedId = base64_encode(Auth::user()->id); @endphp
                   <a class="dropdown-item" href="https://t.me/rsui_casemanager_bot?start={{ $encodedId }}" target="_blank">
                       <i class="dropdown-item-icon mdi mdi-send text-info me-2"></i>Hubungkan Telegram (App)
