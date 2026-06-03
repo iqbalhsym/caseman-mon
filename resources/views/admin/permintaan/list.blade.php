@@ -412,6 +412,8 @@
                             <div class="card-footer justify-content-between align-items-center">
                                 <div class="text-muted" style="font-size: 0.7rem;">
                                     <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
+                                    <br>
+                                    <i class="mdi mdi-account text-primary me-1"></i> Pengaju: <strong>${item.pengaju || '-'}</strong>
                                 </div>
                             </div>
                         `;

@@ -157,9 +157,8 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="lantai-select">Lokasi Lantai</label>
-                            <select class="form-control" id="lantai-select" required>
-                                <option value="">-- Pilih Lantai --</option>
+                            <label for="lantai-select">Lokasi Lantai (bisa pilih lebih dari satu)</label>
+                            <select class="form-control" id="lantai-select" name="lantai[]" multiple="multiple" required style="width: 100%">
                                 @foreach($lantais as $lantai)
                                     <option value="{{ $lantai }}">Lantai {{ $lantai }}</option>
                                 @endforeach
@@ -216,7 +215,7 @@
             disableMobile: "true"
         });
 
-        // Init Select2 on user-select
+        // Init Select2 on user-select and lantai-select
         function initSelect2() {
             const selectData = [{ id: '', text: '-- Cari & pilih pengguna --' }].concat(
                 users.map(u => ({ id: u.id, text: `${u.name} (${u.role})` }))
@@ -226,6 +225,14 @@
                 data: selectData,
                 dropdownParent: $('#shift-modal'),
                 placeholder: 'Ketik nama untuk mencari...',
+                allowClear: true,
+                width: '100%',
+            });
+
+            $('#lantai-select').select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $('#shift-modal'),
+                placeholder: '-- Pilih Lantai --',
                 allowClear: true,
                 width: '100%',
             });
@@ -349,6 +356,7 @@
             form.reset();
             flatpickrInstance.clear();
             $('#user-select').val('').trigger('change'); // reset Select2
+            $('#lantai-select').val([]).trigger('change'); // reset Select2
 
             if (shift) {
                 modalTitle.textContent = 'Edit Shift';
@@ -357,7 +365,15 @@
                 flatpickrInstance.setDate(shift.date);
                 document.getElementById('start-time').value = shift.startTime;
                 document.getElementById('end-time').value = shift.endTime;
-                document.getElementById('lantai-select').value = shift.lantai;
+                
+                // Set multiple Select2 value for lantai-select
+                if (shift.lantai) {
+                    const lantaiArr = typeof shift.lantai === 'string' ? shift.lantai.split(',') : [shift.lantai];
+                    $('#lantai-select').val(lantaiArr).trigger('change');
+                } else {
+                    $('#lantai-select').val([]).trigger('change');
+                }
+                
                 deleteBtn.style.display = 'block';
                 shiftDatesInput.disabled = true;
             } else {
@@ -366,7 +382,6 @@
                 flatpickrInstance.setDate(toISODateString(currentDate));
                 document.getElementById('start-time').value = '08:00';
                 document.getElementById('end-time').value = '16:00';
-                document.getElementById('lantai-select').value = '';
                 deleteBtn.style.display = 'none';
                 shiftDatesInput.disabled = false;
             }
@@ -399,7 +414,7 @@
                 userId: parseInt($('#user-select').val()),
                 startTime: document.getElementById('start-time').value,
                 endTime: document.getElementById('end-time').value,
-                lantai: document.getElementById('lantai-select').value,
+                lantai: $('#lantai-select').val(),
             };
 
             let url;
@@ -426,11 +441,12 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    let errorMessage = errorData.message || 'Gagal menyimpan data.';
-                    if (errorData.errors) {
-                        errorMessage += '\n' + Object.values(errorData.errors).join('\n');
+                const result = await response.json();
+
+                if (!response.ok || result.status === 'error') {
+                    let errorMessage = result.message || 'Gagal menyimpan data.';
+                    if (result.errors) {
+                        errorMessage += '\n' + Object.values(result.errors).join('\n');
                     }
                     Swal.fire("Gagal", errorMessage, "error");
                 } else {

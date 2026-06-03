@@ -85,6 +85,8 @@ class ShiftController extends Controller
             DB::beginTransaction();
 
             // 2. Lakukan perulangan untuk setiap tanggal yang dikirim
+            $lantaiStr = is_array($request->lantai) ? implode(',', array_map('trim', $request->lantai)) : trim($request->lantai);
+
             foreach ($request->dates as $date) {
                 $jam_mulai = date('Y-m-d H:i', strtotime($date . ' ' . $request->startTime));
                 $jam_selesai = date('Y-m-d H:i', strtotime($date . ' ' . $request->endTime));
@@ -94,7 +96,7 @@ class ShiftController extends Controller
                     'tanggal' => $date,
                     'jam_mulai' => $jam_mulai,
                     'jam_selesai' => $jam_selesai,
-                    'lantai' => $request->lantai,
+                    'lantai' => $lantaiStr,
                 ]);
             }
 
@@ -182,11 +184,13 @@ class ShiftController extends Controller
             $jam_selesai = date('Y-m-d H:i:s', strtotime($shift->tanggal . ' ' . $request->endTime));
 
             // 4. Lakukan update data
+            $lantaiStr = is_array($request->lantai) ? implode(',', array_map('trim', $request->lantai)) : trim($request->lantai);
+
             $shift->update([
                 'user_id' => $request->userId,
                 'jam_mulai' => $jam_mulai,
                 'jam_selesai' => $jam_selesai,
-                'lantai' => $request->lantai,
+                'lantai' => $lantaiStr,
             ]);
 
             DB::commit();
