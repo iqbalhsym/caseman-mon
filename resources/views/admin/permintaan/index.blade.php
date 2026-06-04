@@ -4,6 +4,18 @@
 
     @push('style')
         <style>
+            .sticky-toolbar {
+            position: fixed;
+            top: 97px;
+            left: 285px;
+            right: 20px;
+            z-index: 999;
+            background: #f4f5f7;
+            padding-top: 10px;
+            }
+           #submission-list {
+            margin-top: 90px;
+            }
             .filter-nav {
                 display: flex;
                 flex-wrap: wrap;
@@ -194,6 +206,7 @@
         </style>
     @endpush
 
+    <div class="sticky-toolbar"> 
     <div class="row">
         <div class="col-sm-12">
             <div class="home-tab">
@@ -238,6 +251,8 @@
                             <button class="filter-btn" data-filter="ditolak">Ditolak</button>
                             <button class="filter-btn" data-filter="batal">Batal</button>
                         </nav>
+
+                    </div>
 
                         {{-- Submissions List --}}
                         <div class="row" id="submission-list">
