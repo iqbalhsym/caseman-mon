@@ -6,7 +6,7 @@
         <style>
             .sticky-toolbar {
             position: fixed;
-            top: 97px;
+            top: 160px;
             left: 285px;
             right: 20px;
             z-index: 999;
@@ -209,7 +209,6 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="home-tab">
-                <div class="sticky-toolbar">
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item">
@@ -220,7 +219,7 @@
 
                 <div class="tab-content tab-content-basic">
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
-
+                        {{-- <div class="sticky-toolbar"> --}}
                         {{-- Card Pencarian (Toolbar) --}}
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
@@ -252,7 +251,7 @@
                             <button class="filter-btn" data-filter="batal">Batal</button>
                         </nav>
 
-                    </div>
+                    {{-- </div> --}}
 
                         {{-- Submissions List --}}
                         <div class="row" id="submission-list">
