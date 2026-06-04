@@ -6,7 +6,7 @@
         <style>
             .sticky-toolbar {
             position: fixed;
-            top: 160px;
+            top: 100px;
             left: 285px;
             right: 20px;
             z-index: 999;
@@ -14,7 +14,7 @@
             padding-top: 10px;
             }
            #submission-list {
-            margin-top: 90px;
+            margin-top: 150px;
             }
             .filter-nav {
                 display: flex;
@@ -210,17 +210,18 @@
         <div class="col-sm-12">
             <div class="home-tab">
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Daftar Pengajuan</a>
-                        </li>
-                    </ul>
+                    
                 </div>
 
                 <div class="tab-content tab-content-basic">
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
-                        {{-- <div class="sticky-toolbar"> --}}
+                        <div class="sticky-toolbar">
                         {{-- Card Pencarian (Toolbar) --}}
+                        <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Daftar Pengajuan</a>
+                        </li>
+                    </ul>
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
                                 <div class="card shadow-sm">
@@ -251,7 +252,7 @@
                             <button class="filter-btn" data-filter="batal">Batal</button>
                         </nav>
 
-                    {{-- </div> --}}
+                    </div>
 
                         {{-- Submissions List --}}
                         <div class="row" id="submission-list">
