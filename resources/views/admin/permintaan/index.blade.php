@@ -10,6 +10,13 @@
                 gap: 10px;
                 margin-bottom: 20px;
             }
+            nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;   /* Memastikan navbar penuh seukuran layar */
+  z-index: 1000;
+}
             .filter-btn {
                 background: #fff;
                 border: 1px solid #dee2e6;
