@@ -117,6 +117,20 @@
             display: none; /* Hide sub-text on mobile to save space */
         }
     }
+
+    @media (min-width: 992px) {
+        .sidebar {
+            position: fixed;
+            top: 70px; /* Menyesuaikan tinggi navbar */
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            z-index: 11;
+        }
+        .main-panel {
+            margin-left: 235px; /* Menyesuaikan lebar sidebar */
+            width: calc(100% - 235px);
+        }
+    }
   </style>
 
   @stack('style')
