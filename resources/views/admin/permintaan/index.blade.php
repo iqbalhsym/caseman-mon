@@ -209,6 +209,7 @@
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
 
                         {{-- Card Pencarian (Toolbar) --}}
+                        <div class="sticky-top pt-3 pb-2" style="z-index: 1020; margin-top: -15px;">
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
                                 <div class="card shadow-sm">
@@ -228,9 +229,10 @@
                                 </div>
                             </div>
                         </div>
+                        </div>
 
                         {{-- Filters --}}
-                        <nav class="filter-nav">
+                        <nav class="filter-nav sticky-top py-2" style="z-index: 1020;">
                             <button class="filter-btn active" data-filter="semua">Semua</button>
                             <button class="filter-btn" data-filter="menunggu">Menunggu</button>
                             <button class="filter-btn" data-filter="konfirmasi">Konfirmasi</button>
