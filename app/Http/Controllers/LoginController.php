@@ -122,7 +122,7 @@ class LoginController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Success',
-                    'url' => route('admin.dashboard.index'),
+                    'url' => route('admin.viewer.index'),
                 ]);
             }
             return response()->json([
