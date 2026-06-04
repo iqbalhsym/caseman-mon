@@ -209,11 +209,11 @@
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
 
                         {{-- Card Pencarian (Toolbar) --}}
-                        <div class="sticky-top bg-grey pt-3 pb-2" style="z-index: 1020; margin-top: -15px;">
+                        <div class="sticky-top bg-white pt-3 pb-2 shadow-sm px-3" style="z-index: 1020; margin-top: -15px; margin-left: -15px; margin-right: -15px;">
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
-                                <div class="card shadow-sm">
-                                    <div class="card-body search-card-body">
+                                <div class="card border-0">
+                                    <div class="card-body search-card-body p-0">
                                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                             <div class="input-group" style="max-width: 380px; flex: 1;">
                                                 <span class="input-group-text input-group-text-custom">
@@ -229,10 +229,9 @@
                                 </div>
                             </div>
                         </div>
-                        </div>
 
                         {{-- Filters --}}
-                        <nav class="filter-nav sticky-top bg-grey py-2" style="z-index: 1020;">
+                        <nav class="filter-nav m-0">
                             <button class="filter-btn active" data-filter="semua">Semua</button>
                             <button class="filter-btn" data-filter="menunggu">Menunggu</button>
                             <button class="filter-btn" data-filter="konfirmasi">Konfirmasi</button>
@@ -240,6 +239,7 @@
                             <button class="filter-btn" data-filter="ditolak">Ditolak</button>
                             <button class="filter-btn" data-filter="batal">Batal</button>
                         </nav>
+                        </div>
 
                         {{-- Submissions List --}}
                         <div class="row" id="submission-list">
