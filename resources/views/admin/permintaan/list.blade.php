@@ -383,57 +383,76 @@
                     let tgTarget = item.phone ? '_blank' : '_self';
                     let tgOnclick = item.phone ? '' : 'onclick="alert(\'Nomor Telegram belum disetel di profil pengguna ini!\')"';
 
+                    let historyHTML = `
+                        <div class="text-muted" style="font-size: 0.7rem;">
+                            <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager || '-'}</strong>
+                            <br>
+                            <i class="mdi mdi-account text-primary me-1"></i> Pengaju: <strong>${item.pengaju || '-'}</strong>
+                        </div>
+                    `;
+
+                    let editButtonHTML = item.can_edit ? `
+                        <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
+                            <i class="mdi mdi-pencil"></i> Edit
+                        </a>
+                    ` : '';
+
                     let cardFooter = '';
                     if (item.status === 'menunggu') {
                         cardFooter = `
-                            <div class="card-footer">
-                                <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
-                                ${!(item.detail_paket && item.detail_paket.length > 0) ? `
-                                <button class="btn btn-xs btn-danger text-white btn-reject" data-id="${item.id}" data-paket="">Tolak</button>
-                                <button class="btn btn-xs btn-dark text-white btn-batal" data-id="${item.id}" data-paket="">Batal</button>
-                                <button class="btn btn-xs bg-orange text-white btn-confirm" data-id="${item.id}" data-paket="">Konfirmasi</button>
-                                <button class="btn btn-xs btn-success text-white btn-approve" data-id="${item.id}" data-paket="">Terima</button>
-                                ` : ''}
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                <div class="d-flex gap-1 flex-wrap align-items-center">
+                                    <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat</a>
+                                    ${editButtonHTML}
+                                    ${!(item.detail_paket && item.detail_paket.length > 0) ? `
+                                        <button class="btn btn-xs btn-danger text-white btn-reject" data-id="${item.id}" data-paket="">Tolak</button>
+                                        <button class="btn btn-xs btn-dark text-white btn-batal" data-id="${item.id}" data-paket="">Batal</button>
+                                        <button class="btn btn-xs bg-orange text-white btn-confirm" data-id="${item.id}" data-paket="">Konfirmasi</button>
+                                        <button class="btn btn-xs btn-success text-white btn-approve" data-id="${item.id}" data-paket="">Terima</button>
+                                    ` : ''}
+                                </div>
                             </div>
                         `;
                     } else if (item.status == 'konfirmasi') {
                         cardFooter = `
-                            <div class="card-footer">
-                                <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
-                                ${!(item.detail_paket && item.detail_paket.length > 0) ? `
-                                <button class="btn btn-xs btn-danger text-white btn-reject" data-id="${item.id}" data-paket="">Tolak</button>
-                                <button class="btn btn-xs btn-dark text-white btn-batal" data-id="${item.id}" data-paket="">Batal</button>
-                                <button class="btn btn-xs btn-success text-white btn-approve" data-id="${item.id}" data-paket="">Terima</button>
-                                ` : ''}
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                <div class="d-flex gap-1 flex-wrap align-items-center">
+                                    <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat</a>
+                                    ${editButtonHTML}
+                                    ${!(item.detail_paket && item.detail_paket.length > 0) ? `
+                                        <button class="btn btn-xs btn-danger text-white btn-reject" data-id="${item.id}" data-paket="">Tolak</button>
+                                        <button class="btn btn-xs btn-dark text-white btn-batal" data-id="${item.id}" data-paket="">Batal</button>
+                                        <button class="btn btn-xs btn-success text-white btn-approve" data-id="${item.id}" data-paket="">Terima</button>
+                                    ` : ''}
+                                </div>
                             </div>
                         `;
                     } else if (item.status == 'disetujui') {
                         cardFooter = `
-                            <div class="card-footer justify-content-between align-items-center">
-                                <div class="text-muted" style="font-size: 0.7rem;">
-                                    <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
-                                    <br>
-                                    <i class="mdi mdi-account text-primary me-1"></i> Pengaju: <strong>${item.pengaju || '-'}</strong>
-                                </div>
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                ${editButtonHTML}
                             </div>
                         `;
                     } else if (item.status == 'ditolak' || item.status == 'batal') {
                         cardFooter = `
-                            <div class="card-footer justify-content-between align-items-center">
-                                <div class="text-muted" style="font-size: 0.7rem;">
-                                    <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                <div class="d-flex gap-1 flex-wrap align-items-center">
+                                    ${editButtonHTML}
+                                    <button class="btn btn-xs btn-outline-warning" id="btn-edit-permintaan" data-id="${item.id}">
+                                        <i class="mdi mdi-pencil"></i> Ubah Status
+                                    </button>
                                 </div>
-                                <button class="btn btn-xs btn-outline-warning" id="btn-edit-permintaan" data-id="${item.id}">
-                                    <i class="mdi mdi-pencil"></i> Edit
-                                </button>
                             </div>
                         `;
                     } else {
                         cardFooter = `
-                            <div class="card-footer justify-content-between align-items-center">
-                                <div class="text-muted" style="font-size: 0.7rem;">
-                                    <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
-                                </div>
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                ${editButtonHTML}
                             </div>
                         `;
                     }
@@ -623,6 +642,7 @@
                 button.addEventListener('click', () => {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
+                    sessionStorage.setItem('activeFilter', button.getAttribute('data-filter'));
                     updateDisplay();
                 });
             });
@@ -648,7 +668,15 @@
             searchInput.addEventListener('input', handleSearch);
 
             // Inisialisasi
-            renderSubmissions();
+            const savedFilter = sessionStorage.getItem('activeFilter');
+            if (savedFilter) {
+                const targetBtn = document.querySelector(`.filter-btn[data-filter="${savedFilter}"]`);
+                if (targetBtn) {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    targetBtn.classList.add('active');
+                }
+            }
+            updateDisplay();
 
         </script>
 
