@@ -118,12 +118,10 @@ class LoginController extends Controller
             $localUser = \App\Models\User::where('username', 'adminarya')->first();
             if ($localUser && \Illuminate\Support\Facades\Hash::check($password, $localUser->password)) {
                 Auth::login($localUser, false);
-                $request->session()->regenerate();
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Success',
-                    'url' => route('admin.viewer.index'),
-                ]);
+                $redirectUrl = match($localUser->role_id) {
+                4 => route('admin.viewer.index'),
+                default => route('admin.dashboard.index'),
+            };
             }
             return response()->json([
                 'status' => false,
