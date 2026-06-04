@@ -7,7 +7,7 @@
             .sticky-toolbar {
             position: fixed;
             top: 100px;
-            left: 10px;
+            left: 200px;
             right: 10px;
             z-index: 999;
             background: #f4f5f7;
