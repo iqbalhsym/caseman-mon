@@ -115,19 +115,30 @@ class LoginController extends Controller
 
         // 1. Bypass untuk admin lokal
         if ($username === 'adminarya') {
-            $localUser = \App\Models\User::where('username', 'adminarya')->first();
-            if ($localUser && \Illuminate\Support\Facades\Hash::check($password, $localUser->password)) {
-                Auth::login($localUser, false);
-                $redirectUrl = match($localUser->role_id) {
-                4 => route('admin.viewer.index'),
-                default => route('admin.dashboard.index'),
-            };
-            }
-            return response()->json([
-                'status' => false,
-                'message' => 'Password salah!'
-            ]);
-        }
+    $localUser = \App\Models\User::where('username', 'adminarya')->first();
+    
+    if ($localUser && \Illuminate\Support\Facades\Hash::check($password, $localUser->password)) {
+        Auth::login($localUser, false);
+        $request->session()->regenerate();
+        
+        $redirectUrl = match($localUser->role_id) {
+            1 => route('admin.dashboard.index'),
+            default => route('admin.viewer.index'),
+        };
+        
+        return response()->json([  // <-- return di DALAM if
+            'status' => true,
+            'message' => 'Success',
+            'url' => $redirectUrl,
+        ]);
+    }
+    
+    // Jika password salah
+    return response()->json([
+        'status' => false,
+        'message' => 'Password salah',
+    ]);
+}
 
         // 2. Cari user di Active Directory
         $ldapUser = LdapUser::where('samaccountname', $username)->first();
