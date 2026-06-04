@@ -121,10 +121,13 @@
     @media (min-width: 992px) {
         .sidebar {
             position: fixed;
-            top: 70px; /* Menyesuaikan tinggi navbar */
-            height: calc(100vh - 70px);
+            top: 97px; /* Menyesuaikan tinggi navbar */
+            height: calc(100vh - 97px);
             overflow-y: auto;
             z-index: 11;
+        }
+        .sidebar .nav {
+        padding-top: 20px; /* Memberikan ruang agar menu 'Beranda' tidak mentok ke atas */
         }
         .main-panel {
             margin-left: 235px; /* Menyesuaikan lebar sidebar */
