@@ -144,12 +144,12 @@
             }
 
             @media (max-width: 991px) {
-                .mobile-filter-trigger {
+                /* .mobile-filter-trigger {
                     position: fixed;
                     top: 90px;        /* sesuaikan tinggi navbar mobile */
                     z-index: 998;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-                }
+                } */
                 .sticky-toolbar {
                     display: none; /* sembunyikan toolbar lama di mobile */
                 }
@@ -260,7 +260,7 @@
                     </div>
 
                     {{-- Tombol trigger drawer (mobile only) --}}
-                    <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3 mobile-filter-trigger">
+                    <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3">
                         <span class="fw-bold text-muted" style="font-size:13px;">Daftar Pengajuan</span>
                         <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterDrawer">
                             <i class="mdi mdi-filter-variant"></i> Filter & Cari
