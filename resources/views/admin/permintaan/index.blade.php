@@ -4,6 +4,18 @@
 
     @push('style')
         <style>
+            .sticky-toolbar {
+            position: fixed;
+            top: 90px;
+            left: 250px;
+            right: 10px;
+            z-index: 999;
+            background: #f4f5f7;
+            padding-top: 10px;
+            }
+           #submission-list {
+            margin-top: 150px;
+            }
             .filter-nav {
                 display: flex;
                 flex-wrap: wrap;
@@ -131,18 +143,18 @@
                 color: #fff !important;
             }
 
-            @media (max-width: 768px) {
-                .filter-nav {
-                    flex-wrap: nowrap;
-                    overflow-x: auto;
-                    padding-bottom: 10px;
+            @media (max-width: 991px) {
+                .sticky-toolbar {
+                    display: none; /* sembunyikan toolbar lama di mobile */
                 }
-                .filter-btn {
-                    white-space: nowrap;
+                #submission-list {
+                    margin-top: 10px;
                 }
+
                 .info-row {
                     flex-direction: column;
                 }
+
                 .info-row .label {
                     margin-bottom: 2px;
                 }
@@ -193,22 +205,23 @@
         }
         </style>
     @endpush
-
+ 
     <div class="row">
         <div class="col-sm-12">
             <div class="home-tab">
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Daftar Pengajuan</a>
-                        </li>
-                    </ul>
+                    
                 </div>
 
                 <div class="tab-content tab-content-basic">
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
-
+                        <div class="sticky-toolbar">
                         {{-- Card Pencarian (Toolbar) --}}
+                        <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Daftar Pengajuan</a>
+                        </li>
+                    </ul>
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
                                 <div class="card shadow-sm">
@@ -238,6 +251,15 @@
                             <button class="filter-btn" data-filter="ditolak">Ditolak</button>
                             <button class="filter-btn" data-filter="batal">Batal</button>
                         </nav>
+                    </div>
+
+                    {{-- Tombol trigger drawer (mobile only) --}}
+                    <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3">
+                        <span class="fw-bold text-muted" style="font-size:13px;">Daftar Pengajuan</span>
+                        <button class="btn btn-sm btn-outline-primary" type="button" id="btnFilterDrawer">
+                            <i class="mdi mdi-filter-variant"></i> Filter & Cari
+                        </button>
+                    </div>
 
                         {{-- Submissions List --}}
                         <div class="row" id="submission-list">
@@ -315,6 +337,37 @@
         </div>
     </div>
 
+    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="filterDrawer" style="height: auto; border-radius: 16px 16px 0 0;">
+    <div class="offcanvas-header border-bottom">
+        <h6 class="offcanvas-title">Filter & Pencarian</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        {{-- Search --}}
+        <div class="input-group mb-3">
+            <span class="input-group-text bg-transparent border-end-0">
+                <i class="mdi mdi-magnify text-muted"></i>
+            </span>
+            <input type="search" class="form-control border-start-0" id="search-input-drawer" placeholder="Cari nama, No. RM, atau Ruangan...">
+        </div>
+
+        {{-- Filter --}}
+        <p class="text-muted mb-2" style="font-size:12px;">Status</p>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="filter-btn active" data-filter="semua">Semua</button>
+            <button class="filter-btn" data-filter="menunggu">Menunggu</button>
+            <button class="filter-btn" data-filter="konfirmasi">Konfirmasi</button>
+            <button class="filter-btn" data-filter="disetujui">Disetujui</button>
+            <button class="filter-btn" data-filter="ditolak">Ditolak</button>
+            <button class="filter-btn" data-filter="batal">Batal</button>
+        </div>
+
+        <button class="btn btn-primary w-100 text-white" data-bs-dismiss="offcanvas">
+            Terapkan
+        </button>
+    </div>
+</div>
+
     @push('script')
         <script>
             const currentUserRole = {{ Auth::user()->role_id }};
@@ -384,64 +437,75 @@
                     let tgTarget = item.phone ? '_blank' : '_self';
                     let tgOnclick = item.phone ? '' : 'onclick="alert(\'Nomor Telegram belum disetel di profil pengguna ini!\')"';
 
+                    let historyHTML = `
+                        <div class="text-muted" style="font-size: 0.7rem;">
+                            <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager || '-'}</strong>
+                            <br>
+                            <i class="mdi mdi-account text-primary me-1"></i> Pengaju: <strong>${item.pengaju || '-'}</strong>
+                        </div>
+                    `;
+
+                    let editButtonHTML = item.can_edit ? `
+                        <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
+                            <i class="mdi mdi-pencil"></i> Edit
+                        </a>
+                    ` : '';
+
                     let cardFooter = '';
                     if (item.status === 'menunggu') {
                         cardFooter = `
-                            <div class="card-footer">
-                                <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
-                                ${!(item.detail_paket && item.detail_paket.length > 0) ? `
-                                ${item.can_edit ? `
-                                    <a href="/admin/permintaan/${item.id}/edit" class="btn btn-xs btn-outline-warning edit">
-                                        <i class="mdi mdi-pencil"></i> Edit
-                                    </a>
-                                ` : ''}
-                                    ${currentUserRole !== 3 ? `
-                                    <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
-                                    <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
-                                    <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="">Konfirmasi</button>
-                                    <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                <div class="d-flex gap-1 flex-wrap align-items-center">
+                                    <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat</a>
+                                    ${editButtonHTML}
+                                    ${!(item.detail_paket && item.detail_paket.length > 0) ? `
+                                        ${currentUserRole !== 3 ? `
+                                        <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
+                                        <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
+                                        <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="">Konfirmasi</button>
+                                        <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                        ` : ''}
                                     ` : ''}
-                                ` : ''}
+                                </div>
                             </div>
                         `;
                     } else if (item.status == 'konfirmasi') {
                         cardFooter = `
-                            <div class="card-footer">
-                                <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat Telegram</a>
-                                ${!(item.detail_paket && item.detail_paket.length > 0) ? `
-                                    ${currentUserRole !== 3 ? `
-                                    <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
-                                    <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
-                                    <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                <div class="d-flex gap-1 flex-wrap align-items-center">
+                                    <a href="${tgLink}" target="${tgTarget}" ${tgOnclick} class="btn btn-xs btn-info text-white"><i class="mdi mdi-telegram"></i> Chat</a>
+                                    ${editButtonHTML}
+                                    ${!(item.detail_paket && item.detail_paket.length > 0) ? `
+                                        ${currentUserRole !== 3 ? `
+                                        <button class="btn btn-xs btn-danger text-white btn-reject-action" data-id="${item.id}" data-paket="">Tolak</button>
+                                        <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
+                                        <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                        ` : ''}
                                     ` : ''}
-                                ` : ''}
+                                </div>
                             </div>
                         `;
                     } else if (item.status == 'disetujui') {
                         cardFooter = `
-                            <div class="card-footer justify-content-between align-items-center">
-                                <div class="text-muted" style="font-size: 0.7rem;">
-                                    <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
-                                    <br>
-                                    <i class="mdi mdi-account text-primary me-1"></i> Pengaju: <strong>${item.pengaju || '-'}</strong>
-                                </div>
-
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                ${editButtonHTML}
                             </div>
                         `;
                     } else if (item.status == 'ditolak' || item.status == 'batal') {
                         cardFooter = `
-                            <div class="card-footer justify-content-between align-items-center">
-                                <div class="text-muted" style="font-size: 0.7rem;">
-                                    <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
-                                </div>
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                ${editButtonHTML}
                             </div>
                         `;
                     } else {
                         cardFooter = `
-                            <div class="card-footer justify-content-between align-items-center">
-                                <div class="text-muted" style="font-size: 0.7rem;">
-                                    <i class="mdi mdi-account-check text-success me-1"></i> ${item.status2} oleh: <strong>${item.manager}</strong>
-                                </div>
+                            <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
+                                ${historyHTML}
+                                ${editButtonHTML}
                             </div>
                         `;
                     }
@@ -640,32 +704,54 @@
                 button.addEventListener('click', () => {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
+                    const filter = button.getAttribute('data-filter');
+                    sessionStorage.setItem('activeFilter', filter);
                     updateDisplay();
                 });
             });
 
-            const handleSearch = debounce(function () {
+            function fetchByStatus(status) {
                 const q = searchInput.value.trim();
-                if (q.length === 0) {
+                const params = { q: q };
+                if (status !== 'semua') params.status = status;
+
+                $.getJSON("{{ route('admin.permintaan.search') }}", params)
+                    .done(function (resp) {
+                        if (resp.status === 'success') {
+                            submissions = resp.data;
+                            renderSubmissions(status, q);
+                        }
+                    });
+}
+
+            const handleSearch = debounce(function () {
+                const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'semua';
+                const q = searchInput.value.trim();
+
+                if (q.length === 0 && activeFilter === 'semua') {
                     submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
                     updateDisplay();
                     return;
                 }
 
-                fetchSearch(q).done(function (resp) {
-                    if (resp.status === 'success') {
-                        submissions = resp.data;
-                        updateDisplay();
-                    }
-                }).fail(function () {
-                    // Fallback
-                });
+                fetchByStatus(activeFilter); // gunakan fetchByStatus yg sudah bawa q & status
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
 
             // Inisialisasi
-            renderSubmissions();
+            const savedFilter = sessionStorage.getItem('activeFilter') || 'semua';
+                const targetBtn = document.querySelector(`.filter-btn[data-filter="${savedFilter}"]`);
+                if (targetBtn) {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    targetBtn.classList.add('active');
+                }
+
+                if (savedFilter === 'semua') {
+                    updateDisplay(); // pakai data awal dari PHP, tidak perlu fetch
+                } else {
+                    fetchByStatus(savedFilter); // fetch ke server sesuai filter tersimpan
+                }
 
         </script>
         <script>
@@ -818,6 +904,23 @@
                         });
                     }
                 })
+            });
+
+            document.getElementById('search-input-drawer').addEventListener('input', function () {
+                searchInput.value = this.value;
+                handleSearch();
+            });
+
+            // Sinkron search utama → search drawer (saat resize)
+            searchInput.addEventListener('input', function () {
+                const drawerInput = document.getElementById('search-input-drawer');
+                if (drawerInput) drawerInput.value = this.value;
+            });
+            document.getElementById('btnFilterDrawer').addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // cegah event naik ke sidebar
+                var drawer = new bootstrap.Offcanvas(document.getElementById('filterDrawer'));
+                drawer.show();
             });
         </script>
     @endpush

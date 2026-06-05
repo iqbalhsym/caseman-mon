@@ -3,6 +3,18 @@
 <x-staradmin>
     @push('style')
         <style>
+            .sticky-toolbar {
+            position: fixed;
+            top: 90px;
+            left: 250px;
+            right: 10px;
+            z-index: 999;
+            background: #f4f5f7;
+            padding-top: 10px;
+            }
+           #submission-list {
+            margin-top: 150px;
+            }
             .filter-nav {
                 display: flex;
                 flex-wrap: wrap;
@@ -147,15 +159,21 @@
                 border-left: none !important;
                 padding-left: 0 !important;
             }
-            @media (max-width: 768px) {
-                .filter-nav {
-                    flex-wrap: nowrap;
-                    overflow-x: auto;
-                    padding-bottom: 6px;
-                    scrollbar-width: thin;
+            @media (max-width: 991px) {
+                .sticky-toolbar {
+                    display: none; /* sembunyikan toolbar lama di mobile */
                 }
-                .filter-btn { flex: 0 0 auto; }
-                .info-grid { grid-template-columns: 1fr; }
+                #submission-list {
+                    margin-top: 10px;
+                }
+
+                .info-row {
+                    flex-direction: column;
+                }
+
+                .info-row .label {
+                    margin-bottom: 2px;
+                }
             }
         </style>
     @endpush
@@ -164,16 +182,17 @@
         <div class="col-sm-12">
             <div class="home-tab">
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab">Viewer Status Permintaan</a>
-                        </li>
-                    </ul>
+                    
                 </div>
 
                 <div class="tab-content tab-content-basic">
                     <div class="tab-pane fade show active" id="overview" role="tabpanel">
-
+                        <div class="sticky-toolbar">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab">Viewer Status Permintaan</a>
+                            </li>
+                        </ul>
                         {{-- Card Pencarian --}}
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
@@ -204,6 +223,14 @@
                             <button class="filter-btn" data-filter="Bmhp">BMHP</button>
                             <button class="filter-btn" data-filter="Darah">Produk Darah</button>
                         </nav>
+                        </div>
+                        {{-- Tombol trigger drawer (mobile only) --}}
+                        <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3">
+                            <span class="fw-bold text-muted" style="font-size:13px;">Daftar Pengajuan</span>
+                            <button class="btn btn-sm btn-outline-primary" type="button" id="btnFilterDrawer">
+                                <i class="mdi mdi-filter-variant"></i> Filter & Cari
+                            </button>
+                        </div>
 
                         <div class="row" id="submission-list">
                             <!-- Diisi oleh Javascript -->
@@ -214,6 +241,38 @@
             </div>
         </div>
     </div>
+
+    {{-- Offcanvas Drawer Filter (Mobile) --}}
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="filterDrawer" style="height: auto; border-radius: 16px 16px 0 0; max-height: 80vh;">
+    <div class="offcanvas-header border-bottom">
+        <h6 class="offcanvas-title mb-0">Filter & Pencarian</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        {{-- Search --}}
+        <div class="input-group mb-3">
+            <span class="input-group-text bg-transparent border-end-0">
+                <i class="mdi mdi-magnify text-muted"></i>
+            </span>
+            <input type="search" class="form-control border-start-0" id="search-input-drawer" placeholder="Cari nama, No. RM, atau Ruangan...">
+        </div>
+
+        {{-- Filter Kategori --}}
+                <p class="text-muted mb-2" style="font-size:12px;">Kategori</p>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <button class="filter-btn active" data-filter="semua">Semua</button>
+                    <button class="filter-btn" data-filter="Obat">Farmasi</button>
+                    <button class="filter-btn" data-filter="Lab">Laboratorium</button>
+                    <button class="filter-btn" data-filter="Rad">Radiologi</button>
+                    <button class="filter-btn" data-filter="Bmhp">BMHP</button>
+                    <button class="filter-btn" data-filter="Darah">Produk Darah</button>
+                </div>
+
+                <button class="btn btn-primary w-100 text-white" data-bs-dismiss="offcanvas">
+                    Terapkan
+                </button>
+            </div>
+        </div>
 
     @push('script')
         <script>
@@ -446,6 +505,18 @@
 
             searchInput.addEventListener('input', handleSearch);
             renderSubmissions();
+            
+            // Sinkron search utama → search drawer (saat resize)
+            searchInput.addEventListener('input', function () {
+                const drawerInput = document.getElementById('search-input-drawer');
+                if (drawerInput) drawerInput.value = this.value;
+            });
+            document.getElementById('btnFilterDrawer').addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // cegah event naik ke sidebar
+                var drawer = new bootstrap.Offcanvas(document.getElementById('filterDrawer'));
+                drawer.show();
+            });
         </script>
     @endpush
 

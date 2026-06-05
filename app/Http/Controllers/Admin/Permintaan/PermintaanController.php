@@ -310,7 +310,7 @@ class PermintaanController extends Controller
     {
         try {
             $q     = trim($request->get('q', ''));
-            $query = Permintaan::with('user', 'lokasi', 'penjamin')->orderBy('created_at', 'desc');
+            $query = Permintaan::with('user', 'lokasi', 'penjamin', 'manager')->orderBy('created_at', 'desc');
 
             if ($request->has('status')) {
                 $query->where('status', $request->get('status'));
@@ -403,10 +403,11 @@ class PermintaanController extends Controller
             return response()->json([
                 'status' => 'success',
                 'data'   => [
-                    'nama'       => $data->nama,
-                    'lokasi_id'  => $data->lokasi_id,
-                    'jaminan_id' => $data->jaminan ?? $data->lantai,
-                    'diagnosis'  => $data->diagnosis,
+                    'nama'            => $data->nama,
+                    'lokasi_id'       => $data->lokasi_id,
+                    'jaminan_id'      => $data->jaminan ?? $data->lantai,
+                    'diagnosis'       => $data->diagnosis,
+                    'tanggal_masuk'   => $data->tanggal ? date('Y-m-d', strtotime($data->tanggal)) : null,
                 ],
             ]);
         } catch (\Throwable $th) {

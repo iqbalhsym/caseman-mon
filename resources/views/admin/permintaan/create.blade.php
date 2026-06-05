@@ -253,8 +253,9 @@
 
             fetchSearch(q).done(function (resp) {
                 if (resp.status === 'success') {
-                    // Always update name if found
+                    // Always update name and registered date if found
                     $('#nama').val(resp.data.nama);
+                    if (resp.data.tanggal_masuk) $('#tanggal_masuk').val(resp.data.tanggal_masuk);
 
                     // Only fill others if empty to avoid overwriting manual input
                     if (!$('#jaminan').val()) $('#jaminan').val(resp.data.jaminan_id);
