@@ -5,28 +5,23 @@
     @push('style')
         <style>
             .sticky-toolbar {
-                position: fixed;         /* ganti fixed → sticky */
-                top: 0;
-                left: 0;                  /* hapus left: 250px */
-                right: 0;
-                z-index: 999;
-                background: #f4f5f7;
-                padding: 10px 10px 0;
+            position: fixed;
+            top: 90px;
+            left: 250px;
+            right: 10px;
+            z-index: 999;
+            background: #f4f5f7;
+            padding-top: 10px;
             }
-
-            #submission-list {
-                margin-top: 10px;         /* hapus margin-top: 150px */
+           #submission-list {
+            margin-top: 150px;
             }
             .filter-nav {
                 display: flex;
-                flex-wrap: nowrap;           /* ganti wrap → nowrap */
-                overflow-x: auto;
-                gap: 8px;
-                padding-bottom: 8px;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;       /* sembunyikan scrollbar */
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 20px;
             }
-            .filter-nav::-webkit-scrollbar { display: none; }
             .filter-btn {
                 background: #fff;
                 border: 1px solid #dee2e6;
@@ -72,15 +67,12 @@
                 padding: 12px 15px;
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-start;    /* ganti center → flex-start */
-                gap: 8px;                   /* tambahkan gap */
+                align-items: center;
             }
             .submission-card .card-body {
                 padding: 12px 15px;
             }
             .patient-name {
-                word-break: break-word;
-                overflow: break-word;
                 font-size: 0.85rem;
                 font-weight: 800;
                 color: #333;
@@ -720,7 +712,7 @@
                 if (savedFilter === 'semua') {
                     updateDisplay(); // pakai data awal dari PHP, tidak perlu fetch
                 } else {
-                    updateDisplay();
+                    fetchByStatus(savedFilter); // fetch ke server sesuai filter tersimpan
                 }
 
         </script>
