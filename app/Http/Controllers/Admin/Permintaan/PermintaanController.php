@@ -650,6 +650,7 @@ class PermintaanController extends Controller
                 $statusAngka = 1; // menunggu
                 if ($request->status === 'disetujui') $statusAngka = 2;
                 if ($request->status === 'ditolak') $statusAngka = 3;
+                if ($request->status === 'dibatalkan') $statusAngka = 4;
 
                 $data->update([
                     'status'           => $request->status,

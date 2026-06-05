@@ -214,6 +214,7 @@
                                                     <option value="menunggu" {{ $data->status == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
                                                     <option value="disetujui" {{ $data->status == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
                                                     <option value="ditolak" {{ $data->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                                    <option value="dibatalkan" {{ $data->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
                                                 </select>
                                             </div>
                                         </div>
