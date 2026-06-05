@@ -143,11 +143,13 @@
                 color: #fff !important;
             }
 
-            @media (max-width: 768px) {
-                .filter-nav {
-                    flex-wrap: nowrap;
-                    overflow-x: auto;
-                    padding-bottom: 10px;
+            @media (max-width: 991px) {
+                .sticky-toolbar {
+                    left: 0;
+                    top: 60px;
+                }
+                #submission-list {
+                    margin-top: 170px;
                 }
                 .filter-btn {
                     white-space: nowrap;
