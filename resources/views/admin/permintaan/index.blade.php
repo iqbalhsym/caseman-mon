@@ -368,6 +368,26 @@
     </div>
 </div>
 
+{{-- Tombol Kembali ke Atas (Mobile Only) --}}
+<button id="btnScrollTop" class="d-md-none" style="
+    display: none !important;
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    z-index: 997;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1f3bb3;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 18px;
+    cursor: pointer;
+">
+    <i class="mdi mdi-chevron-up"></i>
+</button>
+
     @push('script')
         <script>
             const currentUserRole = {{ Auth::user()->role_id }};
@@ -922,6 +942,24 @@
                 var drawer = new bootstrap.Offcanvas(document.getElementById('filterDrawer'));
                 drawer.show();
             });
+            // Tombol scroll to top
+                const btnScrollTop = document.getElementById('btnScrollTop');
+
+                window.addEventListener('scroll', function () {
+                    if (window.innerWidth <= 991) {
+                        if (window.scrollY > 300) {
+                            btnScrollTop.style.setProperty('display', 'flex', 'important');
+                            btnScrollTop.style.alignItems = 'center';
+                            btnScrollTop.style.justifyContent = 'center';
+                        } else {
+                            btnScrollTop.style.setProperty('display', 'none', 'important');
+                        }
+                    }
+                });
+
+                btnScrollTop.addEventListener('click', function () {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
         </script>
     @endpush
 
