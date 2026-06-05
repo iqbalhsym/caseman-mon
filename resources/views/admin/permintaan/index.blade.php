@@ -146,7 +146,7 @@
             @media (max-width: 991px) {
                 .mobile-filter-trigger {
                     position: fixed;
-                    top: 60px;        /* sesuaikan tinggi navbar mobile */
+                    top: 90px;        /* sesuaikan tinggi navbar mobile */
                     z-index: 998;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
                 }
