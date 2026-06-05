@@ -56,6 +56,7 @@
             .submission-card.status-konfirmasi { border-left-color: #fd7e14; }
             .submission-card.status-ditolak { border-left-color: #dc3545; }
             .submission-card.status-batal { border-left-color: #000000; }
+            .submission-card.status-dibatalkan  { border-left-color: #000000; }
 
             .submission-card:hover {
                 transform: translateY(-5px);
@@ -430,6 +431,7 @@
                     menunggu: { text: 'Menunggu', badge: 'warning' },
                     konfirmasi: { text: 'Dikonfirmasi', badge: 'orange' },
                     batal: { text: 'Dibatalkan', badge: 'dark' },
+                    dibatalkan:  { text: 'Dibatalkan',  badge: 'dark' },
                 };
 
                 const lowerCaseQuery = searchQuery.toLowerCase().trim();
@@ -520,7 +522,7 @@
                                 ${editButtonHTML}
                             </div>
                         `;
-                    } else if (item.status == 'ditolak' || item.status == 'batal') {
+                    } else if (item.status == 'ditolak' || item.status == 'batal' || item.status == 'dibatalkan') {
                         cardFooter = `
                             <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
                                 ${historyHTML}
