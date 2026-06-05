@@ -145,6 +145,7 @@
 
             @media (max-width: 991px) {
                 .sticky-toolbar {
+                    position: fixed;
                     display: none; /* sembunyikan toolbar lama di mobile */
                 }
                 #submission-list {
