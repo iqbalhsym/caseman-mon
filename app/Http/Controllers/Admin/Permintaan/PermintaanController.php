@@ -310,7 +310,7 @@ class PermintaanController extends Controller
     {
         try {
             $q     = trim($request->get('q', ''));
-            $query = Permintaan::with('user', 'lokasi', 'penjamin')->orderBy('created_at', 'desc');
+            $query = Permintaan::with('user', 'lokasi', 'penjamin', 'manager')->orderBy('created_at', 'desc');
 
             if ($request->has('status')) {
                 $query->where('status', $request->get('status'));

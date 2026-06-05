@@ -666,41 +666,54 @@
                 button.addEventListener('click', () => {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
-                    sessionStorage.setItem('activeFilter', button.getAttribute('data-filter'));
+                    const filter = button.getAttribute('data-filter');
+                    sessionStorage.setItem('activeFilter', filter);
                     updateDisplay();
                 });
             });
 
-            const handleSearch = debounce(function () {
+            function fetchByStatus(status) {
                 const q = searchInput.value.trim();
-                if (q.length === 0) {
+                const params = { q: q };
+                if (status !== 'semua') params.status = status;
+
+                $.getJSON("{{ route('admin.permintaan.search') }}", params)
+                    .done(function (resp) {
+                        if (resp.status === 'success') {
+                            submissions = resp.data;
+                            renderSubmissions(status, q);
+                        }
+                    });
+}
+
+            const handleSearch = debounce(function () {
+                const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'semua';
+                const q = searchInput.value.trim();
+
+                if (q.length === 0 && activeFilter === 'semua') {
                     submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
                     updateDisplay();
                     return;
                 }
 
-                fetchSearch(q).done(function (resp) {
-                    if (resp.status === 'success') {
-                        submissions = resp.data;
-                        updateDisplay();
-                    }
-                }).fail(function () {
-                    // Fallback
-                });
+                fetchByStatus(activeFilter); // gunakan fetchByStatus yg sudah bawa q & status
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
 
             // Inisialisasi
-            const savedFilter = sessionStorage.getItem('activeFilter');
-            if (savedFilter) {
+            const savedFilter = sessionStorage.getItem('activeFilter') || 'semua';
                 const targetBtn = document.querySelector(`.filter-btn[data-filter="${savedFilter}"]`);
                 if (targetBtn) {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     targetBtn.classList.add('active');
                 }
-            }
-            updateDisplay();
+
+                if (savedFilter === 'semua') {
+                    updateDisplay(); // pakai data awal dari PHP, tidak perlu fetch
+                } else {
+                    updateDisplay();
+                }
 
         </script>
         <script>
