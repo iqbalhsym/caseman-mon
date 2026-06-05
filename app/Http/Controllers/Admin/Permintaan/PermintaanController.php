@@ -78,7 +78,7 @@ class PermintaanController extends Controller
         if ($role === 'casemanager') return true;
         if ($role === 'tenagamedis') return true;
 
-        return false; // 'viewer' dan 'casemanager' tidak bisa membuat baru
+        return false; // 'viewer' dan 'casemanager' tidak bisa membuat baru ya
     }
 
     /**

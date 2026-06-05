@@ -24,6 +24,7 @@
                         <input type="hidden" id="user" name="user" value="{{ Auth::user()->id }}">
                         <input type="hidden" id="dataId" name="id" value="{{ $data->id }}">
 
+                        
                         {{-- VARIABEL PENGAMAN ROLE --}}
                         @php
                             $isTenagaMedis = auth()->user()->role->name === 'tenagamedis';
