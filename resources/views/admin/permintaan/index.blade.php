@@ -145,18 +145,16 @@
 
             @media (max-width: 991px) {
                 .sticky-toolbar {
-                    left: 0;
-                    top: 60px;
+                    display: none; /* sembunyikan toolbar lama di mobile */
                 }
                 #submission-list {
-                    margin-top: 170px;
+                    margin-top: 10px;
                 }
-                .filter-btn {
-                    white-space: nowrap;
-                }
+
                 .info-row {
                     flex-direction: column;
                 }
+
                 .info-row .label {
                     margin-bottom: 2px;
                 }
@@ -253,7 +251,14 @@
                             <button class="filter-btn" data-filter="ditolak">Ditolak</button>
                             <button class="filter-btn" data-filter="batal">Batal</button>
                         </nav>
+                    </div>
 
+                    {{-- Tombol trigger drawer (mobile only) --}}
+                    <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3">
+                        <span class="fw-bold text-muted" style="font-size:13px;">Daftar Pengajuan</span>
+                        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterDrawer">
+                            <i class="mdi mdi-filter-variant"></i> Filter & Cari
+                        </button>
                     </div>
 
                         {{-- Submissions List --}}
@@ -331,6 +336,37 @@
             </div>
         </div>
     </div>
+
+    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="filterDrawer" style="height: auto; border-radius: 16px 16px 0 0;">
+    <div class="offcanvas-header border-bottom">
+        <h6 class="offcanvas-title">Filter & Pencarian</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        {{-- Search --}}
+        <div class="input-group mb-3">
+            <span class="input-group-text bg-transparent border-end-0">
+                <i class="mdi mdi-magnify text-muted"></i>
+            </span>
+            <input type="search" class="form-control border-start-0" id="search-input-drawer" placeholder="Cari nama, No. RM, atau Ruangan...">
+        </div>
+
+        {{-- Filter --}}
+        <p class="text-muted mb-2" style="font-size:12px;">Status</p>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="filter-btn active" data-filter="semua">Semua</button>
+            <button class="filter-btn" data-filter="menunggu">Menunggu</button>
+            <button class="filter-btn" data-filter="konfirmasi">Konfirmasi</button>
+            <button class="filter-btn" data-filter="disetujui">Disetujui</button>
+            <button class="filter-btn" data-filter="ditolak">Ditolak</button>
+            <button class="filter-btn" data-filter="batal">Batal</button>
+        </div>
+
+        <button class="btn btn-primary w-100 text-white" data-bs-dismiss="offcanvas">
+            Terapkan
+        </button>
+    </div>
+</div>
 
     @push('script')
         <script>
@@ -868,6 +904,17 @@
                         });
                     }
                 })
+            });
+
+            document.getElementById('search-input-drawer').addEventListener('input', function () {
+                searchInput.value = this.value;
+                handleSearch();
+            });
+
+            // Sinkron search utama → search drawer (saat resize)
+            searchInput.addEventListener('input', function () {
+                const drawerInput = document.getElementById('search-input-drawer');
+                if (drawerInput) drawerInput.value = this.value;
             });
         </script>
     @endpush
