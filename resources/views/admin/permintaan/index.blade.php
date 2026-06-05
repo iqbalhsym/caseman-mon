@@ -5,7 +5,7 @@
     @push('style')
         <style>
             .sticky-toolbar {
-                position: sticky;         /* ganti fixed → sticky */
+                position: fixed;         /* ganti fixed → sticky */
                 top: 0;
                 left: 0;                  /* hapus left: 250px */
                 right: 0;
