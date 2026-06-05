@@ -273,12 +273,12 @@
           @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 2))
           <li class="nav-item nav-category">Monitoring</li>
           @endif
-          <li class="nav-item {{ Request::is('admin/list-permintaan*') ? 'active' : '' }}">
-            {{-- <a class="nav-link" href="{{ route('admin.list-permintaan.index') }}">
+          {{-- <li class="nav-item {{ Request::is('admin/list-permintaan*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.list-permintaan.index') }}">
               <i class="menu-icon mdi mdi-format-list-checks"></i>
               <span class="menu-title">List Permintaan</span>
-            </a> --}}
-            </li>
+            </a>
+            </li> --}}
           @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 2))
           <li class="nav-item {{ Request::is('admin/laporan*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('admin.laporan.index') }}">

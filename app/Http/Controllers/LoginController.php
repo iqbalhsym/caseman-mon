@@ -208,7 +208,7 @@ class LoginController extends Controller
             } else if ($user->role_id == 3){
                 $url = route('admin.permintaan.index');
             } else if ($user->role_id == 4){
-                $url = route('admin.list-permintaan.index');
+                $url = route('admin.viewer.index');
             } else if ($user->role_id == 5){
                 $url = route('admin.viewer.index');
             } else {
