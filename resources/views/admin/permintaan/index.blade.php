@@ -144,12 +144,6 @@
             }
 
             @media (max-width: 991px) {
-                /* .mobile-filter-trigger {
-                    position: fixed;
-                    top: 90px;        /* sesuaikan tinggi navbar mobile */
-                    z-index: 998;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-                } */
                 .sticky-toolbar {
                     display: none; /* sembunyikan toolbar lama di mobile */
                 }
