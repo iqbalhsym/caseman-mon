@@ -256,7 +256,7 @@
                     {{-- Tombol trigger drawer (mobile only) --}}
                     <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3">
                         <span class="fw-bold text-muted" style="font-size:13px;">Daftar Pengajuan</span>
-                        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterDrawer">
+                        <button class="btn btn-sm btn-outline-primary" type="button" id="btnFilterDrawer">
                             <i class="mdi mdi-filter-variant"></i> Filter & Cari
                         </button>
                     </div>
@@ -915,6 +915,12 @@
             searchInput.addEventListener('input', function () {
                 const drawerInput = document.getElementById('search-input-drawer');
                 if (drawerInput) drawerInput.value = this.value;
+            });
+            document.getElementById('btnFilterDrawer').addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation(); // cegah event naik ke sidebar
+                var drawer = new bootstrap.Offcanvas(document.getElementById('filterDrawer'));
+                drawer.show();
             });
         </script>
     @endpush
