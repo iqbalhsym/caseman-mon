@@ -5,31 +5,44 @@
     @push('style')
         <style>
             .sticky-toolbar {
-            position: fixed;
-            top: 90px;
-            left: 250px;
-            right: 10px;
-            z-index: 999;
-            background: #f4f5f7;
-            padding-top: 10px;
+                position: fixed;
+                top: 70px; /* offset for mobile navbar */
+                left: 1.5rem;
+                right: 1.5rem;
+                z-index: 999;
+                background: #f4f5f7;
+                padding-top: 10px;
+                padding-bottom: 5px;
             }
-           #submission-list {
-            margin-top: 150px;
+            @media (min-width: 992px) {
+                .sticky-toolbar {
+                    top: 97px; /* matches desktop navbar height */
+                    left: calc(235px + 1.5rem); /* sidebar width + padding */
+                    right: 1.5rem;
+                }
+                body.sidebar-icon-only .sticky-toolbar {
+                    left: calc(70px + 1.5rem);
+                }
+            }
+            #submission-list {
+                margin-top: 10px;
             }
             .filter-nav {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 10px;
-                margin-bottom: 20px;
+                gap: 8px;
+                margin-bottom: 5px;
             }
             .filter-btn {
                 background: #fff;
                 border: 1px solid #dee2e6;
-                padding: 8px 16px;
+                padding: 5px 14px;
                 border-radius: 20px;
                 color: #6c757d;
                 font-weight: 500;
-                transition: all 0.3s ease;
+                font-size: 0.82rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
             }
             .filter-btn:hover {
                 background: #f8f9fa;
@@ -145,17 +158,14 @@
             }
 
             @media (max-width: 991px) {
-                .mobile-filter-trigger {
-                    position: sticky;
-                    top: 0;
-                    z-index: 998;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+                .filter-nav {
+                    flex-wrap: nowrap !important;
+                    overflow-x: auto !important;
+                    padding-bottom: 10px;
+                    -webkit-overflow-scrolling: touch;
                 }
-                .sticky-toolbar {
-                    display: none; /* sembunyikan toolbar lama di mobile */
-                }
-                #submission-list {
-                    margin-top: 10px;
+                .filter-btn {
+                    white-space: nowrap !important;
                 }
 
                 .info-row {
@@ -260,13 +270,7 @@
                         </nav>
                     </div>
 
-                    {{-- Tombol trigger drawer (mobile only) --}}
-                    <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3 mobile-filter-trigger">
-                        <span class="fw-bold text-muted" style="font-size:13px;">Daftar Pengajuan</span>
-                        <button class="btn btn-sm btn-outline-primary" type="button" id="btnFilterDrawer">
-                            <i class="mdi mdi-filter-variant"></i> Filter & Cari
-                        </button>
-                    </div>
+
 
                         {{-- Submissions List --}}
                         <div class="row" id="submission-list">
@@ -344,36 +348,7 @@
         </div>
     </div>
 
-    <div class="offcanvas offcanvas-bottom" tabindex="-1" id="filterDrawer" style="height: auto; border-radius: 16px 16px 0 0;">
-    <div class="offcanvas-header border-bottom">
-        <h6 class="offcanvas-title">Filter & Pencarian</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body">
-        {{-- Search --}}
-        <div class="input-group mb-3">
-            <span class="input-group-text bg-transparent border-end-0">
-                <i class="mdi mdi-magnify text-muted"></i>
-            </span>
-            <input type="search" class="form-control border-start-0" id="search-input-drawer" placeholder="Cari nama, No. RM, atau Ruangan...">
-        </div>
 
-        {{-- Filter --}}
-        <p class="text-muted mb-2" style="font-size:12px;">Status</p>
-        <div class="d-flex flex-wrap gap-2 mb-3">
-            <button class="filter-btn active" data-filter="semua">Semua</button>
-            <button class="filter-btn" data-filter="menunggu">Menunggu</button>
-            <button class="filter-btn" data-filter="konfirmasi">Konfirmasi</button>
-            <button class="filter-btn" data-filter="disetujui">Disetujui</button>
-            <button class="filter-btn" data-filter="ditolak">Ditolak</button>
-            <button class="filter-btn" data-filter="batal">Batal</button>
-        </div>
-
-        <button class="btn btn-primary w-100 text-white" data-bs-dismiss="offcanvas">
-            Terapkan
-        </button>
-    </div>
-</div>
 
 {{-- Tombol Kembali ke Atas (Mobile Only) --}}
 <button id="btnScrollTop" class="d-md-none" style="
@@ -397,6 +372,31 @@
 
     @push('script')
         <script>
+            function reloadWithScroll() {
+                sessionStorage.setItem('scrollPositionIndex', window.scrollY);
+                window.location.reload();
+            }
+
+            function restoreScroll() {
+                const scrollPos = sessionStorage.getItem('scrollPositionIndex');
+                if (scrollPos !== null) {
+                    window.scrollTo(0, parseInt(scrollPos));
+                    sessionStorage.removeItem('scrollPositionIndex');
+                }
+            }
+
+            function adjustSubmissionListMargin() {
+                const toolbar = document.querySelector('.sticky-toolbar');
+                const list = document.getElementById('submission-list');
+                if (toolbar && list) {
+                    list.style.marginTop = (toolbar.offsetHeight + 2) + 'px';
+                }
+            }
+
+            window.addEventListener('resize', adjustSubmissionListMargin);
+            window.addEventListener('load', adjustSubmissionListMargin);
+            document.addEventListener('DOMContentLoaded', adjustSubmissionListMargin);
+
             const currentUserRole = {{ Auth::user()->role_id }};
             const initialSubmissions = @json($datas);
             let submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
@@ -720,6 +720,10 @@
                     `;
                     submissionListContainer.insertAdjacentHTML('beforeend', cardHTML);
                 });
+                setTimeout(() => {
+                    restoreScroll();
+                    adjustSubmissionListMargin();
+                }, 50);
             }
 
             function updateDisplay() {
@@ -733,8 +737,8 @@
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
                     const filter = button.getAttribute('data-filter');
-                    sessionStorage.setItem('activeFilter', filter);
-                    updateDisplay();
+                    sessionStorage.setItem('activeFilterIndex', filter);
+                    fetchByStatus(filter);
                 });
             });
 
@@ -750,25 +754,19 @@
                             renderSubmissions(status, q);
                         }
                     });
-}
+            }
 
             const handleSearch = debounce(function () {
                 const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'semua';
                 const q = searchInput.value.trim();
 
-                if (q.length === 0 && activeFilter === 'semua') {
-                    submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
-                    updateDisplay();
-                    return;
-                }
-
-                fetchByStatus(activeFilter); // gunakan fetchByStatus yg sudah bawa q & status
+                fetchByStatus(activeFilter);
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
 
             // Inisialisasi
-            const savedFilter = sessionStorage.getItem('activeFilter') || 'semua';
+            const savedFilter = sessionStorage.getItem('activeFilterIndex') || 'semua';
                 const targetBtn = document.querySelector(`.filter-btn[data-filter="${savedFilter}"]`);
                 if (targetBtn) {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -780,6 +778,7 @@
                 } else {
                     fetchByStatus(savedFilter); // fetch ke server sesuai filter tersimpan
                 }
+                setTimeout(adjustSubmissionListMargin, 100);
 
         </script>
         <script>
@@ -816,7 +815,7 @@
                     },
                     success: function (data) {
                         if(data.status == 'success') {
-                            window.location.reload();
+                            reloadWithScroll();
                         } else {
                             Swal.fire("Gagal !!", data.message, "error");
                         }
@@ -883,7 +882,7 @@
                     },
                     success: function (data) {
                         if(data.status == 'success') {
-                            window.location.reload();
+                            reloadWithScroll();
                         } else {
                             Swal.fire("Gagal !!", data.message, "error");
                         }
@@ -921,7 +920,7 @@
                             },
                             success: function (data) {
                                 if (data.status == 'success') {
-                                    window.location.reload();
+                                    reloadWithScroll();
                                 } else {
                                     Swal.fire("Gagal !!", data.message, "error");
                                 }
@@ -934,22 +933,7 @@
                 })
             });
 
-            document.getElementById('search-input-drawer').addEventListener('input', function () {
-                searchInput.value = this.value;
-                handleSearch();
-            });
 
-            // Sinkron search utama → search drawer (saat resize)
-            searchInput.addEventListener('input', function () {
-                const drawerInput = document.getElementById('search-input-drawer');
-                if (drawerInput) drawerInput.value = this.value;
-            });
-            document.getElementById('btnFilterDrawer').addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation(); // cegah event naik ke sidebar
-                var drawer = new bootstrap.Offcanvas(document.getElementById('filterDrawer'));
-                drawer.show();
-            });
             // Tombol scroll to top
                 const btnScrollTop = document.getElementById('btnScrollTop');
 
