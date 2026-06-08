@@ -1,6 +1,15 @@
 @section('title', 'Edit Permintaan')
 
 <x-staradmin>
+    @push('style')
+        <style>
+            .paste-zone:hover, .paste-zone:focus {
+                border-color: #1f3bb3 !important;
+                background-color: #f0f3ff !important;
+                color: #1f3bb3 !important;
+            }
+        </style>
+    @endpush
 
     <div class="row">
         <div class="col-12 grid-margin">
@@ -15,6 +24,7 @@
                         <input type="hidden" id="user" name="user" value="{{ Auth::user()->id }}">
                         <input type="hidden" id="dataId" name="id" value="{{ $data->id }}">
 
+                        
                         {{-- VARIABEL PENGAMAN ROLE --}}
                         @php
                             $isTenagaMedis = auth()->user()->role->name === 'tenagamedis';
@@ -28,74 +38,56 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="tanggal_masuk">Tanggal Masuk</label>
                                     <div class="col-sm-8">
-                                        <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d', strtotime($data->tanggal)) }}" {{ $isCaseManager ? 'readonly' : '' }}>
+                                        <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d', strtotime($data->tanggal)) }}">
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="no_rm">No. Rekam Medis</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="no_rm" name="no_rm" value="{{ $data->no_rm }}" {{ $isCaseManager ? 'readonly' : '' }}>
+                                        <input type="text" class="form-control" id="no_rm" name="no_rm" value="{{ $data->no_rm }}">
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="nama">Nama Pasien</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}" {{ $isCaseManager ? 'readonly' : '' }}>
+                                        <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}">
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan</label>
                                     <div class="col-sm-8">
-                                        @if($isCaseManager)
-                                            <input type="text" class="form-control" value="{{ strtoupper($data->ruangan) }}" readonly>
-                                            <input type="hidden" id="jaminan" name="jaminan" value="{{ $data->ruangan }}">
-                                        {{-- @else
-                                            <select class="form-select" id="jaminan" name="jaminan">
-                                                <option value="umum">Pasien Umum</option>
-                                                <option value="bpjs">Pasien BPJS Kesehatan</option>
-                                                <option value="uhc">Pasien UHC</option>
-                                                <option value="bpjs_jasaraharja">Jasa Raharja - BPJS Kesehatan</option>
-                                            </select>
-                                        @endif --}}
-                                        @else
-                                                <select class="form-select" id="jaminan" name="jaminan">
-                                                    @forelse ($penjamin as $item)
-                                                        <option value="{{ $item->nama }}"
-                                                            {{ old('jaminan', $data->jaminan) == $item->nama ? 'selected' : '' }}>
-                                                            {{ $item->nama }}
-                                                        </option>
-                                                    @empty
-                                                        <option value="">Tidak ada data penjaminan</option>
-                                                    @endforelse
-                                                </select>
-                                        @endif
+                                        <select class="form-select" id="jaminan" name="jaminan">
+                                            @forelse ($penjamin as $item)
+                                                <option value="{{ $item->nama }}"
+                                                    {{ old('jaminan', $data->jaminan) == $item->nama ? 'selected' : '' }}>
+                                                    {{ $item->nama }}
+                                                </option>
+                                            @empty
+                                                <option value="">Tidak ada data penjaminan</option>
+                                            @endforelse
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="lokasi">Lokasi Ruangan</label>
                                     <div class="col-sm-8">
-                                        @if($isCaseManager)
-                                            <input type="text" class="form-control" value="{{ $data->lokasi?->nama }} Lt. {{ $data->lokasi?->lantai }}" readonly>
-                                            <input type="hidden" id="lokasi" name="lokasi" value="{{ $data->lokasi_id }}">
-                                        @else
-                                            <select class="form-select" id="lokasi" name="lokasi">
-                                                <option value="">Pilih Lokasi...</option>
-                                                @foreach ($lokasi as $item)
-                                                    <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
-                                                @endforeach
-                                            </select>
-                                        @endif
+                                        <select class="form-select" id="lokasi" name="lokasi">
+                                            <option value="">Pilih Lokasi...</option>
+                                            @foreach ($lokasi as $item)
+                                                <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="diagnosis">Diagnosis</label>
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="4" {{ $isCaseManager ? 'readonly' : '' }}>{{ $data->diagnosis }}</textarea>
+                                        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="4">{{ $data->diagnosis }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -106,26 +98,21 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="kategori">Kategori</label>
                                     <div class="col-sm-8">
-                                        @if($isCaseManager)
-                                            <input type="text" class="form-control" value="{{ strtoupper($data->kategori) }}" readonly>
-                                            <input type="hidden" id="kategori" name="kategori" value="{{ $data->kategori }}">
-                                        @else
-                                            <select class="form-select" id="kategori" name="kategori">
-                                                <option value="">Pilih Kategori...</option>
-                                                <option value="obat">Obat</option>
-                                                <option value="lab">Laboratorium</option>
-                                                <option value="rad">Radiologi</option>
-                                                <option value="bmhp">BMHP</option>
-                                                <option value="darah">Produk Darah</option>
-                                            </select>
-                                        @endif
+                                        <select class="form-select" id="kategori" name="kategori">
+                                            <option value="">Pilih Kategori...</option>
+                                            <option value="obat">Obat</option>
+                                            <option value="lab">Laboratorium</option>
+                                            <option value="rad">Radiologi</option>
+                                            <option value="bmhp">BMHP</option>
+                                            <option value="darah">Produk Darah</option>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="form-group row d-none" id="riwayat-group">
                                     <label class="col-sm-4 col-form-label" for="riwayat">Riwayat Permintaan</label>
                                     <div class="col-sm-8">
-                                        <select class="form-select" id="riwayat" name="riwayat" {{ $isCaseManager ? 'disabled' : '' }}>
+                                        <select class="form-select" id="riwayat" name="riwayat">
                                             <option value="">Pilih Riwayat...</option>
                                         </select>
                                     </div>
@@ -134,14 +121,14 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="keterangan">Keterangan</label>
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" {{ $isCaseManager ? 'readonly' : '' }}>{{ $data->keterangan }}</textarea>
+                                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3">{{ $data->keterangan }}</textarea>
                                     </div>
                                 </div>
 
                                 <div class="form-group row {{ $data->kategori == 'obat' ? '' : 'd-none' }}" id="detail-obat-group">
                                     <label class="col-sm-4 col-form-label text-success" for="detail_obat">Detail Obat</label>
                                     <div class="col-sm-8">
-                                        <div class="form-control obat-input-div" contenteditable="{{ $isTenagaMedis ? 'true' : 'false' }}" style="min-height: 80px; overflow: auto; resize: vertical; background-eq: {{ $isCaseManager ? '#e9ecef' : '#fff' }}" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">{!! $data->detail_obat !!}</div>
+                                        <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow: auto; resize: vertical;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">{!! $data->detail_obat !!}</div>
                                         <textarea class="form-control d-none" id="detail_obat" name="detail_obat" rows="3">{{ $data->detail_obat }}</textarea>
                                     </div>
                                 </div>
@@ -149,7 +136,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="indikasi">Indikasi</label>
                                     <div class="col-sm-8">
-                                        <textarea class="form-control" id="indikasi" name="indikasi" rows="3" {{ $isCaseManager ? 'readonly' : '' }}>{{ $data->indikasi }}</textarea>
+                                        <textarea class="form-control" id="indikasi" name="indikasi" rows="3">{{ $data->indikasi }}</textarea>
                                     </div>
                                 </div>
 
@@ -158,7 +145,18 @@
                                         {!! $data->file ? '<br><a href="' . asset($data->file) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file" name="file" {{ $isCaseManager ? 'disabled' : '' }}>
+                                        <div class="d-flex gap-2">
+                                            <input type="file" class="form-control file-input-control" id="file" name="file" data-preview="preview-file" data-paste="paste-zone-file">
+                                            <div class="paste-zone flex-shrink-0" id="paste-zone-file" tabindex="0" style="border: 2px dashed #ccc; border-radius: 4px; padding: 6px 12px; text-align: center; cursor: pointer; background: #fafafa; font-size: 0.8rem; color: #6c757d; outline: none; min-width: 130px; height: 38px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                                <i class="mdi mdi-content-paste me-1"></i> Paste (Ctrl+V)
+                                            </div>
+                                        </div>
+                                        <div class="preview-container mt-2 align-items-center" id="preview-file" style="display:none; gap: 10px;">
+                                            <img src="" style="max-height: 80px; border: 1px solid #ddd; border-radius: 4px; display: block;" class="img-thumbnail">
+                                            <div>
+                                                <button type="button" class="btn btn-xs btn-danger text-white btn-clear-file" data-target="file">Hapus</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -167,7 +165,18 @@
                                         {!! $data->file2 ? '<br><a href="' . asset($data->file2) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file2" name="file2" {{ $isCaseManager ? 'disabled' : '' }}>
+                                        <div class="d-flex gap-2">
+                                            <input type="file" class="form-control file-input-control" id="file2" name="file2" data-preview="preview-file2" data-paste="paste-zone-file2">
+                                            <div class="paste-zone flex-shrink-0" id="paste-zone-file2" tabindex="0" style="border: 2px dashed #ccc; border-radius: 4px; padding: 6px 12px; text-align: center; cursor: pointer; background: #fafafa; font-size: 0.8rem; color: #6c757d; outline: none; min-width: 130px; height: 38px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                                <i class="mdi mdi-content-paste me-1"></i> Paste (Ctrl+V)
+                                            </div>
+                                        </div>
+                                        <div class="preview-container mt-2 align-items-center" id="preview-file2" style="display:none; gap: 10px;">
+                                            <img src="" style="max-height: 80px; border: 1px solid #ddd; border-radius: 4px; display: block;" class="img-thumbnail">
+                                            <div>
+                                                <button type="button" class="btn btn-xs btn-danger text-white btn-clear-file" data-target="file2">Hapus</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -176,7 +185,18 @@
                                         {!! $data->file3 ? '<br><a href="' . asset($data->file3) . '" target="_blank" class="badge badge-success mt-1">Lihat File Saat Ini</a>' : '' !!}
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file3" name="file3" {{ $isCaseManager ? 'disabled' : '' }}>
+                                        <div class="d-flex gap-2">
+                                            <input type="file" class="form-control file-input-control" id="file3" name="file3" data-preview="preview-file3" data-paste="paste-zone-file3">
+                                            <div class="paste-zone flex-shrink-0" id="paste-zone-file3" tabindex="0" style="border: 2px dashed #ccc; border-radius: 4px; padding: 6px 12px; text-align: center; cursor: pointer; background: #fafafa; font-size: 0.8rem; color: #6c757d; outline: none; min-width: 130px; height: 38px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                                <i class="mdi mdi-content-paste me-1"></i> Paste (Ctrl+V)
+                                            </div>
+                                        </div>
+                                        <div class="preview-container mt-2 align-items-center" id="preview-file3" style="display:none; gap: 10px;">
+                                            <img src="" style="max-height: 80px; border: 1px solid #ddd; border-radius: 4px; display: block;" class="img-thumbnail">
+                                            <div>
+                                                <button type="button" class="btn btn-xs btn-danger text-white btn-clear-file" data-target="file3">Hapus</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -194,6 +214,7 @@
                                                     <option value="menunggu" {{ $data->status == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
                                                     <option value="disetujui" {{ $data->status == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
                                                     <option value="ditolak" {{ $data->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                                    <option value="dibatalkan" {{ $data->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -228,23 +249,11 @@
 @push('script')
     <script>
         // Set awal data select
-        @if(!$isCaseManager)
-            $('#jaminan').val("{{ $data->ruangan }}");
-            $('#lokasi').val("{{ $data->lokasi_id }}");
-            $('#kategori').val("{{ $data->kategori }}");
-        @endif
+        $('#jaminan').val("{{ $data->ruangan }}");
+        $('#lokasi').val("{{ $data->lokasi_id }}");
+        $('#kategori').val("{{ $data->kategori }}");
 
         function validasiForm() {
-            // Jika login sebagai Case Manager, tidak perlu validasi input data medis
-            if(document.getElementById("status")) {
-                var status = document.getElementById("status").value;
-                if(status === "menunggu") {
-                    showToast('Silahkan pilih status Disetujui atau Ditolak', 'error');
-                    return false;
-                }
-                return true;
-            }
-
             var no_rm = document.getElementById("no_rm").value;
             var nama = document.getElementById("nama").value;
             var jaminan = document.getElementById("jaminan").value;
@@ -252,13 +261,15 @@
             var diagnosis = document.getElementById("diagnosis").value;
             var kategori = document.getElementById("kategori").value;
             var indikasi = document.getElementById("indikasi").value;
+            var detail_obat = document.getElementById("detail_obat").value;
 
             if (kategori !== 'obat') {
                 document.getElementById("detail_obat").value = '';
+                detail_obat = '';
             }
 
-            if (no_rm === "" || nama === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || detail_obat === "" || indikasi === "") {
-                showToast('Semua field harus diisi, kecuali file pendukung', 'error');
+            if (no_rm === "" || nama === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || (kategori === 'obat' && detail_obat === "") || indikasi === "") {
+                showToast('Semua field data medis harus diisi, kecuali file pendukung', 'error');
                 return false;
             }
 
@@ -311,7 +322,6 @@
             };
         }
 
-        @if(!$isCaseManager)
         function fetchSearch(q) {
             return $.getJSON("{{ route('admin.permintaan.search.rm') }}", { q: q });
         }
@@ -431,7 +441,62 @@
         $(document).on('focus', '.obat-input-div', function() {
             if ($(this).html().trim() === '<br>') $(this).html('');
         });
-        @endif
+
+        // --- Logika Paste & Pratinjau File Pendukung ---
+        function showFilePreview(file, previewId) {
+            const previewEl = $(`#${previewId}`);
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewEl.find('img').attr('src', e.target.result).show();
+                    previewEl.css('display', 'flex');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewEl.find('img').hide();
+                previewEl.hide();
+            }
+        }
+
+        $(document).on('change', '.file-input-control', function() {
+            const file = this.files[0];
+            const previewId = $(this).data('preview');
+            showFilePreview(file, previewId);
+        });
+
+        $(document).on('paste', '.paste-zone', function(e) {
+            const inputId = $(this).attr('id').replace('paste-zone-', '');
+            const inputEl = document.getElementById(inputId);
+            const previewId = $(inputEl).data('preview');
+            
+            const clipboardData = e.clipboardData || e.originalEvent.clipboardData;
+            const items = clipboardData.items;
+            
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") !== -1) {
+                    const blob = items[i].getAsFile();
+                    const file = new File([blob], "pasted_image_" + Date.now() + ".png", { type: blob.type });
+                    
+                    const container = new DataTransfer();
+                    container.items.add(file);
+                    inputEl.files = container.files;
+                    
+                    showFilePreview(file, previewId);
+                    showToast('Gambar berhasil di-paste', 'success');
+                    e.preventDefault();
+                    break;
+                }
+            }
+        });
+
+        $(document).on('click', '.btn-clear-file', function() {
+            const inputId = $(this).data('target');
+            const inputEl = document.getElementById(inputId);
+            const previewId = $(inputEl).data('preview');
+            
+            inputEl.value = '';
+            $(`#${previewId}`).hide();
+        });
     </script>
 @endpush
 

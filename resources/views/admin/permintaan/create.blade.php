@@ -1,6 +1,15 @@
 @section('title', 'Buat Permintaan')
 
 <x-staradmin>
+    @push('style')
+        <style>
+            .paste-zone:hover, .paste-zone:focus {
+                border-color: #1f3bb3 !important;
+                background-color: #f0f3ff !important;
+                color: #1f3bb3 !important;
+            }
+        </style>
+    @endpush
 
     <div class="row">
         <div class="col-12 grid-margin">
@@ -74,6 +83,7 @@
                             </div>
 
                             <!-- Bagian Detail Permintaan -->
+
                             <div class="col-md-6 ps-4">
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Detail Permintaan & Berkas</h5>
 
@@ -134,21 +144,54 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file">File Pendukung 1</label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file" name="file">
+                                        <div class="d-flex gap-2">
+                                            <input type="file" class="form-control file-input-control" id="file" name="file" data-preview="preview-file" data-paste="paste-zone-file">
+                                            <div class="paste-zone flex-shrink-0" id="paste-zone-file" tabindex="0" style="border: 2px dashed #ccc; border-radius: 4px; padding: 6px 12px; text-align: center; cursor: pointer; background: #fafafa; font-size: 0.8rem; color: #6c757d; outline: none; min-width: 130px; height: 38px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                                <i class="mdi mdi-content-paste me-1"></i> Paste (Ctrl+V)
+                                            </div>
+                                        </div>
+                                        <div class="preview-container mt-2 align-items-center" id="preview-file" style="display:none; gap: 10px;">
+                                            <img src="" style="max-height: 80px; border: 1px solid #ddd; border-radius: 4px; display: block;" class="img-thumbnail">
+                                            <div>
+                                                <button type="button" class="btn btn-xs btn-danger text-white btn-clear-file" data-target="file">Hapus</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file2">File Pendukung 2</label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file2" name="file2">
+                                        <div class="d-flex gap-2">
+                                            <input type="file" class="form-control file-input-control" id="file2" name="file2" data-preview="preview-file2" data-paste="paste-zone-file2">
+                                            <div class="paste-zone flex-shrink-0" id="paste-zone-file2" tabindex="0" style="border: 2px dashed #ccc; border-radius: 4px; padding: 6px 12px; text-align: center; cursor: pointer; background: #fafafa; font-size: 0.8rem; color: #6c757d; outline: none; min-width: 130px; height: 38px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                                <i class="mdi mdi-content-paste me-1"></i> Paste (Ctrl+V)
+                                            </div>
+                                        </div>
+                                        <div class="preview-container mt-2 align-items-center" id="preview-file2" style="display:none; gap: 10px;">
+                                            <img src="" style="max-height: 80px; border: 1px solid #ddd; border-radius: 4px; display: block;" class="img-thumbnail">
+                                            <div>
+                                                <button type="button" class="btn btn-xs btn-danger text-white btn-clear-file" data-target="file2">Hapus</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="file3">File Pendukung 3</label>
                                     <div class="col-sm-8">
-                                        <input type="file" class="form-control" id="file3" name="file3">
+                                        <div class="d-flex gap-2">
+                                            <input type="file" class="form-control file-input-control" id="file3" name="file3" data-preview="preview-file3" data-paste="paste-zone-file3">
+                                            <div class="paste-zone flex-shrink-0" id="paste-zone-file3" tabindex="0" style="border: 2px dashed #ccc; border-radius: 4px; padding: 6px 12px; text-align: center; cursor: pointer; background: #fafafa; font-size: 0.8rem; color: #6c757d; outline: none; min-width: 130px; height: 38px; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                                <i class="mdi mdi-content-paste me-1"></i> Paste (Ctrl+V)
+                                            </div>
+                                        </div>
+                                        <div class="preview-container mt-2 align-items-center" id="preview-file3" style="display:none; gap: 10px;">
+                                            <img src="" style="max-height: 80px; border: 1px solid #ddd; border-radius: 4px; display: block;" class="img-thumbnail">
+                                            <div>
+                                                <button type="button" class="btn btn-xs btn-danger text-white btn-clear-file" data-target="file3">Hapus</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -475,6 +518,62 @@
         // Re-attach Tribute and fix placeholder behavior
         $(document).on('focus', '.obat-input-div', function() {
             if ($(this).html().trim() === '<br>') $(this).html('');
+        });
+
+        // --- Logika Paste & Pratinjau File Pendukung ---
+        function showFilePreview(file, previewId) {
+            const previewEl = $(`#${previewId}`);
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewEl.find('img').attr('src', e.target.result).show();
+                    previewEl.css('display', 'flex');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewEl.find('img').hide();
+                previewEl.hide();
+            }
+        }
+
+        $(document).on('change', '.file-input-control', function() {
+            const file = this.files[0];
+            const previewId = $(this).data('preview');
+            showFilePreview(file, previewId);
+        });
+
+        $(document).on('paste', '.paste-zone', function(e) {
+            const inputId = $(this).attr('id').replace('paste-zone-', '');
+            const inputEl = document.getElementById(inputId);
+            const previewId = $(inputEl).data('preview');
+            
+            const clipboardData = e.clipboardData || e.originalEvent.clipboardData;
+            const items = clipboardData.items;
+            
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") !== -1) {
+                    const blob = items[i].getAsFile();
+                    const file = new File([blob], "pasted_image_" + Date.now() + ".png", { type: blob.type });
+                    
+                    const container = new DataTransfer();
+                    container.items.add(file);
+                    inputEl.files = container.files;
+                    
+                    showFilePreview(file, previewId);
+                    showToast('Gambar berhasil di-paste', 'success');
+                    e.preventDefault();
+                    break;
+                }
+            }
+        });
+
+        $(document).on('click', '.btn-clear-file', function() {
+            const inputId = $(this).data('target');
+            const inputEl = document.getElementById(inputId);
+            const previewId = $(inputEl).data('preview');
+            
+            inputEl.value = '';
+            $(`#${previewId}`).hide();
         });
 
         // Hapus kode sync saat riwayat dipilih di sini karena sudah dipindahkan ke atas

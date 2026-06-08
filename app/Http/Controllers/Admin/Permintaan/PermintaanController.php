@@ -78,7 +78,7 @@ class PermintaanController extends Controller
         if ($role === 'casemanager') return true;
         if ($role === 'tenagamedis') return true;
 
-        return false; // 'viewer' dan 'casemanager' tidak bisa membuat baru
+        return false; // 'viewer' dan 'casemanager' tidak bisa membuat baru ya
     }
 
     /**
@@ -600,27 +600,7 @@ class PermintaanController extends Controller
 
             $role = Auth::user()->role?->name;
 
-            if (in_array($role, ['casemanager', 'administrator'])) {
-
-                // Set angka status berdasarkan pilihan untuk keperluan sorting di index
-                $statusAngka = 1; // menunggu
-                if ($request->status === 'disetujui') $statusAngka = 2;
-                if ($request->status === 'ditolak') $statusAngka = 3;
-
-                $data->update([
-                    'status'           => $request->status,
-                    'status_angka'     => $statusAngka,
-                    'catatan_diterima' => $request->catatan_diterima,
-                    'manager_id'       => Auth::user()->id, // Menyimpan siapa CM yang melakukan ACC
-                    'tanggal_jam_respon'=> Carbon::now(),     // Track waktu respon untuk kolom jam_respon
-                ]);
-
-                // Opsional: Anda bisa menambahkan trigger kirim notifikasi whatsapp/telegram
-                // ke Tenaga Medis di sini jika statusnya di-acc atau ditolak.
-
-            // KONDISI B: Jika yang login adalah Tenaga Medis (Hanya perbaikan data pengajuan)
-            } else if ($role === 'tenagamedis') {
-
+            // 1. Update data medis pengajuan (berlaku untuk semua role: tenagamedis, casemanager, administrator)
             $data->update([
                 'user_id'     => $request->user,
                 'tanggal'     => date('Y-m-d', strtotime($request->tanggal_masuk)),
@@ -664,7 +644,22 @@ class PermintaanController extends Controller
                 $path     = $request->file('file3')->storeAs('permintaan', $filename, 'public');
                 $data->update(['file3' => 'storage/' . $path]);
             }
-        }
+
+            // 2. Tambahan pembaruan keputusan jika role adalah casemanager atau administrator
+            if (in_array($role, ['casemanager', 'administrator'])) {
+                $statusAngka = 1; // menunggu
+                if ($request->status === 'disetujui') $statusAngka = 2;
+                if ($request->status === 'ditolak') $statusAngka = 3;
+                if ($request->status === 'dibatalkan') $statusAngka = 4;
+
+                $data->update([
+                    'status'           => $request->status,
+                    'status_angka'     => $statusAngka,
+                    'catatan_diterima' => $request->catatan_diterima,
+                    'manager_id'       => Auth::user()->id, // Menyimpan siapa CM yang melakukan ACC
+                    'tanggal_jam_respon'=> Carbon::now(),     // Track waktu respon untuk kolom jam_respon
+                ]);
+            }
 
             DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Permintaan Berhasil Diupdate', 'data' => $data]);

@@ -56,6 +56,7 @@
             .submission-card.status-konfirmasi { border-left-color: #fd7e14; }
             .submission-card.status-ditolak { border-left-color: #dc3545; }
             .submission-card.status-batal { border-left-color: #000000; }
+            .submission-card.status-dibatalkan  { border-left-color: #000000; }
 
             .submission-card:hover {
                 transform: translateY(-5px);
@@ -144,6 +145,12 @@
             }
 
             @media (max-width: 991px) {
+                .mobile-filter-trigger {
+                    position: sticky;
+                    top: 0;
+                    z-index: 998;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+                }
                 .sticky-toolbar {
                     display: none; /* sembunyikan toolbar lama di mobile */
                 }
@@ -254,7 +261,7 @@
                     </div>
 
                     {{-- Tombol trigger drawer (mobile only) --}}
-                    <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3">
+                    <div class="d-flex d-md-none justify-content-between align-items-center px-2 py-2 bg-white border-bottom mb-3 mobile-filter-trigger">
                         <span class="fw-bold text-muted" style="font-size:13px;">Daftar Pengajuan</span>
                         <button class="btn btn-sm btn-outline-primary" type="button" id="btnFilterDrawer">
                             <i class="mdi mdi-filter-variant"></i> Filter & Cari
@@ -368,6 +375,26 @@
     </div>
 </div>
 
+{{-- Tombol Kembali ke Atas (Mobile Only) --}}
+<button id="btnScrollTop" class="d-md-none" style="
+    display: none !important;
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    z-index: 997;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1f3bb3;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 18px;
+    cursor: pointer;
+">
+    <i class="mdi mdi-chevron-up"></i>
+</button>
+
     @push('script')
         <script>
             const currentUserRole = {{ Auth::user()->role_id }};
@@ -404,6 +431,7 @@
                     menunggu: { text: 'Menunggu', badge: 'warning' },
                     konfirmasi: { text: 'Dikonfirmasi', badge: 'orange' },
                     batal: { text: 'Dibatalkan', badge: 'dark' },
+                    dibatalkan:  { text: 'Dibatalkan',  badge: 'dark' },
                 };
 
                 const lowerCaseQuery = searchQuery.toLowerCase().trim();
@@ -494,7 +522,7 @@
                                 ${editButtonHTML}
                             </div>
                         `;
-                    } else if (item.status == 'ditolak' || item.status == 'batal') {
+                    } else if (item.status == 'ditolak' || item.status == 'batal' || item.status == 'dibatalkan') {
                         cardFooter = `
                             <div class="card-footer justify-content-between align-items-center flex-wrap gap-2">
                                 ${historyHTML}
@@ -922,6 +950,24 @@
                 var drawer = new bootstrap.Offcanvas(document.getElementById('filterDrawer'));
                 drawer.show();
             });
+            // Tombol scroll to top
+                const btnScrollTop = document.getElementById('btnScrollTop');
+
+                window.addEventListener('scroll', function () {
+                    if (window.innerWidth <= 991) {
+                        if (window.scrollY > 300) {
+                            btnScrollTop.style.setProperty('display', 'flex', 'important');
+                            btnScrollTop.style.alignItems = 'center';
+                            btnScrollTop.style.justifyContent = 'center';
+                        } else {
+                            btnScrollTop.style.setProperty('display', 'none', 'important');
+                        }
+                    }
+                });
+
+                btnScrollTop.addEventListener('click', function () {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
         </script>
     @endpush
 
