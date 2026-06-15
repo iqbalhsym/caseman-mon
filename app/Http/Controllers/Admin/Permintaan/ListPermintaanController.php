@@ -284,18 +284,34 @@ class ListPermintaanController extends Controller
 
             $data = Permintaan::find($id);
 
-            $data->update([
+            $updateData = [
                 'status' => 'menunggu',
                 'status_angka' => 1,
                 'manager_id' => null,
                 'tanggal_jam_respon' => null,
-                'catatan_diterima' => null
-            ]);
+                'catatan_diterima' => null,
+                'jumlah_hari' => null,
+                'tanggal_mulai_expired' => null,
+                'tanggal_berakhir_expired' => null,
+            ];
+
+            if (!empty($data->detail_paket) && is_array($data->detail_paket)) {
+                $detail_paket = $data->detail_paket;
+                foreach ($detail_paket as $idx => $paket) {
+                    $detail_paket[$idx]['status'] = 'menunggu';
+                    unset($detail_paket[$idx]['catatan']);
+                    unset($detail_paket[$idx]['jumlah_hari']);
+                    unset($detail_paket[$idx]['tanggal_mulai_expired']);
+                    unset($detail_paket[$idx]['tanggal_berakhir_expired']);
+                }
+                $updateData['detail_paket'] = $detail_paket;
+            }
+
+            $data->update($updateData);
 
             return response()->json(['status' => 'success', 'message' => 'Data Permintaan Berhasil Diubah']);
 
         } catch (\Throwable $th) {
-            DB::rollBack();
             return response()->json(['status' => 'error', 'message' => $th->getMessage()]);
         }
     }

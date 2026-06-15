@@ -648,18 +648,51 @@ class PermintaanController extends Controller
 
             // 2. Tambahan pembaruan keputusan jika role adalah casemanager atau administrator
             if (in_array($role, ['casemanager', 'administrator'])) {
+                $statusStr = $request->status;
                 $statusAngka = 1; // menunggu
-                if ($request->status === 'disetujui') $statusAngka = 2;
-                if ($request->status === 'ditolak') $statusAngka = 3;
-                if ($request->status === 'dibatalkan') $statusAngka = 4;
 
-                $data->update([
-                    'status'           => $request->status,
-                    'status_angka'     => $statusAngka,
-                    'catatan_diterima' => $request->catatan_diterima,
-                    'manager_id'       => Auth::user()->id, // Menyimpan siapa CM yang melakukan ACC
-                    'tanggal_jam_respon'=> Carbon::now(),     // Track waktu respon untuk kolom jam_respon
-                ]);
+                if ($statusStr === 'disetujui') {
+                    $statusAngka = 2;
+                } else if ($statusStr === 'konfirmasi') {
+                    $statusAngka = 3;
+                } else if ($statusStr === 'ditolak') {
+                    $statusAngka = 4;
+                } else if ($statusStr === 'batal' || $statusStr === 'dibatalkan') {
+                    $statusStr = 'batal';
+                    $statusAngka = 5;
+                }
+
+                $updateData = [
+                    'status'             => $statusStr,
+                    'status_angka'       => $statusAngka,
+                    'catatan_diterima'   => $request->catatan_diterima,
+                    'manager_id'         => Auth::user()->id, // Menyimpan siapa CM yang melakukan ACC
+                    'tanggal_jam_respon' => Carbon::now(),     // Track waktu respon untuk kolom jam_respon
+                ];
+
+                if ($statusStr !== 'disetujui') {
+                    $updateData['jumlah_hari'] = null;
+                    $updateData['tanggal_mulai_expired'] = null;
+                    $updateData['tanggal_berakhir_expired'] = null;
+                }
+
+                // Jika ada detail_paket, update status dan catatan di setiap item paket
+                if (!empty($data->detail_paket) && is_array($data->detail_paket)) {
+                    $detail_paket = $data->detail_paket;
+                    foreach ($detail_paket as $idx => $paket) {
+                        $detail_paket[$idx]['status'] = $statusStr;
+                        $detail_paket[$idx]['catatan'] = $request->catatan_diterima;
+                        
+                        if ($statusStr !== 'disetujui') {
+                            unset($detail_paket[$idx]['jumlah_hari']);
+                            unset($detail_paket[$idx]['tanggal_mulai_expired']);
+                            unset($detail_paket[$idx]['tanggal_berakhir_expired']);
+                        }
+                    }
+                    $updateData['detail_paket'] = $detail_paket;
+                }
+
+                $data->update($updateData);
             }
 
             DB::commit();
