@@ -23,7 +23,7 @@ class PermintaanController extends Controller
     {
         $user = Auth::user();
 
-        $data = Permintaan::with('user', 'lokasi', 'penjamin')
+        $data = Permintaan::with('user', 'lokasi', 'penjamin', 'manager')
             ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->orderBy('created_at', 'desc')
             ->orderBy('status_angka', 'asc')
@@ -606,6 +606,7 @@ class PermintaanController extends Controller
                 'tanggal'     => date('Y-m-d', strtotime($request->tanggal_masuk)),
                 'no_rm'       => $request->no_rm,
                 'nama'        => $request->nama,
+                'jaminan'     => $request->jaminan,
                 'ruangan'     => $request->jaminan,
                 'lokasi_id'   => $request->lokasi,
                 'diagnosis'   => $request->diagnosis,

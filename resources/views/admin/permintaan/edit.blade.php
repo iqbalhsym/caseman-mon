@@ -21,7 +21,7 @@
                     </p>
 
                     <form id="pengajuan-form" class="form-sample mt-4">
-                        <input type="hidden" id="user" name="user" value="{{ Auth::user()->id }}">
+                        <input type="hidden" id="user" name="user" value="{{ $data->user_id }}">
                         <input type="hidden" id="dataId" name="id" value="{{ $data->id }}">
 
                         
@@ -60,9 +60,10 @@
                                     <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan</label>
                                     <div class="col-sm-8">
                                         <select class="form-select" id="jaminan" name="jaminan">
+                                            <option value="">Pilih Jaminan...</option>
                                             @forelse ($penjamin as $item)
-                                                <option value="{{ $item->nama }}"
-                                                    {{ old('jaminan', $data->jaminan) == $item->nama ? 'selected' : '' }}>
+                                                <option value="{{ $item->id }}"
+                                                    {{ old('jaminan', $data->jaminan) == $item->id ? 'selected' : '' }}>
                                                     {{ $item->nama }}
                                                 </option>
                                             @empty
@@ -249,7 +250,7 @@
 @push('script')
     <script>
         // Set awal data select
-        $('#jaminan').val("{{ $data->ruangan }}");
+        $('#jaminan').val("{{ $data->jaminan }}");
         $('#lokasi').val("{{ $data->lokasi_id }}");
         $('#kategori').val("{{ $data->kategori }}");
 
@@ -261,10 +262,12 @@
             var diagnosis = document.getElementById("diagnosis").value;
             var kategori = document.getElementById("kategori").value;
             var indikasi = document.getElementById("indikasi").value;
-            var detail_obat = document.getElementById("detail_obat").value;
+            
+            var detail_obat_el = document.getElementById("detail_obat");
+            var detail_obat = detail_obat_el ? detail_obat_el.value : '';
 
             if (kategori !== 'obat') {
-                document.getElementById("detail_obat").value = '';
+                if (detail_obat_el) detail_obat_el.value = '';
                 detail_obat = '';
             }
 

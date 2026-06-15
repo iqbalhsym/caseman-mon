@@ -4,20 +4,45 @@
 
     @push('style')
         <style>
+            .sticky-toolbar {
+                position: fixed;
+                top: 70px; /* offset for mobile navbar */
+                left: 1.5rem;
+                right: 1.5rem;
+                z-index: 999;
+                background: #f4f5f7;
+                padding-top: 10px;
+                padding-bottom: 5px;
+            }
+            @media (min-width: 992px) {
+                .sticky-toolbar {
+                    top: 97px; /* matches desktop navbar height */
+                    left: calc(235px + 1.5rem); /* sidebar width + padding */
+                    right: 1.5rem;
+                }
+                body.sidebar-icon-only .sticky-toolbar {
+                    left: calc(70px + 1.5rem);
+                }
+            }
+            #submission-list {
+                margin-top: 10px;
+            }
             .filter-nav {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 10px;
-                margin-bottom: 20px;
+                gap: 8px;
+                margin-bottom: 5px;
             }
             .filter-btn {
                 background: #fff;
                 border: 1px solid #dee2e6;
-                padding: 8px 16px;
+                padding: 5px 14px;
                 border-radius: 20px;
                 color: #6c757d;
                 font-weight: 500;
-                transition: all 0.3s ease;
+                font-size: 0.82rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
             }
             .filter-btn:hover {
                 background: #f8f9fa;
@@ -131,14 +156,15 @@
                 color: #fff !important;
             }
             
-            @media (max-width: 768px) {
+            @media (max-width: 991px) {
                 .filter-nav {
-                    flex-wrap: nowrap;
-                    overflow-x: auto;
+                    flex-wrap: nowrap !important;
+                    overflow-x: auto !important;
                     padding-bottom: 10px;
+                    -webkit-overflow-scrolling: touch;
                 }
                 .filter-btn {
-                    white-space: nowrap;
+                    white-space: nowrap !important;
                 }
                 .info-row {
                     flex-direction: column;
@@ -208,33 +234,35 @@
                 <div class="tab-content tab-content-basic">
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
                         
-                        {{-- Card Pencarian (Toolbar) --}}
-                        <div class="row compact-margin">
-                            <div class="col-12 stretch-card">
-                                <div class="card shadow-sm">
-                                    <div class="card-body search-card-body">
-                                        <div class="d-flex align-items-center">
-                                            <div class="input-group" style="max-width: 380px; flex: 1;">
-                                                <span class="input-group-text input-group-text-custom">
-                                                    <i class="mdi mdi-magnify text-muted"></i>
-                                                </span>
-                                                <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM, atau Ruangan...">
+                        <div class="sticky-toolbar">
+                            {{-- Card Pencarian (Toolbar) --}}
+                            <div class="row compact-margin">
+                                <div class="col-12 stretch-card">
+                                    <div class="card shadow-sm">
+                                        <div class="card-body search-card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div class="input-group" style="max-width: 380px; flex: 1;">
+                                                    <span class="input-group-text input-group-text-custom">
+                                                        <i class="mdi mdi-magnify text-muted"></i>
+                                                    </span>
+                                                    <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM, atau Ruangan...">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {{-- Filters --}}
-                        <nav class="filter-nav">
-                            <button class="filter-btn active" data-filter="semua">Semua</button>
-                            <button class="filter-btn" data-filter="menunggu">Menunggu</button>
-                            <button class="filter-btn" data-filter="konfirmasi">Konfirmasi</button>
-                            <button class="filter-btn" data-filter="disetujui">Disetujui</button>
-                            <button class="filter-btn" data-filter="ditolak">Ditolak</button>
-                            <button class="filter-btn" data-filter="batal">Batal</button>
-                        </nav>
+                            {{-- Filters --}}
+                            <nav class="filter-nav">
+                                <button class="filter-btn active" data-filter="semua">Semua</button>
+                                <button class="filter-btn" data-filter="menunggu">Menunggu</button>
+                                <button class="filter-btn" data-filter="konfirmasi">Konfirmasi</button>
+                                <button class="filter-btn" data-filter="disetujui">Disetujui</button>
+                                <button class="filter-btn" data-filter="ditolak">Ditolak</button>
+                                <button class="filter-btn" data-filter="batal">Batal</button>
+                            </nav>
+                        </div>
 
                         {{-- Submissions List --}}
                         <div class="row" id="submission-list">
@@ -314,6 +342,31 @@
 
     @push('script')
         <script>
+            function reloadWithScroll() {
+                sessionStorage.setItem('scrollPositionList', window.scrollY);
+                window.location.reload();
+            }
+
+            function restoreScroll() {
+                const scrollPos = sessionStorage.getItem('scrollPositionList');
+                if (scrollPos !== null) {
+                    window.scrollTo(0, parseInt(scrollPos));
+                    sessionStorage.removeItem('scrollPositionList');
+                }
+            }
+
+            function adjustSubmissionListMargin() {
+                const toolbar = document.querySelector('.sticky-toolbar');
+                const list = document.getElementById('submission-list');
+                if (toolbar && list) {
+                    list.style.marginTop = (toolbar.offsetHeight + 2) + 'px';
+                }
+            }
+
+            window.addEventListener('resize', adjustSubmissionListMargin);
+            window.addEventListener('load', adjustSubmissionListMargin);
+            document.addEventListener('DOMContentLoaded', adjustSubmissionListMargin);
+
             const currentUserRole = {{ Auth::user()->role_id }};
             const initialSubmissions = @json($datas);
             let submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
@@ -630,6 +683,10 @@
                     `;
                     submissionListContainer.insertAdjacentHTML('beforeend', cardHTML);
                 });
+                setTimeout(() => {
+                    restoreScroll();
+                    adjustSubmissionListMargin();
+                }, 50);
             }
 
             function updateDisplay() {
@@ -642,7 +699,7 @@
                 button.addEventListener('click', () => {
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
-                    sessionStorage.setItem('activeFilter', button.getAttribute('data-filter'));
+                    sessionStorage.setItem('activeFilterList', button.getAttribute('data-filter'));
                     updateDisplay();
                 });
             });
@@ -668,7 +725,7 @@
             searchInput.addEventListener('input', handleSearch);
 
             // Inisialisasi
-            const savedFilter = sessionStorage.getItem('activeFilter');
+            const savedFilter = sessionStorage.getItem('activeFilterList');
             if (savedFilter) {
                 const targetBtn = document.querySelector(`.filter-btn[data-filter="${savedFilter}"]`);
                 if (targetBtn) {
@@ -677,6 +734,7 @@
                 }
             }
             updateDisplay();
+            setTimeout(adjustSubmissionListMargin, 100);
 
         </script>
 
@@ -694,7 +752,7 @@
                     url: "{{ route('admin.list-permintaan.store') }}",
                     success: function (data) {
                         if (data.status == 'success') {
-                            window.location.reload();
+                            reloadWithScroll();
                         } else {
                             Swal.fire("Gagal !!", data.message, "error");
                         }
@@ -735,7 +793,7 @@
                     },
                     success: function (data) {
                         if(data.status == 'success') {
-                            window.location.reload();
+                            reloadWithScroll();
                         } else {
                             Swal.fire("Gagal !!", data.message, "error");
                         }
@@ -802,7 +860,7 @@
                     },
                     success: function (data) {
                         if(data.status == 'success') {
-                            window.location.reload();
+                            reloadWithScroll();
                         } else {
                             Swal.fire("Gagal !!", data.message, "error");
                         }
@@ -836,7 +894,7 @@
                             url: "{{ route('admin.list-permintaan.index') }}" + '/' + id + '/edit',
                             success: function (data) {
                                 if(data.status == 'success') {
-                                    window.location.reload();
+                                    reloadWithScroll();
                                 } else {
                                     Swal.fire("Gagal !!", data.message, "error");
                                 }
@@ -870,7 +928,7 @@
                             },
                             success: function (data) {
                                 if (data.status == 'success') {
-                                    window.location.reload();
+                                    reloadWithScroll();
                                 } else {
                                     Swal.fire("Gagal !!", data.message, "error");
                                 }
