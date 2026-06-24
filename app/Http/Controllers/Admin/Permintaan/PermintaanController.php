@@ -696,6 +696,38 @@ class PermintaanController extends Controller
             }
 
             DB::commit();
+
+            // SINKRONISASI KE PASIEN HISTORI (pasien-mon)
+            try {
+                if ($data->status == 'disetujui') {
+                    $pasienHistoriService = resolve(\App\Services\PasienHistoriService::class);
+                    
+                    if (!empty($data->detail_paket) && is_array($data->detail_paket)) {
+                        // Jika memproses per paket
+                        foreach ($data->detail_paket as $paket) {
+                            if (isset($paket['kategori']) && strtolower($paket['kategori']) === 'obat' && !empty($paket['detail_obat']) && ($paket['status'] ?? '') == 'disetujui') {
+                                $pasienHistoriService->sendObatPickup(
+                                    $data->no_rm,
+                                    $paket['detail_obat'],
+                                    $data->tanggal_jam_respon ?? date('Y-m-d H:i:s')
+                                );
+                            }
+                        }
+                    } else {
+                        // Jika memproses single request
+                        if (strtolower($data->kategori) === 'obat' && !empty($data->detail_obat)) {
+                            $pasienHistoriService->sendObatPickup(
+                                $data->no_rm,
+                                $data->detail_obat,
+                                $data->tanggal_jam_respon ?? date('Y-m-d H:i:s')
+                            );
+                        }
+                    }
+                }
+            } catch (\Throwable $th) {
+                \Illuminate\Support\Facades\Log::error('Gagal sinkronisasi obat ke pasien-histori di PermintaanController: ' . $th->getMessage());
+            }
+
             return response()->json(['status' => 'success', 'message' => 'Permintaan Berhasil Diupdate', 'data' => $data]);
 
         } catch (\Throwable $th) {

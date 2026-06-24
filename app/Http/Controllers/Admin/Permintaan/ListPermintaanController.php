@@ -259,6 +259,36 @@ class ListPermintaanController extends Controller
 
             DB::commit();
 
+            // SINKRONISASI KE PASIEN HISTORI (pasien-mon)
+            try {
+                if ($data->status == 'disetujui' || (isset($detail_paket) && isset($detail_paket[$idx]) && $detail_paket[$idx]['status'] == 'disetujui')) {
+                    $pasienHistoriService = resolve(\App\Services\PasienHistoriService::class);
+                    
+                    if (isset($detail_paket) && isset($detail_paket[$idx])) {
+                        // Jika memproses per paket
+                        $paket = $detail_paket[$idx];
+                        if (isset($paket['kategori']) && strtolower($paket['kategori']) === 'obat' && !empty($paket['detail_obat'])) {
+                            $pasienHistoriService->sendObatPickup(
+                                $data->no_rm,
+                                $paket['detail_obat'],
+                                date('Y-m-d H:i:s')
+                            );
+                        }
+                    } else {
+                        // Jika memproses single request
+                        if (strtolower($data->kategori) === 'obat' && !empty($data->detail_obat)) {
+                            $pasienHistoriService->sendObatPickup(
+                                $data->no_rm,
+                                $data->detail_obat,
+                                date('Y-m-d H:i:s')
+                            );
+                        }
+                    }
+                }
+            } catch (\Throwable $th) {
+                \Illuminate\Support\Facades\Log::error('Gagal sinkronisasi obat ke pasien-histori: ' . $th->getMessage());
+            }
+
             return response()->json(['status' => 'success', 'message' => 'Data Permintaan Berhasil Diubah', 'data' => $data]);
 
         } catch (\Throwable $th) {
