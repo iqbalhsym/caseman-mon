@@ -1055,56 +1055,42 @@
                 let detailStr = '';
                 if (item.detail_paket && item.detail_paket.length > 0) {
                     detailStr = item.detail_paket.map((paket, idx) => {
-                        let text = `[Paket ${idx + 1}]\n`;
-                        text += `- Kategori: ${paket.kategori ? paket.kategori.replace(/_/g, ' ').toUpperCase() : '-'}\n`;
-                        text += `- Keterangan: ${paket.keterangan || '-'}\n`;
-                        if (paket.detail_obat) {
-                            let cleanObat = paket.detail_obat.replace(/<[^>]*>/g, '').trim();
-                            text += `- Detail Obat: ${cleanObat}\n`;
+                        let lines = [];
+                        if (paket.kategori === 'obat' && paket.detail_obat) {
+                            let cleanObat = paket.detail_obat.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+                            if (cleanObat) lines.push(cleanObat);
+                        } else if (paket.keterangan) {
+                            lines.push(paket.keterangan.trim());
                         }
-                        text += `- Indikasi: ${paket.indikasi || '-'}\n`;
-                        if (paket.status) {
-                            text += `- Status: ${paket.status.toUpperCase()}\n`;
+                        if (paket.indikasi) {
+                            lines.push(paket.indikasi.trim());
                         }
-                        if (paket.jumlah_hari) {
-                            text += `- Persetujuan: ${paket.jumlah_hari} Hari (${paket.tanggal_mulai_expired} s/d ${paket.tanggal_berakhir_expired})\n`;
-                        }
-                        return text;
-                    }).join('\n');
+                        return lines.join('\n');
+                    }).filter(t => t.length > 0).join('\n\n');
                 } else {
-                    detailStr = `- Kategori: ${item.kategori ? item.kategori.replace(/_/g, ' ').toUpperCase() : '-'}\n`;
-                    detailStr += `- Keterangan: ${item.keterangan || '-'}\n`;
-                    if (item.detail_obat) {
-                        let cleanObat = item.detail_obat.replace(/<[^>]*>/g, '').trim();
-                        detailStr += `- Detail Obat: ${cleanObat}\n`;
+                    let lines = [];
+                    if (item.kategori && item.kategori.toLowerCase() === 'obat' && item.detail_obat) {
+                        let cleanObat = item.detail_obat.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+                        if (cleanObat) lines.push(cleanObat);
+                    } else if (item.keterangan) {
+                        lines.push(item.keterangan.trim());
                     }
-                    detailStr += `- Indikasi: ${item.indikasi || '-'}\n`;
-                    if (item.catatan_diterima) {
-                        detailStr += `- Catatan Persetujuan: ${item.catatan_diterima}\n`;
+                    if (item.indikasi) {
+                        lines.push(item.indikasi.trim());
                     }
-                    if (item.jumlah_hari) {
-                        detailStr += `- Persetujuan: ${item.jumlah_hari} Hari (${item.tanggal_mulai_expired} s/d ${item.tanggal_berakhir_expired})\n`;
-                    }
+                    detailStr = lines.join('\n');
                 }
-
-                const dateStr = new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                 
-                const copyText = `--- DATA PERMINTAAN CASEMAN ---
-Nama Pasien    : ${item.nama}
+                const copyText = `Nama Pasien    : ${item.nama}
 No. Rekam Medis: ${item.no_rm}
 Umur Pasien    : ${item.umur || '-'}
 Tanggal Masuk  : ${item.tanggal_masuk || '-'}
 Ruangan/Lokasi : ${item.lokasi || '-'}
 Jaminan Pasien : ${item.jaminan || '-'}
 Diagnosis      : ${item.diagnosis || '-'}
-Status         : ${item.status ? item.status.toUpperCase() : '-'}
-Case Manager   : ${item.manager || '-'}
-Diajukan Oleh  : ${item.pengaju || '-'}
-Waktu Diajukan : ${dateStr} ${item.jam || ''}
-Jam Respon     : ${item.jam_respon || '-'}
 
-DETAIL PERMINTAAN:
 ${detailStr}
+
 -------------------------------`;
 
                 // Fallback copy function for non-HTTPS / local HTTP context
