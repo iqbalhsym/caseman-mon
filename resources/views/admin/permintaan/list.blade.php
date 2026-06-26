@@ -428,8 +428,14 @@
             function adjustSubmissionListMargin() {
                 const toolbar = document.querySelector('.sticky-toolbar');
                 const list = document.getElementById('submission-list');
-                if (toolbar && list) {
-                    list.style.marginTop = (toolbar.offsetHeight + 2) + 'px';
+                const loader = document.getElementById('skeleton-loader');
+                const offset = toolbar ? (toolbar.offsetHeight + 2) + 'px' : '0px';
+
+                if (list) {
+                    list.style.marginTop = offset;
+                }
+                if (loader) {
+                    loader.style.marginTop = offset;
                 }
             }
 
@@ -1103,7 +1109,34 @@ DETAIL PERMINTAAN:
 ${detailStr}
 -------------------------------`;
 
-                navigator.clipboard.writeText(copyText).then(function() {
+                // Fallback copy function for non-HTTPS / local HTTP context
+                function doCopy(textVal) {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        return navigator.clipboard.writeText(textVal);
+                    } else {
+                        return new Promise((resolve, reject) => {
+                            const textArea = document.createElement("textarea");
+                            textArea.value = textVal;
+                            textArea.style.position = "fixed";
+                            textArea.style.top = "0";
+                            textArea.style.left = "0";
+                            textArea.style.opacity = "0";
+                            document.body.appendChild(textArea);
+                            textArea.focus();
+                            textArea.select();
+                            try {
+                                const successful = document.execCommand('copy');
+                                if (successful) resolve();
+                                else reject(new Error('copy command failed'));
+                            } catch (err) {
+                                reject(err);
+                            }
+                            document.body.removeChild(textArea);
+                        });
+                    }
+                }
+
+                doCopy(copyText).then(function() {
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
