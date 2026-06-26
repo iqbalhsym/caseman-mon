@@ -240,12 +240,17 @@
                                 <div class="col-12 stretch-card">
                                     <div class="card shadow-sm">
                                         <div class="card-body search-card-body">
-                                            <div class="d-flex align-items-center">
-                                                <div class="input-group" style="max-width: 380px; flex: 1;">
+                                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                                <div class="input-group" style="max-width: 300px; flex: 1;">
                                                     <span class="input-group-text input-group-text-custom">
                                                         <i class="mdi mdi-magnify text-muted"></i>
                                                     </span>
-                                                    <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM, atau Ruangan...">
+                                                    <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM...">
+                                                </div>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <input type="date" class="form-control form-control-sm" id="filter-start-date" value="{{ date('Y-m-d') }}" style="width: 135px; height: 38px;">
+                                                    <span class="text-muted small">s/d</span>
+                                                    <input type="date" class="form-control form-control-sm" id="filter-end-date" value="{{ date('Y-m-d') }}" style="width: 135px; height: 38px;">
                                                 </div>
                                             </div>
                                         </div>
@@ -463,8 +468,8 @@
                 };
             }
 
-            function fetchSearch(q) {
-                return $.getJSON("{{ route('admin.permintaan.search') }}", { q: q });
+            function fetchSearch(q, startDate = '', endDate = '') {
+                return $.getJSON("{{ route('admin.permintaan.search') }}", { q: q, start_date: startDate, end_date: endDate });
             }
 
             function displayHTML(text) {
@@ -815,14 +820,11 @@
 
             const handleSearch = debounce(function () {
                 const q = searchInput.value.trim();
-                if (q.length === 0) {
-                    submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
-                    updateDisplay(true);
-                    return;
-                }
+                const startDate = $('#filter-start-date').val();
+                const endDate = $('#filter-end-date').val();
 
                 showLoader();
-                fetchSearch(q).done(function (resp) {
+                fetchSearch(q, startDate, endDate).done(function (resp) {
                     if (resp.status === 'success') {
                         submissions = resp.data;
                         updateDisplay(false);
@@ -835,6 +837,8 @@
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
+
+            $('#filter-start-date, #filter-end-date').on('change', handleSearch);
 
             // Inisialisasi
             const savedFilter = sessionStorage.getItem('activeFilterList');

@@ -198,16 +198,20 @@
                             <div class="col-12 stretch-card">
                                 <div class="card shadow-sm">
                                     <div class="card-body search-card-body">
-                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                            <div class="input-group" style="max-width: 380px; flex:1;">
-                                                <span class="input-group-text input-group-text-custom">
-                                                    <i class="mdi mdi-magnify text-muted"></i>
-                                                </span>
-                                                <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM, atau Ruangan...">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 w-100">
+                                            <div class="d-flex align-items-center flex-wrap gap-2" style="flex:1;">
+                                                <div class="input-group" style="max-width: 300px; flex:1;">
+                                                    <span class="input-group-text input-group-text-custom">
+                                                        <i class="mdi mdi-magnify text-muted"></i>
+                                                    </span>
+                                                    <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM...">
+                                                </div>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <input type="date" class="form-control form-control-sm" id="filter-start-date" value="{{ date('Y-m-d') }}" style="width: 135px; height: 38px;">
+                                                    <span class="text-muted small">s/d</span>
+                                                    <input type="date" class="form-control form-control-sm" id="filter-end-date" value="{{ date('Y-m-d') }}" style="width: 135px; height: 38px;">
+                                                </div>
                                             </div>
-                                            <span class="text-muted" style="font-size: 0.8rem;">
-                                                <i class="mdi mdi-clock-outline"></i> Menampilkan data 7 hari terakhir yang disetujui
-                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -291,8 +295,8 @@
                 };
             }
 
-            function fetchSearch(q) {
-                return $.getJSON("{{ route('admin.permintaan.search') }}", { q: q, status: 'disetujui' });
+            function fetchSearch(q, startDate = '', endDate = '') {
+                return $.getJSON("{{ route('admin.permintaan.search') }}", { q: q, status: 'disetujui', start_date: startDate, end_date: endDate });
             }
 
             function displayHTML(text) {
@@ -364,6 +368,10 @@
                                     <div class="info-row">
                                         <span class="label">No. RM:</span>
                                         <span class="value">${item.no_rm}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="label">Umur Pasien:</span>
+                                        <span class="value">${item.umur || '-'}</span>
                                     </div>
                                     <div class="info-row">
                                         <span class="label">Ruangan:</span>
@@ -490,12 +498,10 @@
 
             const handleSearch = debounce(function () {
                 const q = searchInput.value.trim();
-                if (q.length === 0) {
-                    submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
-                    updateDisplay();
-                    return;
-                }
-                fetchSearch(q).done(function (resp) {
+                const startDate = $('#filter-start-date').val();
+                const endDate = $('#filter-end-date').val();
+
+                fetchSearch(q, startDate, endDate).done(function (resp) {
                     if (resp.status === 'success') {
                         submissions = resp.data;
                         updateDisplay();
@@ -504,6 +510,8 @@
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
+
+            $('#filter-start-date, #filter-end-date').on('change', handleSearch);
             renderSubmissions();
             
             // Sinkron search utama → search drawer (saat resize)
