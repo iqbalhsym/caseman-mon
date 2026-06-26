@@ -269,6 +269,76 @@
                             <!-- Diisi oleh Javascript -->
                         </div>
 
+                        {{-- Skeleton Loader (Bootstrap 5 Placeholders) --}}
+                        <div class="row d-none" id="skeleton-loader">
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100 placeholder-glow" style="border-left: 5px solid #dee2e6;">
+                                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                                        <div class="placeholder col-6 py-2 rounded"></div>
+                                        <div class="placeholder col-3 py-2 rounded"></div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="placeholder col-8 mb-2"></div>
+                                        <div class="placeholder col-5 mb-2"></div>
+                                        <div class="placeholder col-6 mb-2"></div>
+                                        <div class="placeholder col-4 mb-3"></div>
+                                        <hr>
+                                        <div class="placeholder col-5 mb-2"></div>
+                                        <div class="placeholder col-10 mb-2"></div>
+                                        <div class="placeholder col-8 mb-2"></div>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <div class="placeholder col-4 py-2"></div>
+                                        <div class="placeholder col-4 py-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3 d-none d-md-block">
+                                <div class="card h-100 placeholder-glow" style="border-left: 5px solid #dee2e6;">
+                                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                                        <div class="placeholder col-5 py-2 rounded"></div>
+                                        <div class="placeholder col-3 py-2 rounded"></div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="placeholder col-7 mb-2"></div>
+                                        <div class="placeholder col-6 mb-2"></div>
+                                        <div class="placeholder col-4 mb-2"></div>
+                                        <div class="placeholder col-5 mb-3"></div>
+                                        <hr>
+                                        <div class="placeholder col-6 mb-2"></div>
+                                        <div class="placeholder col-8 mb-2"></div>
+                                        <div class="placeholder col-7 mb-2"></div>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <div class="placeholder col-4 py-2"></div>
+                                        <div class="placeholder col-4 py-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3 d-none d-lg-block">
+                                <div class="card h-100 placeholder-glow" style="border-left: 5px solid #dee2e6;">
+                                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                                        <div class="placeholder col-6 py-2 rounded"></div>
+                                        <div class="placeholder col-3 py-2 rounded"></div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="placeholder col-8 mb-2"></div>
+                                        <div class="placeholder col-4 mb-2"></div>
+                                        <div class="placeholder col-7 mb-2"></div>
+                                        <div class="placeholder col-5 mb-3"></div>
+                                        <hr>
+                                        <div class="placeholder col-4 mb-2"></div>
+                                        <div class="placeholder col-9 mb-2"></div>
+                                        <div class="placeholder col-6 mb-2"></div>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <div class="placeholder col-4 py-2"></div>
+                                        <div class="placeholder col-4 py-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -534,7 +604,12 @@
                                         <p class="patient-name">${item.nama}</p>
                                         <span class="submission-date">Diajukan: ${new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })} ${item.jam || ''}</span>
                                     </div>
-                                    <div class="badge bg-${statusInfo.badge} badge-status">${statusInfo.text}</div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="badge bg-${statusInfo.badge} badge-status">${statusInfo.text}</div>
+                                        <button class="btn btn-link text-primary p-0 ms-2 btn-copy-card" data-id="${item.id}" title="Salin Detail Data" style="font-size: 1.1rem; line-height: 1; border: none; background: transparent;">
+                                            <i class="mdi mdi-content-copy"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="info-row">
@@ -689,10 +764,34 @@
                 }, 50);
             }
 
-            function updateDisplay() {
-                const activeFilterBtn = document.querySelector('.filter-btn.active');
-                const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'semua';
-                renderSubmissions(activeFilter, searchInput.value);
+            const skeletonLoader = document.getElementById('skeleton-loader');
+
+            function showLoader() {
+                submissionListContainer.classList.add('d-none');
+                skeletonLoader.classList.remove('d-none');
+                adjustSubmissionListMargin();
+            }
+
+            function hideLoader() {
+                skeletonLoader.classList.add('d-none');
+                submissionListContainer.classList.remove('d-none');
+                adjustSubmissionListMargin();
+            }
+
+            function updateDisplay(withDelay = false) {
+                if (withDelay) {
+                    showLoader();
+                    setTimeout(() => {
+                        const activeFilterBtn = document.querySelector('.filter-btn.active');
+                        const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'semua';
+                        renderSubmissions(activeFilter, searchInput.value);
+                        hideLoader();
+                    }, 250);
+                } else {
+                    const activeFilterBtn = document.querySelector('.filter-btn.active');
+                    const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'semua';
+                    renderSubmissions(activeFilter, searchInput.value);
+                }
             }
 
             filterButtons.forEach(button => {
@@ -700,7 +799,7 @@
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
                     sessionStorage.setItem('activeFilterList', button.getAttribute('data-filter'));
-                    updateDisplay();
+                    updateDisplay(true);
                 });
             });
 
@@ -708,17 +807,20 @@
                 const q = searchInput.value.trim();
                 if (q.length === 0) {
                     submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
-                    updateDisplay();
+                    updateDisplay(true);
                     return;
                 }
 
+                showLoader();
                 fetchSearch(q).done(function (resp) {
                     if (resp.status === 'success') {
                         submissions = resp.data;
-                        updateDisplay();
+                        updateDisplay(false);
                     }
                 }).fail(function () {
                     // Fallback
+                }).always(function () {
+                    hideLoader();
                 });
             }, 300);
 
@@ -733,7 +835,7 @@
                     targetBtn.classList.add('active');
                 }
             }
-            updateDisplay();
+            updateDisplay(true);
             setTimeout(adjustSubmissionListMargin, 100);
 
         </script>
@@ -939,6 +1041,87 @@
                         });
                     }
                 })
+            });
+
+            $('body').on('click', '.btn-copy-card', function (e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                const item = submissions.find(s => s.id == id);
+                if (!item) return;
+
+                let detailStr = '';
+                if (item.detail_paket && item.detail_paket.length > 0) {
+                    detailStr = item.detail_paket.map((paket, idx) => {
+                        let text = `[Paket ${idx + 1}]\n`;
+                        text += `- Kategori: ${paket.kategori ? paket.kategori.replace(/_/g, ' ').toUpperCase() : '-'}\n`;
+                        text += `- Keterangan: ${paket.keterangan || '-'}\n`;
+                        if (paket.detail_obat) {
+                            let cleanObat = paket.detail_obat.replace(/<[^>]*>/g, '').trim();
+                            text += `- Detail Obat: ${cleanObat}\n`;
+                        }
+                        text += `- Indikasi: ${paket.indikasi || '-'}\n`;
+                        if (paket.status) {
+                            text += `- Status: ${paket.status.toUpperCase()}\n`;
+                        }
+                        if (paket.jumlah_hari) {
+                            text += `- Persetujuan: ${paket.jumlah_hari} Hari (${paket.tanggal_mulai_expired} s/d ${paket.tanggal_berakhir_expired})\n`;
+                        }
+                        return text;
+                    }).join('\n');
+                } else {
+                    detailStr = `- Kategori: ${item.kategori ? item.kategori.replace(/_/g, ' ').toUpperCase() : '-'}\n`;
+                    detailStr += `- Keterangan: ${item.keterangan || '-'}\n`;
+                    if (item.detail_obat) {
+                        let cleanObat = item.detail_obat.replace(/<[^>]*>/g, '').trim();
+                        detailStr += `- Detail Obat: ${cleanObat}\n`;
+                    }
+                    detailStr += `- Indikasi: ${item.indikasi || '-'}\n`;
+                    if (item.catatan_diterima) {
+                        detailStr += `- Catatan Persetujuan: ${item.catatan_diterima}\n`;
+                    }
+                    if (item.jumlah_hari) {
+                        detailStr += `- Persetujuan: ${item.jumlah_hari} Hari (${item.tanggal_mulai_expired} s/d ${item.tanggal_berakhir_expired})\n`;
+                    }
+                }
+
+                const dateStr = new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                
+                const copyText = `--- DATA PERMINTAAN CASEMAN ---
+Nama Pasien    : ${item.nama}
+No. Rekam Medis: ${item.no_rm}
+Tanggal Masuk  : ${item.tanggal_masuk || '-'}
+Ruangan/Lokasi : ${item.lokasi || '-'}
+Jaminan Pasien : ${item.jaminan || '-'}
+Diagnosis      : ${item.diagnosis || '-'}
+Status         : ${item.status ? item.status.toUpperCase() : '-'}
+Case Manager   : ${item.manager || '-'}
+Diajukan Oleh  : ${item.pengaju || '-'}
+Waktu Diajukan : ${dateStr} ${item.jam || ''}
+Jam Respon     : ${item.jam_respon || '-'}
+
+DETAIL PERMINTAAN:
+${detailStr}
+-------------------------------`;
+
+                navigator.clipboard.writeText(copyText).then(function() {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Detail data berhasil disalin!'
+                    });
+                }).catch(function() {
+                    Swal.fire("Gagal !!", "Tidak dapat menyalin data ke clipboard", "error");
+                });
             });
         </script>
     @endpush

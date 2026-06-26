@@ -601,7 +601,7 @@ class PermintaanController extends Controller
             $role = Auth::user()->role?->name;
 
             // 1. Update data medis pengajuan (berlaku untuk semua role: tenagamedis, casemanager, administrator)
-            $data->update([
+            $updateData = [
                 'user_id'     => $request->user,
                 'tanggal'     => date('Y-m-d', strtotime($request->tanggal_masuk)),
                 'no_rm'       => $request->no_rm,
@@ -614,7 +614,20 @@ class PermintaanController extends Controller
                 'keterangan'  => $request->keterangan,
                 'detail_obat' => $request->detail_obat,
                 'indikasi'    => $request->indikasi,
-            ]);
+            ];
+
+            if (!empty($data->detail_paket) && is_array($data->detail_paket)) {
+                $detail_paket = $data->detail_paket;
+                if (isset($detail_paket[0])) {
+                    $detail_paket[0]['kategori'] = $request->kategori;
+                    $detail_paket[0]['keterangan'] = $request->keterangan;
+                    $detail_paket[0]['detail_obat'] = $request->detail_obat;
+                    $detail_paket[0]['indikasi'] = $request->indikasi;
+                }
+                $updateData['detail_paket'] = $detail_paket;
+            }
+
+            $data->update($updateData);
 
             if ($request->hasFile('file')) {
                 if ($data->file != null) {

@@ -106,6 +106,7 @@
                                             <option value="rad">Radiologi</option>
                                             <option value="bmhp">BMHP</option>
                                             <option value="darah">Produk Darah</option>
+                                            <option value="lainnya">Lainnya</option>
                                         </select>
                                     </div>
                                 </div>
@@ -126,7 +127,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row {{ $data->kategori == 'obat' ? '' : 'd-none' }}" id="detail-obat-group">
+                                <div class="form-group row {{ strtolower($data->kategori) == 'obat' ? '' : 'd-none' }}" id="detail-obat-group">
                                     <label class="col-sm-4 col-form-label text-success" for="detail_obat">Detail Obat</label>
                                     <div class="col-sm-8">
                                         <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow: auto; resize: vertical;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">{!! $data->detail_obat !!}</div>
@@ -252,7 +253,7 @@
         // Set awal data select
         $('#jaminan').val("{{ $data->jaminan }}");
         $('#lokasi').val("{{ $data->lokasi_id }}");
-        $('#kategori').val("{{ $data->kategori }}");
+        $('#kategori').val("{{ strtolower($data->kategori) }}");
 
         function validasiForm() {
             var no_rm = document.getElementById("no_rm").value;
