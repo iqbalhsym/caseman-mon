@@ -18,7 +18,7 @@ class ListPermintaanController extends Controller
      */
     public function index()
     {
-        $data = Permintaan::with('user', 'lokasi', 'penjamin')->where('created_at', '>=', Carbon::now()->subDays(7))->orderBy('created_at', 'desc')->get();
+        $data = Permintaan::with('user', 'lokasi', 'penjamin')->where('created_at', '>=', Carbon::today())->orderBy('created_at', 'desc')->get();
         // $data = Permintaan::with('user', 'lokasi')->orderBy('created_at', 'desc')->get();
         // $data = Permintaan::with('user', 'lokasi')->orderBy('status', 'desc')->orderBy('created_at', 'desc')->get();
 
