@@ -24,7 +24,7 @@ class PermintaanController extends Controller
         $user = Auth::user();
 
         $data = Permintaan::with('user', 'lokasi', 'penjamin', 'manager')
-            ->where('created_at', '>=', Carbon::today())
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->orderBy('created_at', 'desc')
             ->orderBy('status_angka', 'asc')
             ->get();
@@ -318,17 +318,6 @@ class PermintaanController extends Controller
                 $query->where('status', $request->get('status'));
             }
 
-            if ($request->has('start_date') && $request->has('end_date') && $request->start_date !== '' && $request->end_date !== '') {
-                $query->whereBetween('created_at', [
-                    Carbon::parse($request->start_date)->startOfDay(),
-                    Carbon::parse($request->end_date)->endOfDay()
-                ]);
-            } else {
-                if ($q === '') {
-                    $query->where('created_at', '>=', Carbon::today());
-                }
-            }
-
             if ($q !== '') {
                 $query->where(function ($sub) use ($q) {
                     $sub->where('nama', 'ilike', "%{$q}%")
@@ -340,6 +329,8 @@ class PermintaanController extends Controller
                               ->orWhere('lantai', 'ilike', "%{$q}%");
                         });
                 });
+            } else {
+                $query->where('created_at', '>=', Carbon::now()->subDays(7));
             }
 
             $data          = $query->get();

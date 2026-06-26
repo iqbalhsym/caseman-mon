@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('permintaan', function (Blueprint $table) {
-            $table->index('no_rm');
-            $table->index('nama');
-            $table->index('status');
-            $table->index('created_at');
+            //
         });
     }
 
@@ -25,10 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('permintaan', function (Blueprint $table) {
-            $table->dropIndex(['no_rm']);
-            $table->dropIndex(['nama']);
-            $table->dropIndex(['status']);
-            $table->dropIndex(['created_at']);
+            //
         });
     }
 };

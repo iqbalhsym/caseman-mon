@@ -244,18 +244,11 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body search-card-body">
                                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                            <div class="d-flex align-items-center flex-wrap gap-2" style="flex: 1;">
-                                                <div class="input-group" style="max-width: 300px; flex: 1;">
-                                                    <span class="input-group-text input-group-text-custom">
-                                                        <i class="mdi mdi-magnify text-muted"></i>
-                                                    </span>
-                                                    <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM...">
-                                                </div>
-                                                <div class="d-flex align-items-center gap-1">
-                                                    <input type="date" class="form-control form-control-sm" id="filter-start-date" value="{{ date('Y-m-d') }}" style="width: 135px; height: 38px;">
-                                                    <span class="text-muted small">s/d</span>
-                                                    <input type="date" class="form-control form-control-sm" id="filter-end-date" value="{{ date('Y-m-d') }}" style="width: 135px; height: 38px;">
-                                                </div>
+                                            <div class="input-group" style="max-width: 380px; flex: 1;">
+                                                <span class="input-group-text input-group-text-custom">
+                                                    <i class="mdi mdi-magnify text-muted"></i>
+                                                </span>
+                                                <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM, atau Ruangan...">
                                             </div>
                                             <a href="{{ route('admin.permintaan.create') }}" class="btn btn-primary btn-sm text-white mb-0">
                                                 <i class="mdi mdi-plus-circle"></i> Buat Pengajuan
@@ -860,13 +853,8 @@
 
             function fetchByStatus(status) {
                 const q = searchInput.value.trim();
-                const startDate = $('#filter-start-date').val();
-                const endDate = $('#filter-end-date').val();
-                
                 const params = { q: q };
                 if (status !== 'semua') params.status = status;
-                if (startDate) params.start_date = startDate;
-                if (endDate) params.end_date = endDate;
 
                 showLoader();
                 $.getJSON("{{ route('admin.permintaan.search') }}", params)
@@ -889,11 +877,6 @@
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
-
-            $('#filter-start-date, #filter-end-date').on('change', function() {
-                const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'semua';
-                fetchByStatus(activeFilter);
-            });
 
             // Inisialisasi
             const savedFilter = sessionStorage.getItem('activeFilterIndex') || 'semua';

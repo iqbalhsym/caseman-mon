@@ -16,7 +16,7 @@ class ViewerController extends Controller
     {
         $data = Permintaan::where('status', 'disetujui')
             ->with('user', 'lokasi', 'penjamin')
-            ->where('created_at', '>=', Carbon::today())
+            ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->orderBy('created_at', 'desc')
             ->orderBy('status', 'asc')
             ->get();
@@ -26,7 +26,6 @@ class ViewerController extends Controller
                 'id' => $item->id,
                 'nama' => $item->nama,
                 'no_rm' => $item->no_rm,
-                'umur' => $item->umur,
                 'lokasi' => $item->lokasi?->nama . ' Lt. ' . $item->lokasi?->lantai,
                 'diagnosis' => $item->diagnosis,
                 'kategori' => ucfirst($item->kategori),
