@@ -28,8 +28,9 @@ class UserController extends Controller
         }
 
         $role = Role::get();
+        $lokasi = \App\Models\Lokasi::all();
 
-        return view('admin.user.index', compact('data', 'role'));
+        return view('admin.user.index', compact('data', 'role', 'lokasi'));
     }
 
     /**
@@ -40,7 +41,7 @@ class UserController extends Controller
         try {
             $userRole = \Illuminate\Support\Facades\Auth::user()->role_id;
             
-            $query = User::with('role')->orderBy('role_id', 'asc');
+            $query = User::with('role', 'lokasi')->orderBy('role_id', 'asc');
             
             if ($userRole != 1) {
                 $query->where('id', \Illuminate\Support\Facades\Auth::user()->id);
@@ -51,6 +52,7 @@ class UserController extends Controller
             $formattedData = $data->map(function($user) {
                 $userData = $user->toArray();
                 $userData['role_alias'] = $user->role->alias ?? '-';
+                $userData['lokasi_name'] = $user->lokasi ? ($user->lokasi->nama . ' Lt. ' . $user->lokasi->lantai) : '-';
                 return $userData;
             });
 
@@ -109,6 +111,7 @@ class UserController extends Controller
                 'role_id' => $request->role,
                 'phone' => $request->phone,
                 'status' => $request->status,
+                'lokasi_id' => $request->lokasi_id,
             ];
 
             if ($request->create === 'create') {

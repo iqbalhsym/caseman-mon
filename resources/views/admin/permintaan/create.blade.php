@@ -51,6 +51,13 @@
                                 </div>
 
                                 <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label" for="umur">Umur Pasien <span class="text-danger">*</span></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="umur" name="umur" placeholder="Masukkan umur pasien...">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
                                         <select class="form-select" id="jaminan" name="jaminan">
@@ -65,12 +72,22 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="lokasi">Lokasi Ruangan <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
-                                        <select class="form-select" id="lokasi" name="lokasi">
-                                            <option value="">Pilih Lokasi...</option>
-                                            @foreach ($lokasi as $item)
-                                                <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
-                                            @endforeach
-                                        </select>
+                                        @if (auth()->user()->lokasi_id)
+                                            <select class="form-select text-dark" id="lokasi" disabled="disabled">
+                                                <option value="">Pilih Lokasi...</option>
+                                                @foreach ($lokasi as $item)
+                                                    <option value="{{ $item->id }}" {{ auth()->user()->lokasi_id == $item->id ? 'selected' : '' }}>{{ $item->nama }} Lt. {{ $item->lantai }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="hidden" name="lokasi" id="lokasi_hidden" value="{{ auth()->user()->lokasi_id }}">
+                                        @else
+                                            <select class="form-select" id="lokasi" name="lokasi">
+                                                <option value="">Pilih Lokasi...</option>
+                                                @foreach ($lokasi as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
+                                                @endforeach
+                                            </select>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -216,8 +233,9 @@
         function validasiForm() {
             var no_rm = document.getElementById("no_rm").value;
             var nama = document.getElementById("nama").value;
+            var umur = document.getElementById("umur").value;
             var jaminan = document.getElementById("jaminan").value;
-            var lokasi = document.getElementById("lokasi").value;
+            var lokasi = document.getElementById("lokasi").value || (document.getElementById("lokasi_hidden") ? document.getElementById("lokasi_hidden").value : "");
             var diagnosis = document.getElementById("diagnosis").value;
 
             var valid = true;
@@ -227,7 +245,7 @@
                 }
             });
 
-            if (no_rm === "" || nama === "" || jaminan === "" || lokasi === "" || diagnosis === "" || !valid) {
+            if (no_rm === "" || nama === "" || umur === "" || jaminan === "" || lokasi === "" || diagnosis === "" || !valid) {
                 showToast('Semua field utama dan detail paket harus diisi', 'error');
                 return false;
             }
@@ -298,11 +316,12 @@
                 if (resp.status === 'success') {
                     // Always update name and registered date if found
                     $('#nama').val(resp.data.nama);
+                    if (resp.data.umur) $('#umur').val(resp.data.umur);
                     if (resp.data.tanggal_masuk) $('#tanggal_masuk').val(resp.data.tanggal_masuk);
 
                     // Only fill others if empty to avoid overwriting manual input
                     if (!$('#jaminan').val()) $('#jaminan').val(resp.data.jaminan_id);
-                    if (!$('#lokasi').val()) $('#lokasi').val(resp.data.lokasi_id);
+                    if (!$('#lokasi').prop('disabled') && !$('#lokasi').val()) $('#lokasi').val(resp.data.lokasi_id);
                     if (!$('#diagnosis').val()) $('#diagnosis').val(resp.data.diagnosis);
 
                     showToast('Data pasien ditemukan', 'success');

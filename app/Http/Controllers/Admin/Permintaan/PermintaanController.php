@@ -33,6 +33,7 @@ class PermintaanController extends Controller
             return [
                 'id'                      => $item->id,
                 'nama'                    => $item->nama,
+                'umur'                    => $item->umur,
                 'no_rm'                   => $item->no_rm,
                 'lokasi'                  => $item->lokasi?->nama . ' Lt. ' . $item->lokasi?->lantai,
                 'diagnosis'               => $item->diagnosis,
@@ -190,6 +191,7 @@ class PermintaanController extends Controller
                 'tanggal'      => date('Y-m-d', strtotime($request->tanggal_masuk)),
                 'no_rm'        => $request->no_rm,
                 'nama'         => $request->nama,
+                'umur'         => $request->umur,
                 'lokasi_id'    => $request->lokasi,
                 'jaminan'      => $request->jaminan,
                 'lantai'       => $lantaiPasien,
@@ -336,6 +338,7 @@ class PermintaanController extends Controller
                 return [
                     'id'                      => $item->id,
                     'nama'                    => $item->nama,
+                    'umur'                    => $item->umur,
                     'no_rm'                   => $item->no_rm,
                     'lokasi'                  => $item->lokasi ? ($item->lokasi->nama . ' Lt. ' . $item->lokasi->lantai) : ($item->ruangan ? ($item->ruangan . ' Lt. ' . $item->lantai) : '-'),
                     'diagnosis'               => $item->diagnosis,
@@ -404,6 +407,7 @@ class PermintaanController extends Controller
                 'status' => 'success',
                 'data'   => [
                     'nama'            => $data->nama,
+                    'umur'            => $data->umur,
                     'lokasi_id'       => $data->lokasi_id,
                     'jaminan_id'      => $data->jaminan ?? $data->lantai,
                     'diagnosis'       => $data->diagnosis,
@@ -606,6 +610,7 @@ class PermintaanController extends Controller
                 'tanggal'     => date('Y-m-d', strtotime($request->tanggal_masuk)),
                 'no_rm'       => $request->no_rm,
                 'nama'        => $request->nama,
+                'umur'        => $request->umur,
                 'jaminan'     => $request->jaminan,
                 'ruangan'     => $request->jaminan,
                 'lokasi_id'   => $request->lokasi,
@@ -665,41 +670,109 @@ class PermintaanController extends Controller
                 $statusAngka = 1; // menunggu
 
                 if ($statusStr === 'disetujui') {
-                    $statusAngka = 2;
+                     $statusAngka = 2;
                 } else if ($statusStr === 'konfirmasi') {
-                    $statusAngka = 3;
+                     $statusAngka = 3;
                 } else if ($statusStr === 'ditolak') {
-                    $statusAngka = 4;
+                     $statusAngka = 4;
                 } else if ($statusStr === 'batal' || $statusStr === 'dibatalkan') {
-                    $statusStr = 'batal';
-                    $statusAngka = 5;
+                     $statusStr = 'batal';
+                     $statusAngka = 5;
                 }
 
-                $updateData = [
-                    'status'             => $statusStr,
-                    'status_angka'       => $statusAngka,
-                    'catatan_diterima'   => $request->catatan_diterima,
-                    'manager_id'         => Auth::user()->id, // Menyimpan siapa CM yang melakukan ACC
-                    'tanggal_jam_respon' => Carbon::now(),     // Track waktu respon untuk kolom jam_respon
-                ];
+                $updateData['status'] = $statusStr;
+                $updateData['status_angka'] = $statusAngka;
+                $updateData['catatan_diterima'] = $request->catatan_diterima;
+                $updateData['manager_id'] = Auth::user()->id;
+                $updateData['tanggal_jam_respon'] = Carbon::now();
 
-                if ($statusStr !== 'disetujui') {
+                if ($statusStr === 'disetujui') {
+                    if ($request->has('jumlah_hari') && $request->has('tanggal_mulai_expired')) {
+                        $updateData['jumlah_hari'] = $request->jumlah_hari;
+                        $updateData['tanggal_mulai_expired'] = $request->tanggal_mulai_expired;
+                        if ($request->jumlah_hari && $request->tanggal_mulai_expired) {
+                            $updateData['tanggal_berakhir_expired'] = date('Y-m-d', strtotime($request->tanggal_mulai_expired . ' + ' . $request->jumlah_hari . ' days'));
+                        }
+                    }
+                } else {
                     $updateData['jumlah_hari'] = null;
                     $updateData['tanggal_mulai_expired'] = null;
                     $updateData['tanggal_berakhir_expired'] = null;
                 }
 
-                // Jika ada detail_paket, update status dan catatan di setiap item paket
+                // Jika ada detail_paket, update status dan catatan per paket secara dinamis
                 if (!empty($data->detail_paket) && is_array($data->detail_paket)) {
                     $detail_paket = $data->detail_paket;
-                    foreach ($detail_paket as $idx => $paket) {
-                        $detail_paket[$idx]['status'] = $statusStr;
-                        $detail_paket[$idx]['catatan'] = $request->catatan_diterima;
-                        
-                        if ($statusStr !== 'disetujui') {
-                            unset($detail_paket[$idx]['jumlah_hari']);
-                            unset($detail_paket[$idx]['tanggal_mulai_expired']);
-                            unset($detail_paket[$idx]['tanggal_berakhir_expired']);
+                    
+                    // Cek apakah ada parameter keputusan per paket (dari form edit)
+                    if ($request->has('status_paket')) {
+                        $all_processed = true;
+                        $has_disetujui = false;
+                        $has_konfirmasi = false;
+                        $has_ditolak = false;
+
+                        foreach ($detail_paket as $idx => $paket) {
+                            $p_status = $request->status_paket[$idx] ?? 'menunggu';
+                            $p_catatan = $request->catatan_paket[$idx] ?? '';
+                            
+                            $detail_paket[$idx]['status'] = $p_status;
+                            $detail_paket[$idx]['catatan'] = $p_catatan;
+
+                            if ($p_status === 'disetujui') {
+                                $has_disetujui = true;
+                                $p_hari = $request->hari_paket[$idx] ?? null;
+                                $p_tgl = $request->tanggal_paket[$idx] ?? null;
+                                if ($p_hari && $p_tgl) {
+                                    $detail_paket[$idx]['jumlah_hari'] = $p_hari;
+                                    $detail_paket[$idx]['tanggal_mulai_expired'] = $p_tgl;
+                                    $detail_paket[$idx]['tanggal_berakhir_expired'] = date('Y-m-d', strtotime($p_tgl . ' + ' . $p_hari . ' days'));
+                                }
+                            } else {
+                                unset($detail_paket[$idx]['jumlah_hari']);
+                                unset($detail_paket[$idx]['tanggal_mulai_expired']);
+                                unset($detail_paket[$idx]['tanggal_berakhir_expired']);
+                            }
+
+                            if ($p_status === 'menunggu') {
+                                $all_processed = false;
+                            }
+                            if ($p_status === 'disetujui') $has_disetujui = true;
+                            if ($p_status === 'konfirmasi') $has_konfirmasi = true;
+                            if ($p_status === 'ditolak') $has_ditolak = true;
+                        }
+
+                        // Update overall status based on packages
+                        if ($all_processed) {
+                            if ($has_disetujui) {
+                                $updateData['status'] = 'disetujui';
+                                $updateData['status_angka'] = 2;
+                            } else if ($has_konfirmasi) {
+                                $updateData['status'] = 'konfirmasi';
+                                $updateData['status_angka'] = 3;
+                            } else if ($has_ditolak) {
+                                $updateData['status'] = 'ditolak';
+                                $updateData['status_angka'] = 4;
+                            } else {
+                                $updateData['status'] = 'batal';
+                                $updateData['status_angka'] = 5;
+                            }
+                        } else {
+                            $updateData['status'] = 'menunggu';
+                            $updateData['status_angka'] = 1;
+                        }
+
+                        $updateData['catatan_diterima'] = $request->catatan_paket[0] ?? '';
+                    } else {
+                        // Fallback
+                        foreach ($detail_paket as $idx => $paket) {
+                            $detail_paket[$idx]['status'] = $statusStr;
+                            $detail_paket[$idx]['catatan'] = $request->catatan_diterima;
+                            
+                            if ($statusStr !== 'disetujui') {
+                                unset($detail_paket[$idx]['jumlah_hari']);
+                                unset($detail_paket[$idx]['tanggal_mulai_expired']);
+                                unset($detail_paket[$idx]['tanggal_berakhir_expired']);
+                            }
                         }
                     }
                     $updateData['detail_paket'] = $detail_paket;

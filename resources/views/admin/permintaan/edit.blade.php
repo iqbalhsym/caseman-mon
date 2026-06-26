@@ -57,6 +57,13 @@
                                 </div>
 
                                 <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label" for="umur">Umur Pasien</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="umur" name="umur" value="{{ $data->umur }}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="jaminan">Status Jaminan</label>
                                     <div class="col-sm-8">
                                         <select class="form-select" id="jaminan" name="jaminan">
@@ -76,12 +83,22 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="lokasi">Lokasi Ruangan</label>
                                     <div class="col-sm-8">
-                                        <select class="form-select" id="lokasi" name="lokasi">
-                                            <option value="">Pilih Lokasi...</option>
-                                            @foreach ($lokasi as $item)
-                                                <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
-                                            @endforeach
-                                        </select>
+                                        @if (auth()->user()->lokasi_id)
+                                            <select class="form-select text-dark" id="lokasi" disabled="disabled">
+                                                <option value="">Pilih Lokasi...</option>
+                                                @foreach ($lokasi as $item)
+                                                    <option value="{{ $item->id }}" {{ (old('lokasi', $data->lokasi_id) == $item->id || auth()->user()->lokasi_id == $item->id) ? 'selected' : '' }}>{{ $item->nama }} Lt. {{ $item->lantai }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="hidden" name="lokasi" id="lokasi_hidden" value="{{ auth()->user()->lokasi_id }}">
+                                        @else
+                                            <select class="form-select" id="lokasi" name="lokasi">
+                                                <option value="">Pilih Lokasi...</option>
+                                                @foreach ($lokasi as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->nama }} Lt. {{ $item->lantai }}</option>
+                                                @endforeach
+                                            </select>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -209,24 +226,106 @@
                                     <div class="mt-4 pt-3 border-top border-warning">
                                         <h5 class="text-warning mb-3"><i class="mdi mdi-gavel"></i> Keputusan Case Manager</h5>
 
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label" for="status">Respon Status</label>
-                                            <div class="col-sm-8">
-                                                <select class="form-select border-warning" id="status" name="status">
-                                                    <option value="menunggu" {{ $data->status == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
-                                                    <option value="disetujui" {{ $data->status == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
-                                                    <option value="ditolak" {{ $data->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                                    <option value="batal" {{ $data->status == 'batal' || $data->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
-                                                </select>
+                                        @if (!empty($data->detail_paket) && is_array($data->detail_paket))
+                                            <div class="alert alert-info py-2 small">
+                                                <i class="mdi mdi-information-outline"></i> Permintaan ini memiliki beberapa paket. Silakan berikan keputusan untuk masing-masing paket di bawah ini.
                                             </div>
-                                        </div>
+                                            @foreach ($data->detail_paket as $idx => $paket)
+                                                <div class="card mb-3 border border-secondary shadow-sm">
+                                                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-2 px-3">
+                                                        <h6 class="mb-0 text-secondary font-weight-bold" style="font-size: 0.9rem;">Paket {{ $idx + 1 }} : {{ ucfirst($paket['kategori'] ?? '') }}</h6>
+                                                        <span class="badge {{ ($paket['status'] ?? 'menunggu') == 'disetujui' ? 'bg-success' : (($paket['status'] ?? 'menunggu') == 'menunggu' ? 'bg-warning text-dark' : 'bg-danger') }}">
+                                                            {{ ucfirst($paket['status'] ?? 'menunggu') }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="card-body py-3 px-3">
+                                                        <div class="row">
+                                                            <div class="col-md-6 border-end">
+                                                                <p class="mb-1 text-muted small">Keterangan:</p>
+                                                                <p class="mb-2 font-weight-semibold text-dark small">{{ $paket['keterangan'] ?? '-' }}</p>
 
-                                        <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label" for="catatan_diterima">Catatan / Alasan</label>
-                                            <div class="col-sm-8">
-                                                <textarea class="form-control border-warning" id="catatan_diterima" name="catatan_diterima" rows="3" placeholder="Masukkan catatan persetujuan atau alasan penolakan di sini...">{{ $data->catatan_diterima }}</textarea>
+                                                                @if (($paket['kategori'] ?? '') == 'obat' && !empty($paket['detail_obat']))
+                                                                    <p class="mb-1 text-success small">Detail Obat:</p>
+                                                                    <div class="mb-2 p-2 border rounded bg-light small" style="max-height: 100px; overflow-y: auto;">
+                                                                        {!! $paket['detail_obat'] !!}
+                                                                    </div>
+                                                                @endif
+
+                                                                <p class="mb-1 text-muted small">Indikasi Medis:</p>
+                                                                <p class="mb-0 font-weight-semibold text-dark small">{{ $paket['indikasi'] ?? '-' }}</p>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group mb-2">
+                                                                    <label class="small font-weight-bold text-dark mb-1">Status Paket</label>
+                                                                    <select class="form-select form-select-sm status-paket-select border-secondary" name="status_paket[{{ $idx }}]" data-index="{{ $idx }}">
+                                                                        <option value="menunggu" {{ ($paket['status'] ?? 'menunggu') == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                                                                        <option value="disetujui" {{ ($paket['status'] ?? 'menunggu') == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
+                                                                        <option value="ditolak" {{ ($paket['status'] ?? 'menunggu') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                                                        <option value="batal" {{ ($paket['status'] ?? 'menunggu') == 'batal' || ($paket['status'] ?? 'menunggu') == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="form-group mb-2">
+                                                                    <label class="small font-weight-bold text-dark mb-1">Catatan Paket</label>
+                                                                    <textarea class="form-control form-control-sm border-secondary" name="catatan_paket[{{ $idx }}]" rows="2" placeholder="Masukkan catatan untuk paket ini...">{{ $paket['catatan'] ?? '' }}</textarea>
+                                                                </div>
+
+                                                                <div class="expiry-paket-container" id="expiry-paket-{{ $idx }}" style="{{ ($paket['status'] ?? 'menunggu') == 'disetujui' ? '' : 'display: none;' }}">
+                                                                    <div class="row g-2">
+                                                                        <div class="col-6">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="small font-weight-bold text-success mb-1">Mulai Expired</label>
+                                                                                <input type="date" class="form-control form-control-sm border-success" name="tanggal_paket[{{ $idx }}]" value="{{ $paket['tanggal_mulai_expired'] ?? date('Y-m-d') }}">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="small font-weight-bold text-success mb-1">Durasi Hari</label>
+                                                                                <input type="number" class="form-control form-control-sm border-success" name="hari_paket[{{ $idx }}]" min="1" placeholder="Hari..." value="{{ $paket['jumlah_hari'] ?? '' }}">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label" for="status">Respon Status</label>
+                                                <div class="col-sm-8">
+                                                    <select class="form-select border-warning" id="status" name="status">
+                                                        <option value="menunggu" {{ $data->status == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                                                        <option value="disetujui" {{ $data->status == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
+                                                        <option value="ditolak" {{ $data->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                                        <option value="batal" {{ $data->status == 'batal' || $data->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+                                                    </select>
+                                                </div>
                                             </div>
-                                        </div>
+
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label" for="catatan_diterima">Catatan / Alasan</label>
+                                                <div class="col-sm-8">
+                                                    <textarea class="form-control border-warning" id="catatan_diterima" name="catatan_diterima" rows="3" placeholder="Masukkan catatan persetujuan atau alasan penolakan di sini...">{{ $data->catatan_diterima }}</textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="expiry-global-container" id="expiry-global" style="{{ $data->status == 'disetujui' ? '' : 'display: none;' }}">
+                                                <div class="form-group row mt-2">
+                                                    <label class="col-sm-4 col-form-label text-success" for="tanggal_mulai_expired">Mulai Expired</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="date" class="form-control border-success" id="tanggal_mulai_expired" name="tanggal_mulai_expired" value="{{ $data->tanggal_mulai_expired ?? date('Y-m-d') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row mt-2">
+                                                    <label class="col-sm-4 col-form-label text-success" for="jumlah_hari">Durasi Hari</label>
+                                                    <div class="col-sm-8">
+                                                        <input type="number" class="form-control border-success" id="jumlah_hari" name="jumlah_hari" min="1" placeholder="Masukkan jumlah hari..." value="{{ $data->jumlah_hari ?? '' }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
                                 {{-- ========================================================================= --}}
@@ -258,8 +357,9 @@
         function validasiForm() {
             var no_rm = document.getElementById("no_rm").value;
             var nama = document.getElementById("nama").value;
+            var umur = document.getElementById("umur").value;
             var jaminan = document.getElementById("jaminan").value;
-            var lokasi = document.getElementById("lokasi").value;
+            var lokasi = document.getElementById("lokasi").value || (document.getElementById("lokasi_hidden") ? document.getElementById("lokasi_hidden").value : "");
             var diagnosis = document.getElementById("diagnosis").value;
             var kategori = document.getElementById("kategori").value;
             var indikasi = document.getElementById("indikasi").value;
@@ -272,7 +372,7 @@
                 detail_obat = '';
             }
 
-            if (no_rm === "" || nama === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || (kategori === 'obat' && detail_obat === "") || indikasi === "") {
+            if (no_rm === "" || nama === "" || umur === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || (kategori === 'obat' && detail_obat === "") || indikasi === "") {
                 showToast('Semua field data medis harus diisi, kecuali file pendukung', 'error');
                 return false;
             }
@@ -337,8 +437,9 @@
             fetchSearch(q).done(function (resp) {
                 if (resp.status === 'success') {
                     $('#nama').val(resp.data.nama);
+                    if (resp.data.umur) $('#umur').val(resp.data.umur);
                     $('#jaminan').val(resp.data.jaminan_id);
-                    $('#lokasi').val(resp.data.lokasi_id);
+                    if (!$('#lokasi').prop('disabled')) $('#lokasi').val(resp.data.lokasi_id);
                     $('#diagnosis').val(resp.data.diagnosis);
                 }
             });
@@ -500,6 +601,24 @@
             
             inputEl.value = '';
             $(`#${previewId}`).hide();
+        });
+
+        // Toggle expiry date visibility
+        $(document).on('change', '#status', function() {
+            if ($(this).val() === 'disetujui') {
+                $('#expiry-global').slideDown();
+            } else {
+                $('#expiry-global').slideUp();
+            }
+        });
+
+        $(document).on('change', '.status-paket-select', function() {
+            const idx = $(this).data('index');
+            if ($(this).val() === 'disetujui') {
+                $('#expiry-paket-' + idx).slideDown();
+            } else {
+                $('#expiry-paket-' + idx).slideUp();
+            }
         });
     </script>
 @endpush

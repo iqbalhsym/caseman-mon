@@ -27,6 +27,7 @@ class ListPermintaanController extends Controller
                 'id' => $item->id,
                 'nama' => $item->nama,
                 'no_rm' => $item->no_rm,
+                'umur' => $item->umur,
                 'lokasi' => $item->lokasi?->nama . ' Lt. ' . $item->lokasi?->lantai,
                 // 'ruangan' => $item->ruangan,
                 // 'lantai' => $item->lantai,

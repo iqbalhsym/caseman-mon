@@ -655,6 +655,10 @@
                                         <span class="value">${item.no_rm}</span>
                                     </div>
                                     <div class="info-row">
+                                        <span class="label">Umur Pasien:</span>
+                                        <span class="value">${item.umur || '-'}</span>
+                                    </div>
+                                    <div class="info-row">
                                         <span class="label">Ruangan:</span>
                                         <span class="value">${item.lokasi || '-'}</span>
                                     </div>
@@ -1088,6 +1092,7 @@
                 const copyText = `--- DATA PERMINTAAN CASEMAN ---
 Nama Pasien    : ${item.nama}
 No. Rekam Medis: ${item.no_rm}
+Umur Pasien    : ${item.umur || '-'}
 Tanggal Masuk  : ${item.tanggal_masuk || '-'}
 Ruangan/Lokasi : ${item.lokasi || '-'}
 Jaminan Pasien : ${item.jaminan || '-'}

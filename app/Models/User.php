@@ -75,5 +75,10 @@ class User extends Authenticatable implements LdapAuthenticatable
     {
         return $this->hasOne(Shift::class);
     }
+
+    public function lokasi()
+    {
+        return $this->belongsTo(Lokasi::class, 'lokasi_id');
+    }
 }
 

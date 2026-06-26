@@ -79,6 +79,7 @@
                                                         <th>Username</th>
                                                         <th>No. Telegram</th>
                                                         <th>Role</th>
+                                                        <th>Lokasi</th>
                                                         <th>Status</th>
                                                         <th>Aksi</th>
                                                     </tr>
@@ -100,6 +101,9 @@
                                                                 <div class="badge badge-opacity-info">{{ $item->role->alias ?? '-' }}</div>
                                                             </td>
                                                             <td>
+                                                                {{ $item->lokasi ? ($item->lokasi->nama . ' Lt. ' . $item->lokasi->lantai) : '-' }}
+                                                            </td>
+                                                            <td>
                                                                 <div class="badge badge-opacity-{{ $item->status == 'active' ? 'success' : 'danger' }}">{{ ucfirst($item->status) }}</div>
                                                             </td>
                                                             <td>
@@ -110,7 +114,7 @@
                                                             </td>
                                                         </tr>
                                                     @empty
-                                                        <tr><td colspan="6" class="text-center py-4">Belum ada data pengguna</td></tr>
+                                                        <tr><td colspan="7" class="text-center py-4">Belum ada data pengguna</td></tr>
                                                     @endforelse
                                                 </tbody>
                                             </table>
@@ -144,6 +148,15 @@
                             <select class="form-control" id="role" name="role" @if(Auth::user()->role_id != 1) disabled @endif>
                                 @foreach ($role as $item)
                                     <option value="{{ $item->id }}">{{ $item->alias }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="lokasi_id">Lokasi Ruangan (Khusus Akun Ruangan)</label>
+                            <select class="form-control" id="lokasi_id" name="lokasi_id" @if(Auth::user()->role_id != 1) disabled @endif>
+                                <option value="">Tidak ada/Semua Lokasi</option>
+                                @foreach ($lokasi as $l)
+                                    <option value="{{ $l->id }}">{{ $l->nama }} Lt. {{ $l->lantai }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -197,6 +210,7 @@
                 $('#status').val('active');
                 $('#product_id').val('');
                 $('#create').val('create');
+                $('#lokasi_id').val('');
                 userModal.show();
             });
 
@@ -264,9 +278,9 @@
                                     <td>${element.username}</td>
                                     <td>${element.phone}</td>
                                     <td><div class="badge badge-opacity-info">${element.role_alias || '-'}</div></td>
+                                    <td>${element.lokasi_name || '-'}</td>
                                     <td><div class="badge badge-opacity-${statusBadge}">${element.status.charAt(0).toUpperCase() + element.status.slice(1)}</div></td>
                                     <td>
-
                                         <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="${element.id}" title="Edit"><i class="mdi mdi-pencil"></i></button>
                                         ${currentUserRole == 1 ? `<button type="button" class="btn btn-sm btn-danger text-white delete" data-id="${element.id}" title="Hapus"><i class="mdi mdi-delete"></i></button>` : ''}
                                     </td>
@@ -302,6 +316,7 @@
                         $('#product_id').val(data.data.id);
                         $('#create').val('update');
                         $('#role').val(data.data.role_id);
+                        $('#lokasi_id').val(data.data.lokasi_id || '');
                         userModal.show();
                     },
                     error: function (data) {
