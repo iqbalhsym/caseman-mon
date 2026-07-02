@@ -206,7 +206,7 @@
                                                 <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM, atau Ruangan...">
                                             </div>
                                             <span class="text-muted" style="font-size: 0.8rem;">
-                                                <i class="mdi mdi-clock-outline"></i> Menampilkan data 7 hari terakhir yang disetujui
+                                                <i class="mdi mdi-clock-outline"></i> Menampilkan data hari ini yang disetujui
                                             </span>
                                         </div>
                                     </div>

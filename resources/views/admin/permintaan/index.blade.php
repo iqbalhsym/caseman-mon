@@ -1056,27 +1056,43 @@
                 if (item.detail_paket && item.detail_paket.length > 0) {
                     detailStr = item.detail_paket.map((paket, idx) => {
                         let lines = [];
-                        if (paket.kategori === 'obat' && paket.detail_obat) {
-                            let cleanObat = paket.detail_obat.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-                            if (cleanObat) lines.push(cleanObat);
-                        } else if (paket.keterangan) {
-                            lines.push(paket.keterangan.trim());
-                        }
-                        if (paket.indikasi) {
-                            lines.push(paket.indikasi.trim());
+                        if (paket.kategori === 'obat') {
+                            if (paket.keterangan) lines.push(`Keterangan: ${paket.keterangan.trim()}`);
+                            if (paket.detail_obat) {
+                                let cleanObat = paket.detail_obat.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+                                if (cleanObat) lines.push(`Detail Obat: ${cleanObat}`);
+                            }
+                            if (paket.indikasi) lines.push(`Indikasi: ${paket.indikasi.trim()}`);
+                            if (paket.status) {
+                                let statusText = paket.status === 'disetujui' ? 'Disetujui' : (paket.status === 'konfirmasi' ? 'Dikonfirmasi' : (paket.status === 'ditolak' ? 'Ditolak' : (paket.status === 'menunggu' ? 'Menunggu Persetujuan' : 'Dibatalkan')));
+                                lines.push(`Status CM: ${statusText}`);
+                            }
+                            if (paket.catatan) lines.push(`Catatan CM: ${paket.catatan.trim()}`);
+                            if (paket.jumlah_hari) lines.push(`Persetujuan CM: ${paket.jumlah_hari} Hari (${paket.tanggal_mulai_expired} s/d ${paket.tanggal_berakhir_expired})`);
+                        } else {
+                            if (paket.keterangan) lines.push(paket.keterangan.trim());
+                            if (paket.indikasi) lines.push(paket.indikasi.trim());
                         }
                         return lines.join('\n');
                     }).filter(t => t.length > 0).join('\n\n');
                 } else {
                     let lines = [];
-                    if (item.kategori && item.kategori.toLowerCase() === 'obat' && item.detail_obat) {
-                        let cleanObat = item.detail_obat.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-                        if (cleanObat) lines.push(cleanObat);
-                    } else if (item.keterangan) {
-                        lines.push(item.keterangan.trim());
-                    }
-                    if (item.indikasi) {
-                        lines.push(item.indikasi.trim());
+                    if (item.kategori && item.kategori.toLowerCase() === 'obat') {
+                        if (item.keterangan) lines.push(`Keterangan: ${item.keterangan.trim()}`);
+                        if (item.detail_obat) {
+                            let cleanObat = item.detail_obat.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+                            if (cleanObat) lines.push(`Detail Obat: ${cleanObat}`);
+                        }
+                        if (item.indikasi) lines.push(`Indikasi: ${item.indikasi.trim()}`);
+                        if (item.status) {
+                            let statusText = item.status === 'disetujui' ? 'Disetujui' : (item.status === 'konfirmasi' ? 'Dikonfirmasi' : (item.status === 'ditolak' ? 'Ditolak' : (item.status === 'menunggu' ? 'Menunggu Persetujuan' : 'Dibatalkan')));
+                            lines.push(`Status CM: ${statusText}`);
+                        }
+                        if (item.catatan_diterima) lines.push(`Catatan CM: ${item.catatan_diterima.trim()}`);
+                        if (item.jumlah_hari) lines.push(`Persetujuan CM: ${item.jumlah_hari} Hari (${item.tanggal_mulai_expired} s/d ${item.tanggal_berakhir_expired})`);
+                    } else {
+                        if (item.keterangan) lines.push(item.keterangan.trim());
+                        if (item.indikasi) lines.push(item.indikasi.trim());
                     }
                     detailStr = lines.join('\n');
                 }

@@ -260,6 +260,7 @@
                                                                     <select class="form-select form-select-sm status-paket-select border-secondary" name="status_paket[{{ $idx }}]" data-index="{{ $idx }}">
                                                                         <option value="menunggu" {{ ($paket['status'] ?? 'menunggu') == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
                                                                         <option value="disetujui" {{ ($paket['status'] ?? 'menunggu') == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
+                                                                        <option value="konfirmasi" {{ ($paket['status'] ?? 'menunggu') == 'konfirmasi' ? 'selected' : '' }}>Dikonfirmasi</option>
                                                                         <option value="ditolak" {{ ($paket['status'] ?? 'menunggu') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                                                                         <option value="batal" {{ ($paket['status'] ?? 'menunggu') == 'batal' || ($paket['status'] ?? 'menunggu') == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
                                                                     </select>
@@ -298,6 +299,7 @@
                                                     <select class="form-select border-warning" id="status" name="status">
                                                         <option value="menunggu" {{ $data->status == 'menunggu' ? 'selected' : '' }}>Menunggu Persetujuan</option>
                                                         <option value="disetujui" {{ $data->status == 'disetujui' ? 'selected' : '' }}>Disetujui (ACC)</option>
+                                                        <option value="konfirmasi" {{ $data->status == 'konfirmasi' ? 'selected' : '' }}>Dikonfirmasi</option>
                                                         <option value="ditolak" {{ $data->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                                                         <option value="batal" {{ $data->status == 'batal' || $data->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
                                                     </select>
