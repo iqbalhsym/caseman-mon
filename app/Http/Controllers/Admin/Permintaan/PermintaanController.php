@@ -24,7 +24,6 @@ class PermintaanController extends Controller
         $user = Auth::user();
 
         $data = Permintaan::with('user', 'lokasi', 'penjamin', 'manager')
-            ->where('created_at', '>=', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->orderBy('status_angka', 'asc')
             ->get();
@@ -329,8 +328,6 @@ class PermintaanController extends Controller
                               ->orWhere('lantai', 'ilike', "%{$q}%");
                         });
                 });
-            } else {
-                $query->where('created_at', '>=', Carbon::today());
             }
 
             $data          = $query->get();

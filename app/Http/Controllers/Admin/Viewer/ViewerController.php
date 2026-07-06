@@ -16,7 +16,6 @@ class ViewerController extends Controller
     {
         $data = Permintaan::where('status', 'disetujui')
             ->with('user', 'lokasi', 'penjamin')
-            ->where('created_at', '>=', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->orderBy('status', 'asc')
             ->get();
