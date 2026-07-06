@@ -42,6 +42,8 @@
                                             </div>
                                             <button type="submit" class="btn btn-primary btn-sm text-white mb-0">Terapkan Filter</button>
                                             <button type="button" id="reset-filter" class="btn btn-light btn-sm mb-0">Reset</button>
+                                            <button type="button" id="btn-export-excel" class="btn btn-success btn-sm text-white mb-0"><i class="mdi mdi-file-excel"></i> Ekspor Excel</button>
+                                            <button type="button" id="btn-export-csv" class="btn btn-info btn-sm text-white mb-0"><i class="mdi mdi-file-document"></i> Ekspor CSV</button>
                                         </form>
                                     </div>
                                 </div>
@@ -243,6 +245,27 @@
             document.getElementById('filter-form').reset();
             updateDashboard(initialSubmissions); // Panggil fungsi utama dengan data awal
         });
+
+        document.getElementById('btn-export-excel').addEventListener('click', function() {
+            exportData('excel');
+        });
+
+        document.getElementById('btn-export-csv').addEventListener('click', function() {
+            exportData('csv');
+        });
+
+        function exportData(format) {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            const month = document.getElementById('month').value;
+            
+            let queryParams = new URLSearchParams({ format: format });
+            if (startDate) queryParams.append('start_date', startDate);
+            if (endDate) queryParams.append('end_date', endDate);
+            if (month) queryParams.append('month', month);
+
+            window.location.href = `{{ route('admin.laporan.export') }}?${queryParams.toString()}`;
+        }
 
         // --- INISIALISASI HALAMAN ---
         // Panggil fungsi utama saat halaman pertama kali dimuat

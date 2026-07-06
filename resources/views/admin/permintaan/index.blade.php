@@ -250,9 +250,14 @@
                                                 </span>
                                                 <input type="search" class="form-control search-input-custom" id="search-input" placeholder="Cari nama, No. RM, atau Ruangan...">
                                             </div>
-                                            <a href="{{ route('admin.permintaan.create') }}" class="btn btn-primary btn-sm text-white mb-0">
-                                                <i class="mdi mdi-plus-circle"></i> Buat Pengajuan
-                                            </a>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-success btn-sm text-white mb-0" data-bs-toggle="modal" data-bs-target="#exportModal">
+                                                    <i class="mdi mdi-file-export"></i> Ekspor Data
+                                                </button>
+                                                <a href="{{ route('admin.permintaan.create') }}" class="btn btn-primary btn-sm text-white mb-0">
+                                                    <i class="mdi mdi-plus-circle"></i> Buat Pengajuan
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -390,6 +395,48 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" id="save-btn" class="btn btn-primary text-white">Simpan Persetujuan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ekspor Data -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel"><i class="mdi mdi-file-export text-success"></i> Ekspor & Arsip Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formExportData">
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label for="export_filter_by" class="form-label font-weight-bold">Acuan Tanggal</label>
+                            <select class="form-select" id="export_filter_by" name="filter_by">
+                                <option value="created_at">Tanggal Pengajuan (Waktu Diajukan)</option>
+                                <option value="tanggal">Tanggal Masuk (Admission Date)</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="export_start_date" class="form-label font-weight-bold">Dari Tanggal</label>
+                            <input type="date" class="form-control" id="export_start_date" name="start_date" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="export_end_date" class="form-label font-weight-bold">Sampai Tanggal</label>
+                            <input type="date" class="form-control" id="export_end_date" name="end_date" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="export_format" class="form-label font-weight-bold">Format File</label>
+                            <select class="form-select" id="export_format" name="format">
+                                <option value="excel">Microsoft Excel (.xls)</option>
+                                <option value="csv">Comma Separated Values (.csv)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-success text-white"><i class="mdi mdi-download"></i> Unduh File</button>
                     </div>
                 </form>
             </div>
@@ -934,6 +981,23 @@
         <script>
             var confirmModal = new bootstrap.Modal(document.getElementById('add-user-modal'));
             var cancelModal = new bootstrap.Modal(document.getElementById('modalBatal'));
+            var exportModal = new bootstrap.Modal(document.getElementById('exportModal'));
+
+            $('#formExportData').on('submit', function (e) {
+                e.preventDefault();
+                const startDate = $('#export_start_date').val();
+                const endDate = $('#export_end_date').val();
+                const filterBy = $('#export_filter_by').val();
+                const format = $('#export_format').val();
+                
+                let queryParams = new URLSearchParams({ format: format });
+                if (startDate) queryParams.append('start_date', startDate);
+                if (endDate) queryParams.append('end_date', endDate);
+                if (filterBy) queryParams.append('filter_by', filterBy);
+
+                exportModal.hide();
+                window.location.href = `{{ route('admin.laporan.export') }}?${queryParams.toString()}`;
+            });
 
             $('body').on('click', '.btn-approve-action', function () {
                 $('#product_id').val($(this).data('id'));

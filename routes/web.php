@@ -41,6 +41,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (){
 Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import');
     Route::get('obat/export', [ObatController::class, 'export'])->name('obat.export');
     Route::get('obat-search', [ObatController::class, 'searchObat'])->name('obat.search');
+    Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
 
     Route::resources([
         'lokasi' => LokasiController::class,
