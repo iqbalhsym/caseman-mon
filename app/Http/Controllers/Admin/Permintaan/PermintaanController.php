@@ -23,12 +23,12 @@ class PermintaanController extends Controller
     {
         $user = Auth::user();
 
-        $data = Permintaan::with('user', 'lokasi', 'penjamin', 'manager')
+        $paginated = Permintaan::with('user', 'lokasi', 'penjamin', 'manager')
             ->orderBy('created_at', 'desc')
             ->orderBy('status_angka', 'asc')
-            ->get();
+            ->paginate(30);
 
-        $datas = $data->map(function ($item) {
+        $datas = collect($paginated->items())->map(function ($item) {
             return [
                 'id'                      => $item->id,
                 'nama'                    => $item->nama,
@@ -66,7 +66,9 @@ class PermintaanController extends Controller
             ];
         });
 
-        return view('admin.permintaan.index', compact('datas'));
+        $hasMore = $paginated->hasMorePages();
+
+        return view('admin.permintaan.index', compact('datas', 'hasMore'));
     }
 
     private function canCreate(): bool
@@ -330,8 +332,8 @@ class PermintaanController extends Controller
                 });
             }
 
-            $data          = $query->get();
-            $formattedData = $data->map(function ($item) {
+            $paginated     = $query->paginate(30);
+            $formattedData = collect($paginated->items())->map(function ($item) {
                 return [
                     'id'                      => $item->id,
                     'nama'                    => $item->nama,
@@ -369,10 +371,11 @@ class PermintaanController extends Controller
             });
 
             return response()->json([
-                'status'  => 'success',
-                'message' => 'Data Ditemukan',
-                'total'   => $formattedData->count(),
-                'data'    => $formattedData
+                'status'   => 'success',
+                'message'  => 'Data Ditemukan',
+                'total'    => $paginated->total(),
+                'data'     => $formattedData,
+                'has_more' => $paginated->hasMorePages(),
             ]);
         } catch (\Throwable $th) {
             return response()->json(['status' => 'error', 'message' => $th->getMessage()]);

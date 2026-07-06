@@ -14,13 +14,13 @@ class ViewerController extends Controller
      */
     public function index()
     {
-        $data = Permintaan::where('status', 'disetujui')
+        $paginated = Permintaan::where('status', 'disetujui')
             ->with('user', 'lokasi', 'penjamin')
             ->orderBy('created_at', 'desc')
             ->orderBy('status', 'asc')
-            ->get();
+            ->paginate(30);
 
-        $datas = $data->map(function ($item) {
+        $datas = collect($paginated->items())->map(function ($item) {
             return [
                 'id' => $item->id,
                 'nama' => $item->nama,
@@ -51,7 +51,9 @@ class ViewerController extends Controller
             ];
         });
 
-        return view('admin.viewer.index', compact('datas'));
+        $hasMore = $paginated->hasMorePages();
+
+        return view('admin.viewer.index', compact('datas', 'hasMore'));
     }
 
     /**

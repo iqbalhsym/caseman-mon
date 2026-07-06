@@ -18,11 +18,11 @@ class ListPermintaanController extends Controller
      */
     public function index()
     {
-        $data = Permintaan::with('user', 'lokasi', 'penjamin')->orderBy('created_at', 'desc')->get();
+        $paginated = Permintaan::with('user', 'lokasi', 'penjamin')->orderBy('created_at', 'desc')->paginate(30);
         // $data = Permintaan::with('user', 'lokasi')->orderBy('created_at', 'desc')->get();
         // $data = Permintaan::with('user', 'lokasi')->orderBy('status', 'desc')->orderBy('created_at', 'desc')->get();
 
-        $datas = $data->map(function ($item) {
+        $datas = collect($paginated->items())->map(function ($item) {
             return [
                 'id' => $item->id,
                 'nama' => $item->nama,
@@ -58,7 +58,9 @@ class ListPermintaanController extends Controller
             ];
         });
 
-        return view('admin.permintaan.list', compact('datas'));
+        $hasMore = $paginated->hasMorePages();
+
+        return view('admin.permintaan.list', compact('datas', 'hasMore'));
     }
 
     function formatNomorHp($nomor)

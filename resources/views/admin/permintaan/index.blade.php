@@ -277,6 +277,12 @@
                             <!-- Diisi oleh Javascript -->
                         </div>
 
+                        <div class="text-center my-4 d-none" id="load-more-container">
+                            <button class="btn btn-primary px-4 py-2" id="btn-load-more">
+                                <i class="mdi mdi-refresh me-1"></i> Muat Lebih Banyak
+                            </button>
+                        </div>
+
                         {{-- Skeleton Loader (Bootstrap 5 Placeholders) --}}
                         <div class="row d-none" id="skeleton-loader">
                             <div class="col-md-6 col-lg-4 mb-3">
@@ -476,6 +482,8 @@
             const currentUserRole = {{ Auth::user()->role_id }};
             const initialSubmissions = @json($datas);
             let submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
+            let currentPage = 1;
+            let hasMorePages = {{ $hasMore ? 'true' : 'false' }};
 
             const submissionListContainer = document.getElementById('submission-list');
             const filterButtons = document.querySelectorAll('.filter-btn');
@@ -805,10 +813,20 @@
                     `;
                     submissionListContainer.insertAdjacentHTML('beforeend', cardHTML);
                 });
+                updateLoadMoreButton();
                 setTimeout(() => {
                     restoreScroll();
                     adjustSubmissionListMargin();
                 }, 50);
+            }
+
+            function updateLoadMoreButton() {
+                const container = document.getElementById('load-more-container');
+                if (hasMorePages) {
+                    container.classList.remove('d-none');
+                } else {
+                    container.classList.add('d-none');
+                }
             }
 
             const skeletonLoader = document.getElementById('skeleton-loader');
@@ -847,36 +865,55 @@
                     button.classList.add('active');
                     const filter = button.getAttribute('data-filter');
                     sessionStorage.setItem('activeFilterIndex', filter);
-                    fetchByStatus(filter);
+                    fetchByStatus(filter, 1);
                 });
             });
 
-            function fetchByStatus(status) {
+            function fetchByStatus(status, page = 1) {
                 const q = searchInput.value.trim();
-                const params = { q: q };
+                const params = { q: q, page: page };
                 if (status !== 'semua') params.status = status;
 
-                showLoader();
+                if (page === 1) {
+                    showLoader();
+                } else {
+                    $('#btn-load-more').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Memuat...');
+                }
+
                 $.getJSON("{{ route('admin.permintaan.search') }}", params)
                     .done(function (resp) {
                         if (resp.status === 'success') {
-                            submissions = resp.data;
+                            if (page === 1) {
+                                submissions = resp.data;
+                                currentPage = 1;
+                            } else {
+                                submissions = submissions.concat(resp.data);
+                                currentPage = page;
+                            }
+                            hasMorePages = resp.has_more;
                             renderSubmissions(status, q);
                         }
                     })
                     .always(function () {
-                        hideLoader();
+                        if (page === 1) {
+                            hideLoader();
+                        } else {
+                            $('#btn-load-more').prop('disabled', false).html('<i class="mdi mdi-refresh me-1"></i> Muat Lebih Banyak');
+                        }
                     });
             }
 
             const handleSearch = debounce(function () {
                 const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'semua';
-                const q = searchInput.value.trim();
-
-                fetchByStatus(activeFilter);
+                fetchByStatus(activeFilter, 1);
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
+
+            $('#btn-load-more').on('click', function () {
+                const activeFilter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'semua';
+                fetchByStatus(activeFilter, currentPage + 1);
+            });
 
             // Inisialisasi
             const savedFilter = sessionStorage.getItem('activeFilterIndex') || 'semua';
@@ -889,7 +926,7 @@
             if (savedFilter === 'semua') {
                 updateDisplay(true); // pakai data awal dari PHP dengan transisi loader
             } else {
-                fetchByStatus(savedFilter); // fetch ke server sesuai filter tersimpan (sudah memicu show/hide loader)
+                fetchByStatus(savedFilter, 1); // fetch ke server sesuai filter tersimpan (sudah memicu show/hide loader)
             }
             setTimeout(adjustSubmissionListMargin, 100);
 

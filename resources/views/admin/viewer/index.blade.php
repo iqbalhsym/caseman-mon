@@ -236,6 +236,12 @@
                             <!-- Diisi oleh Javascript -->
                         </div>
 
+                        <div class="text-center my-4 d-none" id="load-more-container">
+                            <button class="btn btn-primary px-4 py-2" id="btn-load-more">
+                                <i class="mdi mdi-refresh me-1"></i> Muat Lebih Banyak
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -278,6 +284,8 @@
         <script>
             const initialSubmissions = @json($datas);
             let submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
+            let currentPage = 1;
+            let hasMorePages = {{ $hasMore ? 'true' : 'false' }};
 
             const submissionListContainer = document.getElementById('submission-list');
             const filterButtons = document.querySelectorAll('.filter-btn');
@@ -473,6 +481,16 @@
                         </div>
                     `);
                 });
+                updateLoadMoreButton();
+            }
+
+            function updateLoadMoreButton() {
+                const container = document.getElementById('load-more-container');
+                if (hasMorePages) {
+                    container.classList.remove('d-none');
+                } else {
+                    container.classList.add('d-none');
+                }
             }
 
             function updateDisplay() {
@@ -488,22 +506,48 @@
                 });
             });
 
-            const handleSearch = debounce(function () {
+            function fetchPage(page = 1) {
                 const q = searchInput.value.trim();
-                if (q.length === 0) {
-                    submissions = Array.isArray(initialSubmissions) ? initialSubmissions.slice() : [];
-                    updateDisplay();
-                    return;
+                const params = { q: q, page: page, status: 'disetujui' };
+
+                if (page === 1) {
+                    // Reset container
+                    submissionListContainer.innerHTML = '<div class="col-12 text-center py-4">Memuat data...</div>';
+                } else {
+                    $('#btn-load-more').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Memuat...');
                 }
-                fetchSearch(q).done(function (resp) {
-                    if (resp.status === 'success') {
-                        submissions = resp.data;
-                        updateDisplay();
-                    }
-                });
+
+                $.getJSON("{{ route('admin.permintaan.search') }}", params)
+                    .done(function (resp) {
+                        if (resp.status === 'success') {
+                            if (page === 1) {
+                                submissions = resp.data;
+                                currentPage = 1;
+                            } else {
+                                submissions = submissions.concat(resp.data);
+                                currentPage = page;
+                            }
+                            hasMorePages = resp.has_more;
+                            updateDisplay();
+                        }
+                    })
+                    .always(function () {
+                        if (page > 1) {
+                            $('#btn-load-more').prop('disabled', false).html('<i class="mdi mdi-refresh me-1"></i> Muat Lebih Banyak');
+                        }
+                    });
+            }
+
+            const handleSearch = debounce(function () {
+                fetchPage(1);
             }, 300);
 
             searchInput.addEventListener('input', handleSearch);
+
+            $('#btn-load-more').on('click', function () {
+                fetchPage(currentPage + 1);
+            });
+
             renderSubmissions();
             
             // Sinkron search utama → search drawer (saat resize)
