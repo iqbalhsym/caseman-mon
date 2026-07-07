@@ -119,7 +119,7 @@ class LaporanController extends Controller
 
                 foreach ($data as $idx => $item) {
                     $lokasiText = $item->lokasi ? ($item->lokasi->nama . ' Lt. ' . $item->lokasi->lantai) : ($item->ruangan ? ($item->ruangan . ' Lt. ' . $item->lantai) : '-');
-                    $detailObatText = $item->detail_paket ? json_encode($item->detail_paket) : ($item->detail_obat ? strip_tags($item->detail_obat) : $item->keterangan);
+                    $detailObatText = $item->detail_paket ? $this->formatDetailPaket($item->detail_paket) : ($item->detail_obat ? strip_tags($item->detail_obat) : $item->keterangan);
                     
                     fputcsv($handle, [
                         $idx + 1,
@@ -158,7 +158,7 @@ class LaporanController extends Controller
 
                 foreach ($data as $idx => $item) {
                     $lokasiText = $item->lokasi ? ($item->lokasi->nama . ' Lt. ' . $item->lokasi->lantai) : ($item->ruangan ? ($item->ruangan . ' Lt. ' . $item->lantai) : '-');
-                    $detailObatText = $item->detail_paket ? json_encode($item->detail_paket) : ($item->detail_obat ? strip_tags($item->detail_obat) : $item->keterangan);
+                    $detailObatText = $item->detail_paket ? $this->formatDetailPaket($item->detail_paket) : ($item->detail_obat ? strip_tags($item->detail_obat) : $item->keterangan);
                     
                     echo '<tr>';
                     echo '<td>' . ($idx + 1) . '</td>';
@@ -170,7 +170,7 @@ class LaporanController extends Controller
                     echo '<td>' . htmlspecialchars($lokasiText) . '</td>';
                     echo '<td>' . htmlspecialchars($item->diagnosis ?? '-') . '</td>';
                     echo '<td>' . htmlspecialchars(ucfirst($item->kategori)) . '</td>';
-                    echo '<td>' . htmlspecialchars($detailObatText) . '</td>';
+                    echo '<td>' . nl2br(htmlspecialchars($detailObatText)) . '</td>';
                     echo '<td>' . htmlspecialchars($item->indikasi ?? '-') . '</td>';
                     echo '<td>' . htmlspecialchars(ucfirst($item->status)) . '</td>';
                     echo '<td>' . htmlspecialchars($item->manager?->name ?? '-') . '</td>';
@@ -181,6 +181,58 @@ class LaporanController extends Controller
                 echo '</table>';
             }, 200, $headers);
         }
+    }
+
+    private function formatDetailPaket($detailPaket)
+    {
+        if (!is_array($detailPaket)) {
+            return '';
+        }
+        
+        $formattedItems = [];
+        foreach ($detailPaket as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            
+            $kategori = isset($item['kategori']) ? strtoupper($item['kategori']) : '-';
+            $ket = isset($item['keterangan']) ? $item['keterangan'] : '';
+            $detailObat = isset($item['detail_obat']) ? $item['detail_obat'] : '';
+            $indikasi = isset($item['indikasi']) ? $item['indikasi'] : '';
+            $status = isset($item['status']) ? ucfirst($item['status']) : '';
+            $catatan = isset($item['catatan']) ? $item['catatan'] : '';
+            
+            $itemStr = "[{$kategori}]";
+            if ($ket) {
+                $itemStr .= " Keterangan: {$ket}";
+            }
+            if ($detailObat) {
+                $cleanObat = strip_tags($detailObat);
+                $cleanObat = html_entity_decode($cleanObat);
+                $cleanObat = str_replace(["&nbsp;", "\r", "\n"], [" ", "", ""], $cleanObat);
+                $cleanObat = preg_replace('/\s+/', ' ', $cleanObat);
+                $itemStr .= " | Detail: " . trim($cleanObat);
+            }
+            if ($indikasi) {
+                $itemStr .= " | Indikasi: {$indikasi}";
+            }
+            if ($status) {
+                $itemStr .= " | Status: {$status}";
+                if ($catatan) {
+                    $itemStr .= " ({$catatan})";
+                }
+            }
+            
+            if (isset($item['jumlah_hari']) && $item['jumlah_hari'] > 0) {
+                $tglMulai = isset($item['tanggal_mulai_expired']) ? date('d-m-Y', strtotime($item['tanggal_mulai_expired'])) : '';
+                $tglAkhir = isset($item['tanggal_berakhir_expired']) ? date('d-m-Y', strtotime($item['tanggal_berakhir_expired'])) : '';
+                $itemStr .= " | Durasi: {$item['jumlah_hari']} Hari ({$tglMulai} s/d {$tglAkhir})";
+            }
+            
+            $formattedItems[] = $itemStr;
+        }
+        
+        return implode("\n", $formattedItems);
     }
     // --- PERUBAHAN SELESAI DI SINI ---
 
