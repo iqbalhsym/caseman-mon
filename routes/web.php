@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Shift\ShiftController;
 use App\Http\Controllers\Admin\User\RoleController;
 use App\Http\Controllers\Admin\User\UserController;
 use App\Http\Controllers\Admin\Viewer\ViewerController;
+use App\Http\Controllers\Admin\Setting\SettingController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PencarianController;
 use App\Models\Permintaan;
@@ -64,6 +65,7 @@ Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import
     Route::middleware('role:administrator')->group(function () {
         Route::resources([
             'role' => RoleController::class,
+            'setting' => SettingController::class,
         ]);
     });
 

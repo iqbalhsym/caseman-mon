@@ -210,7 +210,6 @@
       </div>
     </nav>
     <!-- partial -->
-
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
@@ -261,6 +260,12 @@
             <a class="nav-link" href="{{ route('admin.lab.index') }}">
               <i class="menu-icon mdi mdi-flask"></i>
               <span class="menu-title">Data LAB</span>
+            </a>
+          </li>
+          <li class="nav-item {{ Request::is('admin/setting*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.setting.index') }}">
+              <i class="menu-icon mdi mdi-bullhorn-outline"></i>
+              <span class="menu-title">Running Text</span>
             </a>
           </li>
           @endif
@@ -314,6 +319,16 @@
       <!-- partial -->
 
       <div class="main-panel">
+        @php
+            $announcement = \App\Models\Setting::where('key', 'announcement')->first()?->value;
+        @endphp
+        @if($announcement)
+            <div class="announcement-bar py-2 px-3 border-bottom shadow-sm" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%); color: #856404; font-size: 13px; font-weight: 600; width: 100%; z-index: 1000; position: relative;">
+                <marquee class="m-0" scrollamount="4" onmouseover="this.stop();" onmouseout="this.start();">
+                    <i class="mdi mdi-bell-ring-outline text-warning me-2"></i> {{ $announcement }}
+                </marquee>
+            </div>
+        @endif
         <div class="content-wrapper">
           {{ $slot }}
         </div>
