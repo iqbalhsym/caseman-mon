@@ -27,7 +27,7 @@
                         
                         {{-- VARIABEL PENGAMAN ROLE --}}
                         @php
-                            $isTenagaMedis = auth()->user()->role->name === 'tenagamedis';
+                            $isTenagaMedis = in_array(auth()->user()->role->name, ['tenagamedis', 'supervisor']);
                             $isCaseManager = in_array(auth()->user()->role->name, ['casemanager', 'administrator']);
                         @endphp
 
@@ -137,20 +137,34 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="keterangan">Keterangan</label>
-                                    <div class="col-sm-8">
-                                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3">{{ $data->keterangan }}</textarea>
-                                    </div>
-                                </div>
+                                 <div class="form-group row">
+                                     <label class="col-sm-4 col-form-label" for="keterangan">Keterangan </label>
+                                     <div class="col-sm-8">
+                                        
+                                         <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Jelaskan detail permintaan Anda...">{{ $data->keterangan }}</textarea>
 
-                                <div class="form-group row {{ strtolower($data->kategori) == 'obat' ? '' : 'd-none' }}" id="detail-obat-group">
-                                    <label class="col-sm-4 col-form-label text-success" for="detail_obat">Detail Obat</label>
-                                    <div class="col-sm-8">
-                                        <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow: auto; resize: vertical;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">{!! $data->detail_obat !!}</div>
-                                        <textarea class="form-control d-none" id="detail_obat" name="detail_obat" rows="3">{{ $data->detail_obat }}</textarea>
-                                    </div>
-                                </div>
+                                         <small class="text-muted fst-italic">
+                                            Disarankan mencantumkan nama dokter pemberi advis.
+                                         </small>
+
+                                     </div>
+                                 </div>
+
+                                 <div class="form-group row {{ strtolower($data->kategori) == 'obat' ? '' : 'd-none' }}" id="detail-obat-group">
+                                     <label class="col-sm-4 col-form-label text-success" for="detail_obat_div">Detail Obat</label>
+                                     <div class="col-sm-8">
+                                         <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow: auto; resize: vertical;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa...">@if(strtolower($data->kategori) == 'obat'){!! $data->detail_obat !!}@endif</div>
+                                     </div>
+                                 </div>
+
+                                 <div class="form-group row {{ strtolower($data->kategori) == 'lab' ? '' : 'd-none' }}" id="detail-lab-group">
+                                     <label class="col-sm-4 col-form-label text-info" for="detail_lab_div">Detail LAB</label>
+                                     <div class="col-sm-8">
+                                         <div class="form-control lab-input-div" contenteditable="true" style="min-height: 80px; overflow: auto; resize: vertical;" data-placeholder="Ketik @ untuk tag nama pemeriksaan lab, atau ketik teks biasa...">@if(strtolower($data->kategori) == 'lab'){!! $data->detail_obat !!}@endif</div>
+                                     </div>
+                                 </div>
+
+                                 <textarea class="form-control d-none" id="detail_obat" name="detail_obat" rows="3">{{ $data->detail_obat }}</textarea>
 
                                 <div class="form-group row">
                                     <label class="col-sm-4 col-form-label" for="indikasi">Indikasi</label>
@@ -369,12 +383,12 @@
             var detail_obat_el = document.getElementById("detail_obat");
             var detail_obat = detail_obat_el ? detail_obat_el.value : '';
 
-            if (kategori !== 'obat') {
+            if (kategori !== 'obat' && kategori !== 'lab') {
                 if (detail_obat_el) detail_obat_el.value = '';
                 detail_obat = '';
             }
 
-            if (no_rm === "" || nama === "" || umur === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || (kategori === 'obat' && detail_obat === "") || indikasi === "") {
+            if (no_rm === "" || nama === "" || umur === "" || jaminan === "" || lokasi === "" || diagnosis === "" || kategori === "" || ((kategori === 'obat' || kategori === 'lab') && detail_obat === "") || indikasi === "") {
                 showToast('Semua field data medis harus diisi, kecuali file pendukung', 'error');
                 return false;
             }
@@ -482,10 +496,16 @@
 
         $('#kategori').on('change', function () {
             handleRiwayat();
-            if ($(this).val() === 'obat') {
+            const val = $(this).val();
+            if (val === 'obat') {
                 $('#detail-obat-group').removeClass('d-none');
+                $('#detail-lab-group').addClass('d-none');
+            } else if (val === 'lab') {
+                $('#detail-lab-group').removeClass('d-none');
+                $('#detail-obat-group').addClass('d-none');
             } else {
                 $('#detail-obat-group').addClass('d-none');
+                $('#detail-lab-group').addClass('d-none');
             }
         });
 
@@ -495,9 +515,13 @@
             var detailObat = $(this).find(':selected').data('obat') || '';
             $('#keterangan').val(keterangan);
             $('#indikasi').val(indikasi);
-            if ($('#kategori').val() === 'obat') {
+            const cat = $('#kategori').val();
+            if (cat === 'obat') {
                 $('#detail_obat').val(detailObat);
                 $('.obat-input-div').html(detailObat);
+            } else if (cat === 'lab') {
+                $('#detail_obat').val(detailObat);
+                $('.lab-input-div').html(detailObat);
             }
         });
 
@@ -538,14 +562,50 @@
             replaceTextSuffix: ''
         });
 
-        tribute.attach(document.querySelectorAll('.obat-input-div'));
+        var tributeLab = new Tribute({
+            trigger: '@',
+            values: function (text, cb) {
+                if(text.length < 2) return cb([]);
+                $.ajax({
+                    url: "{{ route('admin.lab.search') }}",
+                    data: { q: text },
+                    dataType: 'json',
+                    success: function (data) {
+                        var mapped = data.map(function (item) {
+                            return {
+                                key: item.nama_item + ' (' + item.kode_item + ')',
+                                value: item.nama_item,
+                                warna: item.warna
+                            };
+                        });
+                        cb(mapped);
+                    }
+                });
+            },
+            selectTemplate: function (item) {
+                if (typeof item === 'undefined') return null;
+                var badgeClass = 'bg-secondary';
+                if (item.original.warna === 'hijau') badgeClass = 'bg-success';
+                else if (item.original.warna === 'kuning') badgeClass = 'bg-warning text-dark';
+                else if (item.original.warna === 'merah') badgeClass = 'bg-danger';
 
-        $(document).on('input', '.obat-input-div', function() {
+                return '<span contenteditable="false" class="badge ' + badgeClass + '">' + item.original.value + '</span> ';
+            },
+            menuItemTemplate: function (item) {
+                return item.string;
+            },
+            replaceTextSuffix: ''
+        });
+
+        tribute.attach(document.querySelectorAll('.obat-input-div'));
+        tributeLab.attach(document.querySelectorAll('.lab-input-div'));
+
+        $(document).on('input', '.obat-input-div, .lab-input-div', function() {
             var content = $(this).html();
             $('#detail_obat').val(content);
         });
 
-        $(document).on('focus', '.obat-input-div', function() {
+        $(document).on('focus', '.obat-input-div, .lab-input-div', function() {
             if ($(this).html().trim() === '<br>') $(this).html('');
         });
 

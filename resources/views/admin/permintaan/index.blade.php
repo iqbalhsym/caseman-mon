@@ -234,11 +234,18 @@
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
                         <div class="sticky-toolbar">
                         {{-- Card Pencarian (Toolbar) --}}
-                        <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Daftar Pengajuan</a>
-                        </li>
-                    </ul>
+                        <div class="d-sm-flex align-items-center justify-content-between">
+                            <ul class="nav nav-tabs border-bottom-0" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Daftar Pengajuan</a>
+                                </li>
+                            </ul>
+                            <div class="mb-2 pe-3">
+                                <a href="https://drive.google.com/file/d/11k19OH8f2-LHAkPQDaMUjedBU1rCJBRb/view" target="_blank" class="btn btn-outline-primary btn-sm fw-bold">
+                                    <i class="mdi mdi-help-circle-outline me-1"></i> Petunjuk Teknis (Juknis)
+                                </a>
+                            </div>
+                        </div>
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
                                 <div class="card shadow-sm">
@@ -624,8 +631,14 @@
                                         <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
                                         <button class="btn btn-xs bg-orange text-white btn-confirm-action" data-id="${item.id}" data-paket="">Konfirmasi</button>
                                         <button class="btn btn-xs btn-success text-white btn-approve-action" data-id="${item.id}" data-paket="">Terima</button>
+                                        ` : `
+                                        <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
+                                        `}
+                                    ` : `
+                                        ${currentUserRole === 3 ? `
+                                        <button class="btn btn-xs btn-dark text-white btn-batal-action" data-id="${item.id}" data-paket="">Batal</button>
                                         ` : ''}
-                                    ` : ''}
+                                    `}
                                 </div>
                             </div>
                         `;

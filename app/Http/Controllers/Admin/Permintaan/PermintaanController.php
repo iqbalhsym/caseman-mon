@@ -75,12 +75,13 @@ class PermintaanController extends Controller
     {
         $role = auth()->user()->role->name;
 
-        // Hanya administrator dan tenagamedis yang bisa membuat permintaan
+        // Hanya administrator, casemanager, tenagamedis, dan supervisor yang bisa membuat permintaan
         if ($role === 'administrator') return true;
         if ($role === 'casemanager') return true;
         if ($role === 'tenagamedis') return true;
+        if ($role === 'supervisor') return true;
 
-        return false; // 'viewer' dan 'casemanager' tidak bisa membuat baru ya
+        return false; // 'viewer' tidak bisa membuat baru
     }
 
     /**
@@ -90,10 +91,9 @@ class PermintaanController extends Controller
     {
         $role = Auth::user()->role?->name;
 
-        // if ($role === 'viewer') return false;
         if ($role === 'administrator') return true;
         if ($role === 'casemanager') return true;
-        if ($role === 'tenagamedis' && $item->status === 'menunggu') return true;
+        if (in_array($role, ['tenagamedis', 'supervisor']) && $item->status === 'menunggu') return true;
 
         return false;
     }
@@ -107,7 +107,6 @@ class PermintaanController extends Controller
 
         if ($role === 'administrator') return true;
         if ($role === 'casemanager') return true;
-        if ($role === 'tenagamedis' && $item->status === 'menunggu') return true;
 
         return false;
     }

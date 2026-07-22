@@ -5,11 +5,16 @@
         <div class="col-sm-12">
             <div class="home-tab">
                 <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                    <ul class="nav nav-tabs" role="tablist">
+                    <ul class="nav nav-tabs border-bottom-0" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Dashboard</a>
                         </li>
                     </ul>
+                    <div class="mb-2">
+                        <a href="https://drive.google.com/file/d/11k19OH8f2-LHAkPQDaMUjedBU1rCJBRb/view" target="_blank" class="btn btn-outline-primary btn-sm fw-bold">
+                            <i class="mdi mdi-help-circle-outline me-1"></i> Petunjuk Teknis (Juknis)
+                        </a>
+                    </div>
                 </div>
                 <div class="tab-content tab-content-basic">
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 

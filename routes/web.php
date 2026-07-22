@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Dashboard\DashboardController;
 use App\Http\Controllers\Admin\Laporan\LaporanController;
 use App\Http\Controllers\Admin\Lokasi\LokasiController;
+use App\Http\Controllers\Admin\Lab\LabController;
 use App\Http\Controllers\Admin\Obat\ObatController;
 use App\Http\Controllers\Admin\Password\GantiPasswordController;
 use App\Http\Controllers\Admin\Penjamin\PenjaminController;
@@ -41,6 +42,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (){
 Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import');
     Route::get('obat/export', [ObatController::class, 'export'])->name('obat.export');
     Route::get('obat-search', [ObatController::class, 'searchObat'])->name('obat.search');
+    Route::post('lab/import', [LabController::class, 'import'])->name('lab.import');
+    Route::get('lab/export', [LabController::class, 'export'])->name('lab.export');
+    Route::get('lab-search', [LabController::class, 'searchLab'])->name('lab.search');
     Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
 
     Route::resources([
@@ -54,6 +58,7 @@ Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import
         'penjamin' => PenjaminController::class,
         'user' => UserController::class,
         'obat' => ObatController::class,
+        'lab' => LabController::class,
     ]);
 
     Route::middleware('role:administrator')->group(function () {

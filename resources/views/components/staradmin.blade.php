@@ -257,6 +257,12 @@
               <span class="menu-title">Data Obat</span>
             </a>
           </li>
+          <li class="nav-item {{ Request::is('admin/lab*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('admin.lab.index') }}">
+              <i class="menu-icon mdi mdi-flask"></i>
+              <span class="menu-title">Data LAB</span>
+            </a>
+          </li>
           @endif
 
           @if(Auth::check() && Auth::user()->role_id != 4)

@@ -132,19 +132,30 @@
                                         </div>
 
                                         <div class="form-group row">
-                                            <label class="col-sm-4 col-form-label">Keterangan</label>
-                                            <div class="col-sm-8">
-                                                <textarea class="form-control keterangan-input" name="keterangan[]" rows="3" placeholder="Jelaskan detail permintaan Anda..."></textarea>
-                                            </div>
-                                        </div>
+                                             <label class="col-sm-4 col-form-label">Keterangan </label>
+                                             <div class="col-sm-8">
+                                                 <textarea class="form-control keterangan-input" name="keterangan[]" rows="3" placeholder="Jelaskan detail permintaan Anda..."></textarea>
+                                                 <small class="text-muted fst-italic">
+                                                    Disarankan mencantumkan nama dokter pemberi advis.
+                                                 </small>
+                                             </div>
+                                         </div>
 
-                                        <div class="form-group row d-none detail-obat-group">
-                                            <label class="col-sm-4 col-form-label text-success">Detail Obat <span class="text-danger">*</span></label>
-                                            <div class="col-sm-8">
-                                                <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow-y: auto;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa..."></div>
-                                                <textarea class="obat-input d-none" name="detail_obat[]" required></textarea>
-                                            </div>
-                                        </div>
+                                         <div class="form-group row d-none detail-obat-group">
+                                             <label class="col-sm-4 col-form-label text-success">Detail Obat <span class="text-danger">*</span></label>
+                                             <div class="col-sm-8">
+                                                 <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; overflow-y: auto;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa..."></div>
+                                             </div>
+                                         </div>
+
+                                         <div class="form-group row d-none detail-lab-group">
+                                             <label class="col-sm-4 col-form-label text-info">Detail LAB <span class="text-danger">*</span></label>
+                                             <div class="col-sm-8">
+                                                 <div class="form-control lab-input-div" contenteditable="true" style="min-height: 80px; overflow-y: auto;" data-placeholder="Ketik @ untuk tag nama pemeriksaan lab, atau ketik teks biasa..."></div>
+                                             </div>
+                                         </div>
+
+                                         <input type="hidden" class="obat-input" name="detail_obat[]">
 
                                         <div class="form-group row">
                                             <label class="col-sm-4 col-form-label">Indikasi <span class="text-danger">*</span></label>
@@ -241,6 +252,14 @@
             var valid = true;
             $('.kategori-input, .indikasi-input').each(function() {
                 if ($(this).val().trim() === '') {
+                    valid = false;
+                }
+            });
+
+            $('.paket-item').each(function() {
+                var cat = $(this).find('.kategori-input').val();
+                var detail = $(this).find('.obat-input').val() || '';
+                if ((cat === 'obat' || cat === 'lab') && detail.trim() === '') {
                     valid = false;
                 }
             });
@@ -347,12 +366,19 @@
             const riwayatGroup = container.find('.riwayat-group');
             const riwayatInput = container.find('.riwayat-input');
             const detailObatGroup = container.find('.detail-obat-group');
+            const detailLabGroup = container.find('.detail-lab-group');
 
             if (cat === 'obat') {
                 detailObatGroup.removeClass('d-none');
+                detailLabGroup.addClass('d-none');
                 container.find('.obat-input-div').focus();
+            } else if (cat === 'lab') {
+                detailLabGroup.removeClass('d-none');
+                detailObatGroup.addClass('d-none');
+                container.find('.lab-input-div').focus();
             } else {
                 detailObatGroup.addClass('d-none');
+                detailLabGroup.addClass('d-none');
             }
 
             if (rm.length === 0 || cat.length === 0) {
@@ -388,9 +414,14 @@
                 var detailObat = $(this).find(':selected').data('obat') || '';
                 container.find('.keterangan-input').val(keterangan);
                 container.find('.indikasi-input').val(indikasi);
-                if (container.find('.kategori-input').val() === 'obat') {
+                
+                const cat = container.find('.kategori-input').val();
+                if (cat === 'obat') {
                     container.find('.obat-input').val(detailObat);
                     container.find('.obat-input-div').html(detailObat);
+                } else if (cat === 'lab') {
+                    container.find('.obat-input').val(detailObat);
+                    container.find('.lab-input-div').html(detailObat);
                 }
             }
         });
@@ -410,7 +441,7 @@
             const newPaket = `
                 <div class="paket-item border rounded p-3 mb-3 bg-light position-relative mt-3">
                     <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 btn-hapus-paket"><i class="mdi mdi-close"></i> Hapus</button>
-                    <h6 class="text-secondary mb-3">Paket Detail ${paketCount}</h6>
+                    <h6 class="text-secondary mb-3">Paket Detail \${paketCount}</h6>
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Kategori <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
@@ -439,6 +470,9 @@
                         <label class="col-sm-4 col-form-label">Keterangan</label>
                         <div class="col-sm-8">
                             <textarea class="form-control keterangan-input" name="keterangan[]" rows="3" placeholder="Jelaskan detail permintaan Anda..."></textarea>
+                            <small class="text-muted fst-italic">
+                                Disarankan mencantumkan nama dokter pemberi advis.
+                            </small>
                         </div>
                     </div>
 
@@ -446,9 +480,17 @@
                         <label class="col-sm-4 col-form-label text-success">Detail Obat <span class="text-danger">*</span></label>
                         <div class="col-sm-8">
                             <div class="form-control obat-input-div" contenteditable="true" style="min-height: 80px; resize: vertical; overflow: auto;" data-placeholder="Ketik @ untuk tag nama obat, atau ketik teks biasa..."></div>
-                            <textarea class="obat-input d-none" name="detail_obat[]"></textarea>
                         </div>
                     </div>
+
+                    <div class="form-group row d-none detail-lab-group">
+                        <label class="col-sm-4 col-form-label text-info">Detail LAB <span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="form-control lab-input-div" contenteditable="true" style="min-height: 80px; resize: vertical; overflow: auto;" data-placeholder="Ketik @ untuk tag nama pemeriksaan lab, atau ketik teks biasa..."></div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" class="obat-input" name="detail_obat[]">
 
                     <div class="form-group row">
                         <label class="col-sm-4 col-form-label">Indikasi <span class="text-danger">*</span></label>
@@ -521,21 +563,62 @@
             replaceTextSuffix: ''
         });
 
+        var tributeLab = new Tribute({
+            trigger: '@',
+            values: function (text, cb) {
+                if(text.length < 2) return cb([]);
+                $.ajax({
+                    url: "{{ route('admin.lab.search') }}",
+                    data: { q: text },
+                    dataType: 'json',
+                    success: function (data) {
+                        var mapped = data.map(function (item) {
+                            return {
+                                key: item.nama_item + ' (' + item.kode_item + ')',
+                                value: item.nama_item,
+                                warna: item.warna
+                            };
+                        });
+                        cb(mapped);
+                    }
+                });
+            },
+            selectTemplate: function (item) {
+                if (typeof item === 'undefined') return null;
+                var badgeClass = 'bg-secondary';
+                if (item.original.warna === 'hijau') badgeClass = 'bg-success';
+                else if (item.original.warna === 'kuning') badgeClass = 'bg-warning text-dark';
+                else if (item.original.warna === 'merah') badgeClass = 'bg-danger';
+
+                return '<span contenteditable="false" class="badge ' + badgeClass + '">' + item.original.value + '</span> ';
+            },
+            menuItemTemplate: function (item) {
+                return item.string;
+            },
+            replaceTextSuffix: ''
+        });
+
         function attachTribute() {
             tribute.attach(document.querySelectorAll('.obat-input-div'));
+            tributeLab.attach(document.querySelectorAll('.lab-input-div'));
         }
 
         // Sync contenteditable to hidden textarea
         $(document).on('input', '.obat-input-div', function() {
             var content = $(this).html();
-            $(this).siblings('.obat-input').val(content);
+            $(this).closest('.paket-item').find('.obat-input').val(content);
+        });
+
+        $(document).on('input', '.lab-input-div', function() {
+            var content = $(this).html();
+            $(this).closest('.paket-item').find('.obat-input').val(content);
         });
 
         // Initialize Tribute on page load
         attachTribute();
 
         // Re-attach Tribute and fix placeholder behavior
-        $(document).on('focus', '.obat-input-div', function() {
+        $(document).on('focus', '.obat-input-div, .lab-input-div', function() {
             if ($(this).html().trim() === '<br>') $(this).html('');
         });
 

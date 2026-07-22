@@ -177,13 +177,27 @@ class ListPermintaanController extends Controller
                         $status = 'batal';
                     }
     
-                    $data->update([
+                    $updateFields = [
                         'status' => $status,
                         'manager_id' => Auth::user()->id,
                         'status_angka' => $request->angka,
                         'tanggal_jam_respon' => date('Y-m-d H:i:s'),
                         'catatan_diterima' => $request->catatan,
-                    ]);
+                    ];
+
+                    if (!empty($data->detail_paket) && is_array($data->detail_paket)) {
+                        $detail_paket = $data->detail_paket;
+                        foreach ($detail_paket as $idx => $paket) {
+                            $detail_paket[$idx]['status'] = $status;
+                            $detail_paket[$idx]['catatan'] = $request->catatan;
+                            unset($detail_paket[$idx]['jumlah_hari']);
+                            unset($detail_paket[$idx]['tanggal_mulai_expired']);
+                            unset($detail_paket[$idx]['tanggal_berakhir_expired']);
+                        }
+                        $updateFields['detail_paket'] = $detail_paket;
+                    }
+
+                    $data->update($updateFields);
                 }
             }
 
