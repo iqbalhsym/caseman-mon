@@ -206,34 +206,48 @@ class PermintaanController extends Controller
                 'jam'          => date('H:i'),
             ]);
 
+            $minioBaseUrl = rtrim(env('MINIO_ENDPOINT', 'https://assets.rs.ui.ac.id'), '/') . '/' . env('MINIO_BUCKET', 'case-manager') . '/';
+
             if ($request->hasFile('file')) {
                 if ($data->file != null) {
-                    $image_path = public_path($data->file);
-                    if (file_exists($image_path)) unlink($image_path);
+                    if (str_starts_with($data->file, $minioBaseUrl)) {
+                        \Illuminate\Support\Facades\Storage::disk('minio')->delete(str_replace($minioBaseUrl, '', $data->file));
+                    } else {
+                        $image_path = public_path($data->file);
+                        if (file_exists($image_path)) unlink($image_path);
+                    }
                 }
                 $filename = $data->uuid . '.' . $request->file('file')->getClientOriginalExtension();
-                $path     = $request->file('file')->storeAs('permintaan', $filename, 'public');
-                $data->update(['file' => 'storage/' . $path]);
+                $path     = $request->file('file')->storeAs('permintaan', $filename, 'minio');
+                $data->update(['file' => \Illuminate\Support\Facades\Storage::disk('minio')->url($path)]);
             }
 
             if ($request->hasFile('file2')) {
                 if ($data->file2 != null) {
-                    $image_path = public_path($data->file2);
-                    if (file_exists($image_path)) unlink($image_path);
+                    if (str_starts_with($data->file2, $minioBaseUrl)) {
+                        \Illuminate\Support\Facades\Storage::disk('minio')->delete(str_replace($minioBaseUrl, '', $data->file2));
+                    } else {
+                        $image_path = public_path($data->file2);
+                        if (file_exists($image_path)) unlink($image_path);
+                    }
                 }
                 $filename = $data->uuid . 'ke2' . '.' . $request->file('file2')->getClientOriginalExtension();
-                $path     = $request->file('file2')->storeAs('permintaan', $filename, 'public');
-                $data->update(['file2' => 'storage/' . $path]);
+                $path     = $request->file('file2')->storeAs('permintaan', $filename, 'minio');
+                $data->update(['file2' => \Illuminate\Support\Facades\Storage::disk('minio')->url($path)]);
             }
 
             if ($request->hasFile('file3')) {
                 if ($data->file3 != null) {
-                    $image_path = public_path($data->file3);
-                    if (file_exists($image_path)) unlink($image_path);
+                    if (str_starts_with($data->file3, $minioBaseUrl)) {
+                        \Illuminate\Support\Facades\Storage::disk('minio')->delete(str_replace($minioBaseUrl, '', $data->file3));
+                    } else {
+                        $image_path = public_path($data->file3);
+                        if (file_exists($image_path)) unlink($image_path);
+                    }
                 }
                 $filename = $data->uuid . 'ke3' . '.' . $request->file('file3')->getClientOriginalExtension();
-                $path     = $request->file('file3')->storeAs('permintaan', $filename, 'public');
-                $data->update(['file3' => 'storage/' . $path]);
+                $path     = $request->file('file3')->storeAs('permintaan', $filename, 'minio');
+                $data->update(['file3' => \Illuminate\Support\Facades\Storage::disk('minio')->url($path)]);
             }
 
             if ($manager && $manager->user && $manager->user->phone) {
@@ -633,34 +647,48 @@ class PermintaanController extends Controller
 
             $data->update($updateData);
 
+            $minioBaseUrl = rtrim(env('MINIO_ENDPOINT', 'https://assets.rs.ui.ac.id'), '/') . '/' . env('MINIO_BUCKET', 'case-manager') . '/';
+
             if ($request->hasFile('file')) {
                 if ($data->file != null) {
-                    $image_path = public_path($data->file);
-                    if (file_exists($image_path)) unlink($image_path);
+                    if (str_starts_with($data->file, $minioBaseUrl)) {
+                        \Illuminate\Support\Facades\Storage::disk('minio')->delete(str_replace($minioBaseUrl, '', $data->file));
+                    } else {
+                        $image_path = public_path($data->file);
+                        if (file_exists($image_path)) unlink($image_path);
+                    }
                 }
                 $filename = $data->uuid . '.' . $request->file('file')->getClientOriginalExtension();
-                $path     = $request->file('file')->storeAs('permintaan', $filename, 'public');
-                $data->update(['file' => 'storage/' . $path]);
+                $path     = $request->file('file')->storeAs('permintaan', $filename, 'minio');
+                $data->update(['file' => \Illuminate\Support\Facades\Storage::disk('minio')->url($path)]);
             }
 
             if ($request->hasFile('file2')) {
                 if ($data->file2 != null) {
-                    $image_path = public_path($data->file2);
-                    if (file_exists($image_path)) unlink($image_path);
+                    if (str_starts_with($data->file2, $minioBaseUrl)) {
+                        \Illuminate\Support\Facades\Storage::disk('minio')->delete(str_replace($minioBaseUrl, '', $data->file2));
+                    } else {
+                        $image_path = public_path($data->file2);
+                        if (file_exists($image_path)) unlink($image_path);
+                    }
                 }
                 $filename = $data->uuid . 'ke2' . '.' . $request->file('file2')->getClientOriginalExtension();
-                $path     = $request->file('file2')->storeAs('permintaan', $filename, 'public');
-                $data->update(['file2' => 'storage/' . $path]);
+                $path     = $request->file('file2')->storeAs('permintaan', $filename, 'minio');
+                $data->update(['file2' => \Illuminate\Support\Facades\Storage::disk('minio')->url($path)]);
             }
 
             if ($request->hasFile('file3')) {
                 if ($data->file3 != null) {
-                    $image_path = public_path($data->file3);
-                    if (file_exists($image_path)) unlink($image_path);
+                    if (str_starts_with($data->file3, $minioBaseUrl)) {
+                        \Illuminate\Support\Facades\Storage::disk('minio')->delete(str_replace($minioBaseUrl, '', $data->file3));
+                    } else {
+                        $image_path = public_path($data->file3);
+                        if (file_exists($image_path)) unlink($image_path);
+                    }
                 }
                 $filename = $data->uuid . 'ke3' . '.' . $request->file('file3')->getClientOriginalExtension();
-                $path     = $request->file('file3')->storeAs('permintaan', $filename, 'public');
-                $data->update(['file3' => 'storage/' . $path]);
+                $path     = $request->file('file3')->storeAs('permintaan', $filename, 'minio');
+                $data->update(['file3' => \Illuminate\Support\Facades\Storage::disk('minio')->url($path)]);
             }
 
             // 2. Tambahan pembaruan keputusan jika role adalah casemanager atau administrator
