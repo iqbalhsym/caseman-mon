@@ -280,6 +280,48 @@
             </div>
         </div>
 
+    {{-- Tombol Navigasi Scroll (Scroll to Up & Scroll to Down) --}}
+    <button id="btnScrollDown" type="button" title="Scroll ke Bawah" style="
+        display: none;
+        position: fixed;
+        bottom: 132px;
+        right: 16px;
+        z-index: 997;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #1f3bb3;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        font-size: 18px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    ">
+        <i class="mdi mdi-chevron-down"></i>
+    </button>
+    <button id="btnScrollTop" type="button" title="Scroll ke Atas" style="
+        display: none;
+        position: fixed;
+        bottom: 80px;
+        right: 16px;
+        z-index: 997;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #1f3bb3;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        font-size: 18px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    ">
+        <i class="mdi mdi-chevron-up"></i>
+    </button>
+
     @push('script')
         <script>
             const initialSubmissions = @json($datas);
@@ -560,6 +602,35 @@
                 e.stopPropagation(); // cegah event naik ke sidebar
                 var drawer = new bootstrap.Offcanvas(document.getElementById('filterDrawer'));
                 drawer.show();
+            });
+
+            // Tombol navigasi scroll (Scroll to Up & Scroll to Down)
+            const btnScrollTop = document.getElementById('btnScrollTop');
+            const btnScrollDown = document.getElementById('btnScrollDown');
+
+            function toggleScrollButtons() {
+                const scrollY = window.scrollY;
+                const atBottom = (window.innerHeight + scrollY) >= (document.documentElement.scrollHeight - 10);
+
+                btnScrollTop.style.display = scrollY > 300 ? 'flex' : 'none';
+                btnScrollDown.style.display = atBottom ? 'none' : 'flex';
+            }
+
+            window.addEventListener('scroll', toggleScrollButtons);
+            window.addEventListener('resize', toggleScrollButtons);
+            toggleScrollButtons();
+
+            // Recheck tombol setiap kali daftar berubah (filter/search/load more)
+            if (submissionListContainer) {
+                new MutationObserver(toggleScrollButtons).observe(submissionListContainer, { childList: true });
+            }
+
+            btnScrollTop.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            btnScrollDown.addEventListener('click', function () {
+                window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
             });
         </script>
     @endpush
