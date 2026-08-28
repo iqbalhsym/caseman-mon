@@ -538,10 +538,12 @@
                     success: function (data) {
                         var mapped = data.map(function (item) {
                             var generic = item.nama_generik ? ' - ' + item.nama_generik : '';
+                            var fnf     = item.f_nf ? '[' + item.f_nf + ']  ' : '';
                             return {
-                                key: item.nama_item + ' (' + item.kode_item + ')' + generic,
+                                key:   fnf + item.nama_item + ' (' + item.kode_item + ')' + generic,
                                 value: item.nama_item,
-                                warna: item.warna
+                                warna: item.warna,
+                                f_nf:  item.f_nf
                             };
                         });
                         cb(mapped);
@@ -555,7 +557,8 @@
                 else if (item.original.warna === 'kuning') badgeClass = 'bg-warning text-dark';
                 else if (item.original.warna === 'merah') badgeClass = 'bg-danger';
 
-                return '<span contenteditable="false" class="badge ' + badgeClass + '">' + item.original.value + '</span> ';
+                var fnfLabel = item.original.f_nf ? ' [' + item.original.f_nf + ']' : '';
+                return '<span contenteditable="false" class="badge ' + badgeClass + '">' + item.original.value + fnfLabel + '</span> ';
             },
             menuItemTemplate: function (item) {
                 return item.string;

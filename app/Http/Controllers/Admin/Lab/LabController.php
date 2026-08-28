@@ -17,9 +17,35 @@ class LabController extends Controller
      */
     public function index()
     {
-        $data = Lab::orderBy('created_at', 'desc')->get();
+        return view('admin.lab.index');
+    }
 
-        return view('admin.lab.index', compact('data'));
+    /**
+     * Server-side paginated data for AJAX (search + filter warna)
+     */
+    public function getData(Request $request)
+    {
+        $query = Lab::query();
+
+        if ($request->filled('search')) {
+            $q = strtolower($request->search);
+            $query->where(function ($sub) use ($q) {
+                $sub->whereRaw('lower(nama_item) like ?', ["%{$q}%"])
+                    ->orWhereRaw('lower(kode_item) like ?', ["%{$q}%"]);
+            });
+        }
+
+        if ($request->filled('warna')) {
+            if ($request->warna === '-') {
+                $query->whereNull('warna');
+            } else {
+                $query->where('warna', $request->warna);
+            }
+        }
+
+        $data = $query->orderBy('nama_item', 'asc')->paginate(20);
+
+        return response()->json($data);
     }
 
     /**
@@ -27,8 +53,8 @@ class LabController extends Controller
      */
     public function create()
     {
-        $data = Lab::orderBy('created_at', 'desc')->get();
-        return response()->json(['status'=> 'success' ,'data' => $data]);
+        // Kept for backward compatibility (tidak digunakan lagi oleh tabel utama)
+        return response()->json(['status' => 'success', 'data' => []]);
     }
 
     /**

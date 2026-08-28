@@ -23,6 +23,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .pagination .page-link { font-size: 0.82rem; }
     </style>
 
     <div class="row">
@@ -37,8 +38,8 @@
                 </div>
 
                 <div class="tab-content tab-content-basic">
-                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview"> 
-                        
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+
                         {{-- Card Pencarian (Toolbar) --}}
                         <div class="row compact-margin">
                             <div class="col-12 stretch-card">
@@ -99,32 +100,19 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody id="lab-table-body">
-                                                    @forelse ($data as $item)
-                                                        <tr class="lab-row" data-id="{{ $item->id }}" data-warna="{{ $item->warna ?? '-' }}">
-                                                            <td><span class="badge badge-info">{{ $item->kode_item }}</span></td>
-                                                            <td><h6 class="mb-0 col-nama-item" title="{{ $item->nama_item }}">{{ $item->nama_item }}</h6></td>
-                                                            <td>
-                                                                @if($item->warna == 'hijau')
-                                                                    <span class="badge bg-success">Hijau</span>
-                                                                @elseif($item->warna == 'kuning')
-                                                                    <span class="badge bg-warning text-dark">Kuning</span>
-                                                                @elseif($item->warna == 'merah')
-                                                                    <span class="badge bg-danger">Merah</span>
-                                                                @else
-                                                                    <span class="badge bg-secondary">-</span>
-                                                                @endif
-                                                            </td>
-                                                            <td>
-                                                                <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="{{ $item->id }}" title="Edit"><i class="mdi mdi-pencil"></i></button>
-                                                                <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="{{ $item->id }}" title="Hapus"><i class="mdi mdi-delete"></i></button>
-                                                            </td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr><td colspan="4" class="text-center py-4">Belum ada data pemeriksaan LAB</td></tr>
-                                                    @endforelse
+                                                    <tr><td colspan="4" class="text-center py-4"><i class="mdi mdi-loading mdi-spin"></i> Memuat data...</td></tr>
                                                 </tbody>
                                             </table>
                                         </div>
+
+                                        {{-- Pagination & Info --}}
+                                        <div class="d-flex justify-content-between align-items-center mt-2 flex-wrap gap-2">
+                                            <small class="text-muted" id="lab-info"></small>
+                                            <nav aria-label="Pagination LAB">
+                                                <ul class="pagination pagination-sm mb-0" id="lab-pagination"></ul>
+                                            </nav>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -147,7 +135,7 @@
                 <form id="formInput">
                     <div class="modal-body">
                         <input type="hidden" id="product_id" name="product_id">
-                        
+
                         <div class="form-group mb-3">
                             <label for="kode_item" class="form-label">Kode Item</label>
                             <input type="text" class="form-control" id="kode_item" name="kode_item" placeholder="Masukkan kode item (misal: LAB-0001)...">
@@ -217,9 +205,109 @@
 
     @push('script')
         <script>
-            const inputModal = new bootstrap.Modal(document.getElementById('add-lab-modal'));
+            const inputModal  = new bootstrap.Modal(document.getElementById('add-lab-modal'));
             const importModal = new bootstrap.Modal(document.getElementById('import-modal'));
 
+            let currentPage  = 1;
+            let debounceTimer = null;
+
+            // ─── Load Data (Server-side Pagination) ───────────────────────────────
+            function loadLab(page) {
+                currentPage = page || 1;
+                const search = $('#lab-search').val();
+                const warna  = $('#lab-color-filter').val();
+
+                $('#lab-table-body').html('<tr><td colspan="4" class="text-center py-3"><i class="mdi mdi-loading mdi-spin"></i> Memuat...</td></tr>');
+
+                $.ajax({
+                    url: "{{ route('admin.lab.data') }}",
+                    type: "GET",
+                    data: { search, warna, page: currentPage },
+                    dataType: 'json',
+                    success: function (res) {
+                        renderTable(res);
+                        renderPagination(res);
+                        if (res.from && res.to) {
+                            $('#lab-info').text('Menampilkan ' + res.from + '–' + res.to + ' dari ' + res.total + ' data');
+                        } else {
+                            $('#lab-info').text('');
+                        }
+                    },
+                    error: function () {
+                        $('#lab-table-body').html('<tr><td colspan="4" class="text-center text-danger">Gagal memuat data.</td></tr>');
+                    }
+                });
+            }
+
+            function renderTable(res) {
+                if (!res.data || res.data.length === 0) {
+                    $('#lab-table-body').html('<tr><td colspan="4" class="text-center py-4">Tidak ada data LAB ditemukan.</td></tr>');
+                    $('#lab-info').text('');
+                    return;
+                }
+
+                let html = '';
+                res.data.forEach(function (el) {
+                    let badgeWarna = '<span class="badge bg-secondary">-</span>';
+                    if (el.warna === 'hijau')  badgeWarna = '<span class="badge bg-success">Hijau</span>';
+                    if (el.warna === 'kuning') badgeWarna = '<span class="badge bg-warning text-dark">Kuning</span>';
+                    if (el.warna === 'merah')  badgeWarna = '<span class="badge bg-danger">Merah</span>';
+
+                    html += `<tr class="lab-row" data-id="${el.id}" data-warna="${el.warna || '-'}">
+                        <td><span class="badge badge-info">${el.kode_item || '-'}</span></td>
+                        <td><h6 class="mb-0 col-nama-item" title="${el.nama_item || '-'}">${el.nama_item || '-'}</h6></td>
+                        <td>${badgeWarna}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-primary text-white edit" data-id="${el.id}" title="Edit"><i class="mdi mdi-pencil"></i></button>
+                            <button type="button" class="btn btn-sm btn-danger text-white delete" data-id="${el.id}" title="Hapus"><i class="mdi mdi-delete"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                $('#lab-table-body').html(html);
+            }
+
+            function renderPagination(res) {
+                if (res.last_page <= 1) {
+                    $('#lab-pagination').html('');
+                    return;
+                }
+
+                let pages = '';
+                pages += `<li class="page-item ${res.current_page === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${res.current_page - 1}">&laquo;</a></li>`;
+
+                let start = Math.max(1, res.current_page - 2);
+                let end   = Math.min(res.last_page, res.current_page + 2);
+                if (start > 1) pages += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+                for (let i = start; i <= end; i++) {
+                    pages += `<li class="page-item ${i === res.current_page ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                }
+                if (end < res.last_page) pages += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+
+                pages += `<li class="page-item ${res.current_page === res.last_page ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${res.current_page + 1}">&raquo;</a></li>`;
+
+                $('#lab-pagination').html(pages);
+            }
+
+            // Pagination click
+            $(document).on('click', '#lab-pagination .page-link', function (e) {
+                e.preventDefault();
+                const page = parseInt($(this).data('page'));
+                if (page && page !== currentPage) loadLab(page);
+            });
+
+            // Search — debounce 400ms
+            $('#lab-search').on('input', function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function () { loadLab(1); }, 400);
+            });
+
+            // Color filter
+            $('#lab-color-filter').on('change', function () { loadLab(1); });
+
+            // ─── Modal Tambah ──────────────────────────────────────────────────────
             $('#add').click(function () {
                 $('#formInput')[0].reset();
                 $('#product_id').val('');
@@ -232,35 +320,63 @@
                 importModal.show();
             });
 
-            // Live Search Client-side
-            function filterTable() {
-                const searchVal = $('#lab-search').val().toLowerCase();
-                const colorFilter = $('#lab-color-filter').val();
+            // ─── Save ──────────────────────────────────────────────────────────────
+            $('#formInput').submit(function (e) {
+                e.preventDefault();
+                const $btn = $('#save-btn');
+                $btn.prop('disabled', true).html('Saving <i class="mdi mdi-loading mdi-spin"></i>');
 
-                $('.lab-row').each(function () {
-                    const row = $(this);
-                    const kode = row.find('td:nth-child(1)').text().toLowerCase();
-                    const nama = row.find('h6').text().toLowerCase();
-                    const warna = row.data('warna');
-
-                    const matchesSearch = kode.includes(searchVal) || nama.includes(searchVal);
-                    const matchesColor = !colorFilter || (colorFilter === '-' && warna === '-') || (warna === colorFilter);
-
-                    if (matchesSearch && matchesColor) {
-                        row.show();
-                    } else {
-                        row.hide();
-                    }
+                $.ajax({
+                    data: $(this).serialize() + '&_token=' + $('meta[name="csrf-token"]').attr('content'),
+                    url: "{{ route('admin.lab.store') }}",
+                    type: "POST",
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.status === 'success') {
+                            showToast(data.message, 'success');
+                            inputModal.hide();
+                            loadLab(currentPage);
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    },
+                    error: function (data) { showToast(data.responseText, 'error'); },
+                    complete: function () { $btn.prop('disabled', false).html('Simpan'); }
                 });
-            }
+            });
 
-            $('#lab-search').on('keyup', filterTable);
-            $('#lab-color-filter').on('change', filterTable);
+            // ─── Import ────────────────────────────────────────────────────────────
+            $('#formImport').submit(function (e) {
+                e.preventDefault();
+                const $btn = $('#import-save-btn');
+                $btn.prop('disabled', true).html('Importing <i class="mdi mdi-loading mdi-spin"></i>');
 
-            // Edit
+                var formData = new FormData(this);
+                formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+
+                $.ajax({
+                    data: formData,
+                    url: "{{ route('admin.lab.import') }}",
+                    type: "POST",
+                    cache: false, contentType: false, processData: false,
+                    success: function (data) {
+                        if (data.status === 'success') {
+                            showToast(data.message, 'success');
+                            importModal.hide();
+                            loadLab(1);
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    },
+                    error: function (data) { showToast(data.responseText, 'error'); },
+                    complete: function () { $btn.prop('disabled', false).html('Mulai Import'); }
+                });
+            });
+
+            // ─── Edit ──────────────────────────────────────────────────────────────
             $('body').on('click', '.edit', function () {
-                var id = $(this).data("id");
-                $.get("{{ route('admin.lab.index') }}" +'/' + id +'/edit', function (data) {
+                const id = $(this).data("id");
+                $.get("{{ route('admin.lab.index') }}/" + id + '/edit', function (data) {
                     if (data.status === 'success') {
                         $('#formInput')[0].reset();
                         $('#addLabModalLabel').html("Edit Data LAB");
@@ -275,74 +391,9 @@
                 });
             });
 
-            // Save
-            $('#formInput').submit(function (e) {
-                e.preventDefault();
-                $('#save-btn').prop('disabled', true);
-                $('#save-btn').html('Saving <i class="mdi mdi-loading mdi-spin"></i>');
-
-                $.ajax({
-                    data: $('#formInput').serialize() + '&_token=' + $('meta[name="csrf-token"]').attr('content'),
-                    url: "{{ route('admin.lab.store') }}",
-                    type: "POST",
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data.status === 'success') {
-                            showToast(data.message, 'success');
-                            inputModal.hide();
-                            setTimeout(() => { window.location.reload(); }, 800);
-                        } else {
-                            showToast(data.message, 'error');
-                            $('#save-btn').prop('disabled', false);
-                            $('#save-btn').html('Simpan');
-                        }
-                    },
-                    error: function (data) {
-                        showToast(data.responseText, 'error');
-                        $('#save-btn').prop('disabled', false);
-                        $('#save-btn').html('Simpan');
-                    }
-                });
-            });
-
-            // Import
-            $('#formImport').submit(function (e) {
-                e.preventDefault();
-                $('#import-save-btn').prop('disabled', true);
-                $('#import-save-btn').html('Importing <i class="mdi mdi-loading mdi-spin"></i>');
-
-                var formData = new FormData(this);
-                formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
-
-                $.ajax({
-                    data: formData,
-                    url: "{{ route('admin.lab.import') }}",
-                    type: "POST",
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function (data) {
-                        if (data.status === 'success') {
-                            showToast(data.message, 'success');
-                            importModal.hide();
-                            setTimeout(() => { window.location.reload(); }, 800);
-                        } else {
-                            showToast(data.message, 'error');
-                            $('#import-save-btn').prop('disabled', false);
-                            $('#import-save-btn').html('Mulai Import');
-                        }
-                    },
-                    error: function (data) {
-                        showToast(data.responseText, 'error');
-                        $('#import-save-btn').prop('disabled', false);
-                        $('#import-save-btn').html('Mulai Import');
-                    }
-                });
-            });
-
-            // Delete
+            // ─── Delete ───────────────────────────────────────────────────────────
             $('body').on('click', '.delete', function () {
-                var id = $(this).data("id");
+                const id = $(this).data("id");
                 Swal.fire({
                     title: 'Yakin Ingin Menghapus Data LAB?',
                     text: "Data yang dihapus tidak dapat dikembalikan!",
@@ -356,25 +407,24 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             type: "DELETE",
-                            url: "{{ route('admin.lab.index') }}" + '/' + id,
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
+                            url: "{{ route('admin.lab.index') }}/" + id,
+                            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                             success: function (data) {
                                 if (data.status === 'success') {
                                     showToast(data.message, 'success');
-                                    setTimeout(() => { window.location.reload(); }, 800);
+                                    loadLab(currentPage);
                                 } else {
-                                    Swal.fire("Gagal !!", data.message, "error");
+                                    Swal.fire("Gagal!!", data.message, "error");
                                 }
                             },
-                            error: function (data) {
-                                Swal.fire("Gagal !!", data.responseText, "error");
-                            }
+                            error: function (data) { Swal.fire("Gagal!!", data.responseText, "error"); }
                         });
                     }
                 });
             });
+
+            // ─── Init ─────────────────────────────────────────────────────────────
+            loadLab(1);
         </script>
     @endpush
 </x-staradmin>

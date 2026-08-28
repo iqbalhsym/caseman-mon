@@ -17,9 +17,36 @@ class ObatController extends Controller
      */
     public function index()
     {
-        $data = Obat::orderBy('created_at', 'desc')->get();
+        return view('admin.obat.index');
+    }
 
-        return view('admin.obat.index', compact('data'));
+    /**
+     * Server-side paginated data for AJAX (search + filter warna)
+     */
+    public function getData(Request $request)
+    {
+        $query = Obat::query();
+
+        if ($request->filled('search')) {
+            $q = strtolower($request->search);
+            $query->where(function ($sub) use ($q) {
+                $sub->whereRaw('lower(nama_item) like ?', ["%{$q}%"])
+                    ->orWhereRaw('lower(kode_item) like ?', ["%{$q}%"])
+                    ->orWhereRaw('lower(nama_generik) like ?', ["%{$q}%"]);
+            });
+        }
+
+        if ($request->filled('warna')) {
+            if ($request->warna === '-') {
+                $query->whereNull('warna');
+            } else {
+                $query->where('warna', $request->warna);
+            }
+        }
+
+        $data = $query->orderBy('nama_item', 'asc')->paginate(20);
+
+        return response()->json($data);
     }
 
     /**
@@ -27,8 +54,8 @@ class ObatController extends Controller
      */
     public function create()
     {
-        $data = Obat::orderBy('created_at', 'desc')->get();
-        return response()->json(['status'=> 'success' ,'data' => $data]);
+        // Kept for backward compatibility (tidak digunakan lagi oleh tabel utama)
+        return response()->json(['status' => 'success', 'data' => []]);
     }
 
     /**
@@ -146,7 +173,7 @@ class ObatController extends Controller
                      ->orWhere(DB::raw('lower(kode_item)'), 'like', "%{$query}%")
                      ->orWhere(DB::raw('lower(nama_generik)'), 'like', "%{$query}%")
                      ->limit(20)
-                     ->get(['id', 'kode_item', 'nama_item', 'nama_generik', 'warna']);
+                     ->get(['id', 'kode_item', 'nama_item', 'nama_generik', 'warna', 'f_nf']);
 
         return response()->json($obats);
     }

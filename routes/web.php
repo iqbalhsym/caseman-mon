@@ -42,9 +42,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (){
 
 Route::post('obat/import', [ObatController::class, 'import'])->name('obat.import');
     Route::get('obat/export', [ObatController::class, 'export'])->name('obat.export');
+    Route::get('obat/data', [ObatController::class, 'getData'])->name('obat.data');
     Route::get('obat-search', [ObatController::class, 'searchObat'])->name('obat.search');
     Route::post('lab/import', [LabController::class, 'import'])->name('lab.import');
     Route::get('lab/export', [LabController::class, 'export'])->name('lab.export');
+    Route::get('lab/data', [LabController::class, 'getData'])->name('lab.data');
     Route::get('lab-search', [LabController::class, 'searchLab'])->name('lab.search');
     Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
 
