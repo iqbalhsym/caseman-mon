@@ -30,16 +30,16 @@
                                 <h5 class="text-primary mb-4 border-bottom pb-2">Data Pasien & Lokasi</h5>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="tanggal_masuk">Tanggal Masuk <span class="text-danger">*</span></label>
+                                    <label class="col-sm-4 col-form-label" for="no_rm">No. Rekam Medis <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
-                                        <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d') }}">
+                                        <input type="text" class="form-control" id="no_rm" name="no_rm" placeholder="Masukkan No. RM...">
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-4 col-form-label" for="no_rm">No. Rekam Medis <span class="text-danger">*</span></label>
+                                    <label class="col-sm-4 col-form-label" for="tanggal_masuk">Tanggal Masuk <span class="text-danger">*</span></label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="no_rm" name="no_rm" placeholder="Masukkan No. RM...">
+                                        <input type="date" class="form-control" id="tanggal_masuk" name="tanggal_masuk" value="{{ date('Y-m-d') }}">
                                     </div>
                                 </div>
 
